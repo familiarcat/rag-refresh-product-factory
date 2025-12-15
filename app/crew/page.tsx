@@ -175,25 +175,12 @@ export default function CrewPage() {
             marginTop: 16
           }}>
             <div className="divisionHeader" style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 12, 
               marginBottom: 16,
               paddingBottom: 12,
               borderBottom: `2px solid ${config.color}40`
             }}>
-              <span style={{ 
-                display: 'inline-block',
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                backgroundColor: config.color,
-                boxShadow: `0 0 12px ${config.color}60`
-              }} />
-              <div>
-                <h2 style={{ margin: 0 }}>{config.emoji} {config.name}</h2>
-                <p className="small" style={{ margin: 0, opacity: 0.7 }}>{config.description}</p>
-              </div>
+              <h2 style={{ margin: 0, color: config.color }}>{config.name}</h2>
+              <p className="small" style={{ margin: '4px 0 0 0', opacity: 0.7 }}>{config.description}</p>
             </div>
             <div className="grid">
               {divisionCrew.map(c => (
@@ -217,28 +204,14 @@ export default function CrewPage() {
                 key={division} 
                 className="span-3" 
                 style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 10,
                   padding: '12px 16px',
                   borderRadius: 12,
                   background: `radial-gradient(ellipse 300px 200px at 0% 0%, ${config.color}40 0%, transparent 80%)`,
                   border: `1px solid ${config.color}40`
                 }}
               >
-                <span style={{ 
-                  display: 'inline-block',
-                  width: 24,
-                  height: 24,
-                  borderRadius: '50%',
-                  backgroundColor: config.color,
-                  boxShadow: `0 0 10px ${config.color}60`,
-                  flexShrink: 0
-                }} />
-                <div>
-                  <strong>{config.emoji} {division}</strong>
-                  <p className="small" style={{ margin: 0, opacity: 0.8 }}>{config.description}</p>
-                </div>
+                <strong style={{ color: config.color }}>{division}</strong>
+                <p className="small" style={{ margin: '4px 0 0 0', opacity: 0.8 }}>{config.description}</p>
               </div>
             );
           })}
