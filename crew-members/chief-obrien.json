@@ -10,8 +10,7 @@
     "grade": "E-8",
     "title": "Senior Chief Petty Officer",
     "order": 6,
-    "enlisted": true,
-    "note": "Highest-ranking enlisted; served under La Forge on Enterprise-D, Chief of Operations on DS9"
+    "enlisted": true
   },
   "specialization": [
     "Pragmatic Solutions",
