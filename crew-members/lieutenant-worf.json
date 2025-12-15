@@ -1,6 +1,7 @@
 {
   "id": "lieutenant_worf",
   "name": "Lieutenant Worf",
+  "callName": "Worf",
   "role": "Chief Security Officer",
   "department": "Security & Tactical",
   "division": "Operations",

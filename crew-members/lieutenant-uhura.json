@@ -1,6 +1,7 @@
 {
   "id": "lieutenant_uhura",
   "name": "Lieutenant Uhura",
+  "callName": "Uhura",
   "role": "Communications Officer",
   "department": "Communications",
   "division": "Operations",

@@ -1,6 +1,7 @@
 {
   "id": "counselor_troi",
   "name": "Counselor Deanna Troi",
+  "callName": "Troi",
   "role": "Ship's Counselor",
   "department": "Counseling",
   "division": "Sciences",

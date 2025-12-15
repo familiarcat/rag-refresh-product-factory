@@ -1,6 +1,7 @@
 {
   "id": "geordi_la_forge",
   "name": "Lieutenant Commander Geordi La Forge",
+  "callName": "La Forge",
   "role": "Chief Engineer",
   "department": "Engineering",
   "division": "Operations",

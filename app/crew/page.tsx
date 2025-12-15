@@ -86,6 +86,7 @@ function loadCrewMembers(): CrewMemberData[] {
     return {
       id: data.id,
       name: data.name,
+      callName: data.callName || data.name.split(' ').pop() || data.name,
       role: data.role,
       department: data.department,
       division: data.division || 'Operations',

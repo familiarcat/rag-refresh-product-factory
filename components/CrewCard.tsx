@@ -6,6 +6,7 @@ import Image from 'next/image';
 export interface CrewMemberData {
   id: string;
   name: string;
+  callName?: string;
   role: string;
   department: string;
   division?: string;
@@ -158,7 +159,7 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
 
       <div className="crewActions">
         <Link href={`/crew/${crew.id}`} className="btn">View Profile</Link>
-        <Link href={`/ask?crew=${crew.id}`} className="btnPrimary">Ask {crew.name.split(' ')[0]}</Link>
+        <Link href={`/ask?crew=${crew.id}`} className="btnPrimary">Ask {crew.callName || crew.name}</Link>
       </div>
     </div>
   );
@@ -200,7 +201,7 @@ export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
               />
             </div>
             <div className="statusInfo">
-              <div className="statusName">{c.name.split(' ').pop()}</div>
+              <div className="statusName">{c.callName || c.name}</div>
               <div className="statusRole">{c.role.split(' ')[0]}</div>
             </div>
             <div 

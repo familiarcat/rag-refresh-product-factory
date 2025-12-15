@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 interface CrewMember {
   id: string;
   name: string;
+  callName?: string;
   role: string;
   department: string;
   specialization: string[];
@@ -101,7 +102,7 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
           </div>
           <div className="profileActions">
             <Link href={`/ask?crew=${crew.id}`} className="btnPrimary">
-              💬 Ask {crew.name.split(' ')[0]}
+              💬 Ask {crew.callName || crew.name}
             </Link>
           </div>
         </div>

@@ -1,16 +1,9 @@
 {
   "id": "chief_obrien",
   "name": "Chief Miles O'Brien",
+  "callName": "O'Brien",
   "role": "Chief of Operations",
-  "department": "Operations",
-  "division": "Operations",
-  "uniformColor": "gold",
-  "rank": {
-    "grade": "E-8",
-    "title": "Senior Chief Petty Officer",
-    "order": 6,
-    "enlisted": true
-  },
+  "department": "Engineering Operations",
   "specialization": [
     "Pragmatic Solutions",
     "Hands-On Implementation",

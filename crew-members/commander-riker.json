@@ -1,6 +1,7 @@
 {
   "id": "commander_riker",
   "name": "Commander William Riker",
+  "callName": "Riker",
   "role": "First Officer",
   "department": "Command",
   "division": "Command",

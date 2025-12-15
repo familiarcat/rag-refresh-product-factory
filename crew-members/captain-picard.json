@@ -1,6 +1,7 @@
 {
   "id": "captain_picard",
   "name": "Captain Jean-Luc Picard",
+  "callName": "Picard",
   "role": "Commanding Officer",
   "department": "Command",
   "division": "Command",

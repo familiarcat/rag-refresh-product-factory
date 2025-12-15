@@ -1,6 +1,7 @@
 {
   "id": "dr_crusher",
   "name": "Dr. Beverly Crusher",
+  "callName": "Dr. Crusher",
   "role": "Chief Medical Officer",
   "department": "Medical",
   "division": "Sciences",

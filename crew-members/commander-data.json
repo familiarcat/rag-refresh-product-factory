@@ -1,6 +1,7 @@
 {
   "id": "commander_data",
   "name": "Commander Data",
+  "callName": "Data",
   "role": "Second Officer / Operations",
   "department": "Operations",
   "division": "Operations",
