@@ -1,5 +1,19 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { docsNav } from '../lib/nav';
+
+const crewIds = [
+  { id: 'captain_picard', name: 'Captain Picard' },
+  { id: 'commander_data', name: 'Commander Data' },
+  { id: 'commander_riker', name: 'Commander Riker' },
+  { id: 'geordi_la_forge', name: 'Geordi La Forge' },
+  { id: 'lieutenant_worf', name: 'Lieutenant Worf' },
+  { id: 'dr_crusher', name: 'Dr. Crusher' },
+  { id: 'counselor_troi', name: 'Counselor Troi' },
+  { id: 'chief_obrien', name: "Chief O'Brien" },
+  { id: 'lieutenant_uhura', name: 'Lieutenant Uhura' },
+  { id: 'quark', name: 'Quark' },
+];
 
 export function Sidebar() {
   return (
@@ -42,19 +56,18 @@ export function Sidebar() {
 
       <div className="crewQuickStatus">
         <div className="quickStatusHeader">Crew Status</div>
-        <div className="quickStatusRow">
-          <span title="Captain Picard">👨‍✈️</span>
-          <span title="Commander Data">🤖</span>
-          <span title="Commander Riker">🎺</span>
-          <span title="Geordi La Forge">🔧</span>
-          <span title="Lieutenant Worf">⚔️</span>
-        </div>
-        <div className="quickStatusRow">
-          <span title="Dr. Crusher">👩‍⚕️</span>
-          <span title="Counselor Troi">💜</span>
-          <span title="Chief O'Brien">🛠️</span>
-          <span title="Lieutenant Uhura">📡</span>
-          <span title="Quark">💰</span>
+        <div className="quickStatusAvatars">
+          {crewIds.map(crew => (
+            <Link key={crew.id} href={`/crew/${crew.id}`} className="quickStatusAvatar" title={crew.name}>
+              <Image 
+                src={`/crew-avatars/${crew.id}.jpg`} 
+                alt={crew.name}
+                width={28}
+                height={28}
+                className="avatarImage"
+              />
+            </Link>
+          ))}
         </div>
       </div>
 

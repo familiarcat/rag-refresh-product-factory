@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
@@ -83,7 +84,15 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
           ← Back to Crew Roster
         </Link>
         <div className="crewProfileHeader">
-          <div className="profileAvatar">{emoji}</div>
+          <div className="profileAvatar">
+            <Image 
+              src={`/crew-avatars/${crew.id}.jpg`} 
+              alt={crew.name}
+              width={100}
+              height={100}
+              className="avatarImage"
+            />
+          </div>
           <div className="profileInfo">
             <h1 style={{ marginTop: 0, marginBottom: 4 }}>{crew.name}</h1>
             <div className="profileRole">{crew.role}</div>
@@ -202,7 +211,15 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
         <div className="collabList">
           {crew.worksWith.filter(w => w !== 'all_crew_members').map((w, i) => (
             <Link key={i} href={`/crew/${w}`} className="collabItem">
-              <span className="collabEmoji">{emojiMap[w] || '🖖'}</span>
+              <div className="collabAvatar">
+                <Image 
+                  src={`/crew-avatars/${w}.jpg`} 
+                  alt={w}
+                  width={32}
+                  height={32}
+                  className="avatarImage"
+                />
+              </div>
               <span className="collabName">{w.replace(/_/g, ' ')}</span>
             </Link>
           ))}

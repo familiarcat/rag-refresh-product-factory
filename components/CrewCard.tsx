@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export interface CrewMemberData {
   id: string;
@@ -21,6 +22,11 @@ interface CrewCardProps {
   compact?: boolean;
 }
 
+// Get avatar path for crew member
+function getAvatarPath(crewId: string): string {
+  return `/crew-avatars/${crewId}.jpg`;
+}
+
 export function CrewCard({ crew, compact = false }: CrewCardProps) {
   const statusColors = {
     active: 'var(--good)',
@@ -31,7 +37,15 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
   if (compact) {
     return (
       <Link href={`/crew/${crew.id}`} className="crewCardCompact">
-        <div className="crewEmoji">{crew.emoji}</div>
+        <div className="crewAvatarSmall">
+          <Image 
+            src={getAvatarPath(crew.id)} 
+            alt={crew.name}
+            width={48}
+            height={48}
+            className="avatarImage"
+          />
+        </div>
         <div className="crewInfo">
           <div className="crewName">{crew.name}</div>
           <div className="crewRole">{crew.role}</div>
@@ -48,7 +62,15 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
   return (
     <div className="crewCard">
       <div className="crewCardHeader">
-        <div className="crewAvatarLarge">{crew.emoji}</div>
+        <div className="crewAvatarLarge">
+          <Image 
+            src={getAvatarPath(crew.id)} 
+            alt={crew.name}
+            width={72}
+            height={72}
+            className="avatarImage"
+          />
+        </div>
         <div className="crewHeaderInfo">
           <h3 className="crewName">{crew.name}</h3>
           <div className="crewRole">{crew.role}</div>
@@ -134,8 +156,16 @@ export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
   return (
     <div className="crewStatusGrid">
       {crew.map(c => (
-        <div key={c.id} className="crewStatusItem">
-          <div className="statusEmoji">{c.emoji}</div>
+        <Link key={c.id} href={`/crew/${c.id}`} className="crewStatusItem">
+          <div className="statusAvatar">
+            <Image 
+              src={getAvatarPath(c.id)} 
+              alt={c.name}
+              width={40}
+              height={40}
+              className="avatarImage"
+            />
+          </div>
           <div className="statusInfo">
             <div className="statusName">{c.name.split(' ').pop()}</div>
             <div className="statusRole">{c.role.split(' ')[0]}</div>
@@ -147,7 +177,7 @@ export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
                          c.status === 'busy' ? 'var(--warn)' : 'var(--muted)'
             }}
           />
-        </div>
+        </Link>
       ))}
     </div>
   );
