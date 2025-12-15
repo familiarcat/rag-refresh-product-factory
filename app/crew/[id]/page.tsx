@@ -110,7 +110,7 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
           </div>
           <div className="profileInfo">
             <h1 style={{ marginTop: 0, marginBottom: 4 }}>{crew.name}</h1>
-            <div className="profileRole">{crew.role}</div>
+            <div className="profileRole" style={{ color: divisionColor }}>{crew.role}</div>
             <div className="profileDept">{crew.department}</div>
           </div>
           <div className="profileActions">
@@ -130,11 +130,11 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
         <div className="profileSection">
           <div className="archetype">
             <span className="archetypeLabel">Archetype:</span>
-            <span className="archetypeValue">{crew.personality.archetype}</span>
+            <span className="archetypeValue" style={{ color: divisionColor }}>{crew.personality.archetype}</span>
           </div>
           <div className="traits">
             {crew.personality.traits.map((t, i) => (
-              <span key={i} className="traitTag">{t}</span>
+              <span key={i} className="traitTag" style={{ borderColor: `${divisionColor}40` }}>{t}</span>
             ))}
           </div>
         </div>
@@ -142,7 +142,7 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
         <h3>Catchphrases</h3>
         <div className="catchphrases">
           {crew.personality.catchphrases.map((c, i) => (
-            <div key={i} className="catchphrase">"{c}"</div>
+            <div key={i} className="catchphrase" style={{ borderLeftColor: divisionColor }}>"{c}"</div>
           ))}
         </div>
 
@@ -167,7 +167,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
           <div className="expertiseSecondary">
             <div className="expLabel">Secondary</div>
             {crew.expertise.secondary.map((s, i) => (
-              <span key={i} className="expTag">{s}</span>
+              <span key={i} className="expTag" style={{ 
+                background: `${divisionColor}20`, 
+                color: divisionColor 
+              }}>{s}</span>
             ))}
           </div>
           <div className="expertiseExp">
@@ -186,7 +189,7 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
         <div className="specList">
           {crew.specialization.map((s, i) => (
             <div key={i} className="specItem">
-              <span className="specIcon">✦</span>
+              <span className="specIcon" style={{ color: divisionColor }}>✦</span>
               <span>{s}</span>
             </div>
           ))}
@@ -215,7 +218,7 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
         <div className="knownForGrid">
           {crew.expertise.knownFor.map((k, i) => (
             <div key={i} className="knownForItem">
-              <span className="kfIcon">⭐</span>
+              <span className="kfIcon" style={{ color: divisionColor }}>⭐</span>
               <span>{k}</span>
             </div>
           ))}
@@ -231,7 +234,7 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
         <div className="useCases">
           {crew.typicalUseCases.map((u, i) => (
             <div key={i} className="useCase">
-              <span className="ucIcon">→</span>
+              <span className="ucIcon" style={{ color: divisionColor }}>→</span>
               <span>{u}</span>
             </div>
           ))}
