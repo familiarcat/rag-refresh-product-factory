@@ -20,7 +20,7 @@ const crewImages = {
     filename: 'captain_picard.jpg'
   },
   'commander_riker': {
-    url: 'https://static.wikia.nocookie.net/memoryalpha/images/2/29/William_Riker%2C_2364.jpg/revision/latest/scale-to-width-down/268?cb=20180906183158&path-prefix=en',
+    url: 'https://static.wikia.nocookie.net/memoryalpha/images/6/6e/William_Riker%2C_2375.jpg/revision/latest/scale-to-width-down/268?cb=20101021184548&path-prefix=en',
     filename: 'commander_riker.jpg'
   },
   'commander_data': {
