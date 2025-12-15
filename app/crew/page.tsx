@@ -169,23 +169,26 @@ export default function CrewPage() {
         const config = divisionConfig[division];
         
         return (
-          <div key={division} className="span-12">
+          <div key={division} className="card span-12 divisionCard" style={{
+            background: `linear-gradient(135deg, ${config.color}15 0%, ${config.color}08 50%, transparent 100%)`,
+            borderColor: `${config.color}30`,
+            marginTop: 16
+          }}>
             <div className="divisionHeader" style={{ 
               display: 'flex', 
               alignItems: 'center', 
               gap: 12, 
-              marginTop: 24, 
               marginBottom: 16,
-              paddingBottom: 8,
-              borderBottom: `3px solid ${config.color}`
+              paddingBottom: 12,
+              borderBottom: `2px solid ${config.color}40`
             }}>
               <span style={{ 
                 display: 'inline-block',
-                width: 16,
-                height: 16,
+                width: 20,
+                height: 20,
                 borderRadius: '50%',
                 backgroundColor: config.color,
-                boxShadow: `0 0 8px ${config.color}40`
+                boxShadow: `0 0 12px ${config.color}60`
               }} />
               <div>
                 <h2 style={{ margin: 0 }}>{config.emoji} {config.name}</h2>
@@ -210,18 +213,31 @@ export default function CrewPage() {
           {divisionOrder.map(division => {
             const config = divisionConfig[division];
             return (
-              <div key={division} className="span-3" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div 
+                key={division} 
+                className="span-3" 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 10,
+                  padding: '12px 16px',
+                  borderRadius: 12,
+                  background: `linear-gradient(135deg, ${config.color}20 0%, ${config.color}08 100%)`,
+                  border: `1px solid ${config.color}30`
+                }}
+              >
                 <span style={{ 
                   display: 'inline-block',
-                  width: 20,
-                  height: 20,
+                  width: 24,
+                  height: 24,
                   borderRadius: '50%',
                   backgroundColor: config.color,
-                  boxShadow: `0 0 6px ${config.color}60`
+                  boxShadow: `0 0 10px ${config.color}60`,
+                  flexShrink: 0
                 }} />
                 <div>
                   <strong>{config.emoji} {division}</strong>
-                  <p className="small" style={{ margin: 0 }}>{config.description}</p>
+                  <p className="small" style={{ margin: 0, opacity: 0.8 }}>{config.description}</p>
                 </div>
               </div>
             );
