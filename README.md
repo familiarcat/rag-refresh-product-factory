@@ -58,3 +58,10 @@ npm run check:env
 
 ## CI/CD
 See `docs/DEV_CICD_PLAYBOOK.md` for the local-to-GitHub-to-EC2 workflow.
+
+
+## Milestones → Supabase RAG
+See `docs/MILESTONE_RAG_PLAYBOOK.md`.
+
+## Unified Workflow
+See `docs/UNIFIED_WORKFLOW_OVERVIEW.md`.
