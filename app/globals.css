@@ -98,3 +98,199 @@ button,input,select,textarea{font:inherit}
 .barValue.good{color:var(--good)}
 .barValue.warn{color:var(--warn)}
 .barValue.risk{color:var(--risk)}
+
+/* ===== CREW VISUALIZATION ===== */
+
+/* Sidebar crew section */
+.navCrew{display:flex;align-items:center;gap:8px}
+.crewIcon{font-size:16px}
+.crewQuickStatus{margin-top:18px;padding:12px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid var(--line)}
+.quickStatusHeader{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.quickStatusRow{display:flex;gap:6px;margin-bottom:4px}
+.quickStatusRow span{font-size:18px;cursor:default;transition:transform .15s}
+.quickStatusRow span:hover{transform:scale(1.2)}
+
+/* Crew Status Grid */
+.crewStatusGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:980px){.crewStatusGrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.crewStatusGrid{grid-template-columns:repeat(2,1fr)}}
+.crewStatusItem{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px}
+.statusEmoji{font-size:24px}
+.statusInfo{flex:1}
+.statusName{font-weight:600;font-size:14px}
+.statusRole{font-size:11px;color:var(--muted)}
+.statusIndicator{width:10px;height:10px;border-radius:50%;box-shadow:0 0 8px currentColor}
+
+/* Crew Card */
+.crewCard{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 14px 36px rgba(0,0,0,.18)}
+.crewCardHeader{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.crewAvatarLarge{font-size:48px;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border-radius:16px;width:72px;height:72px;display:flex;align-items:center;justify-content:center}
+.crewHeaderInfo{flex:1}
+.crewHeaderInfo .crewName{font-size:18px;font-weight:700;margin:0}
+.crewHeaderInfo .crewRole{color:var(--good);font-size:14px;margin-top:4px}
+.crewHeaderInfo .crewDept{color:var(--muted);font-size:12px;margin-top:2px}
+.crewStatusBadge{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid;text-transform:capitalize}
+
+.crewSpecialties{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.specialtyTag{padding:5px 10px;background:rgba(124,92,255,.15);border:1px solid rgba(124,92,255,.3);border-radius:8px;font-size:11px;color:var(--accent1)}
+.specialtyTag.more{background:rgba(255,255,255,.05);border-color:var(--line);color:var(--muted)}
+
+.crewObjective{background:rgba(90,230,255,.08);border:1px solid rgba(90,230,255,.2);border-radius:12px;padding:12px;margin-bottom:12px}
+.objectiveLabel{font-size:12px;font-weight:600;color:var(--good);margin-bottom:6px}
+.objectiveText{font-size:13px;color:var(--text)}
+
+.crewWorries{background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.2);border-radius:12px;padding:12px;margin-bottom:12px}
+.worriesLabel{font-size:12px;font-weight:600;color:var(--warn);margin-bottom:6px}
+.worriesList{margin:0;padding-left:18px;font-size:13px}
+.worriesList li{margin-bottom:4px}
+.moreWorries{color:var(--muted);font-style:italic}
+
+.crewMemories{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:14px}
+.memoriesIcon{font-size:16px}
+
+.crewActions{display:flex;gap:10px}
+.crewActions .btn,.crewActions .btnPrimary{flex:1;text-align:center;padding:10px;font-size:13px}
+
+/* Crew Card Compact */
+.crewCardCompact{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;text-decoration:none;transition:all .15s}
+.crewCardCompact:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);text-decoration:none}
+.crewCardCompact .crewEmoji{font-size:28px}
+.crewCardCompact .crewInfo{flex:1}
+.crewCardCompact .crewName{font-weight:600;color:var(--text)}
+.crewCardCompact .crewRole{font-size:12px;color:var(--muted)}
+.crewStatusDot{width:10px;height:10px;border-radius:50%}
+
+/* Crew Profile Page */
+.crewProfileHeader{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.profileAvatar{font-size:72px;background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(0,194,255,.25));border-radius:20px;width:100px;height:100px;display:flex;align-items:center;justify-content:center}
+.profileInfo{flex:1}
+.profileRole{color:var(--good);font-size:16px;margin-top:4px}
+.profileDept{color:var(--muted);font-size:14px}
+.profileActions{display:flex;gap:12px}
+
+.archetype{margin-bottom:12px}
+.archetypeLabel{color:var(--muted);font-size:12px;margin-right:8px}
+.archetypeValue{color:var(--accent1);font-weight:600}
+.traits{display:flex;flex-wrap:wrap;gap:8px}
+.traitTag{padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;font-size:12px}
+
+.catchphrases{display:flex;flex-direction:column;gap:8px}
+.catchphrase{padding:10px 14px;background:rgba(255,255,255,.03);border-left:3px solid var(--accent1);border-radius:0 8px 8px 0;font-style:italic;color:var(--muted);font-size:13px}
+
+.expertiseSection{display:flex;flex-direction:column;gap:14px}
+.expertisePrimary,.expertiseSecondary,.expertiseExp{padding:12px;background:rgba(255,255,255,.03);border-radius:10px}
+.expLabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.expValue{font-weight:600}
+.expTag{display:inline-block;padding:4px 8px;background:rgba(90,230,255,.1);border-radius:6px;font-size:11px;color:var(--good);margin:2px 4px 2px 0}
+
+.specList,.respList{margin:0;padding:0;list-style:none}
+.specItem{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.specItem:last-child{border-bottom:none}
+.specIcon{color:var(--accent1)}
+.respList li{padding:8px 0;border-bottom:1px solid var(--line)}
+.respList li:last-child{border-bottom:none}
+
+.knownForGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.knownForItem{display:flex;align-items:flex-start;gap:10px;padding:12px;background:rgba(255,255,255,.03);border-radius:10px}
+.kfIcon{color:var(--warn)}
+
+.useCases{display:flex;flex-direction:column;gap:8px}
+.useCase{display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(255,255,255,.02);border-radius:8px;font-size:13px}
+.ucIcon{color:var(--good)}
+
+.collabList{display:flex;flex-direction:column;gap:8px}
+.collabItem{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;text-decoration:none;transition:all .15s}
+.collabItem:hover{background:rgba(255,255,255,.06);text-decoration:none}
+.collabEmoji{font-size:20px}
+.collabName{text-transform:capitalize;color:var(--text)}
+
+/* Memory Alpha Section */
+.memoryAlphaGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:800px){.memoryAlphaGrid{grid-template-columns:repeat(2,1fr)}}
+.maItem{padding:14px;background:rgba(255,255,255,.03);border-radius:10px}
+.maItem.span-2{grid-column:span 2}
+.maLabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.maValue{font-weight:500}
+.maSection h3{margin:18px 0 10px;font-size:16px}
+.maSection ul{margin:0;padding-left:20px}
+.maSection li{margin-bottom:6px;font-size:14px}
+.sourceLink{float:right;font-size:12px;color:var(--good);font-weight:400}
+
+.relationshipGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.relationship{padding:12px;background:rgba(255,255,255,.03);border-radius:10px}
+.relName{font-weight:600;margin-bottom:4px}
+.relType{font-size:12px;color:var(--muted)}
+
+/* Stat Cards */
+.statCard{text-align:center;padding:10px}
+.statValue{font-size:32px;font-weight:800}
+.statValue.good{color:var(--good)}
+.statValue.warn{color:var(--warn)}
+.statValue.risk{color:var(--risk)}
+.statLabel{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* ===== OBSERVATION LOUNGE ===== */
+.observationLounge{padding:0}
+.loungeHeader{margin-bottom:24px}
+.loungeTitle{display:flex;align-items:center;gap:12px}
+.loungeTitle h2{margin:0}
+.loungeIcon{font-size:32px}
+.loungeSubtitle{color:var(--muted);margin-top:8px}
+
+.loungeContent{display:grid;grid-template-columns:1fr 300px;gap:20px}
+@media(max-width:980px){.loungeContent{grid-template-columns:1fr}}
+
+.loungeMain{display:flex;flex-direction:column;gap:20px}
+.loungeSidebar{display:flex;flex-direction:column;gap:16px}
+.loungeSidebar .card{padding:16px}
+.loungeSidebar h4{margin:0 0 12px}
+
+.conveneCard h3{margin:0 0 16px}
+.conveneForm{display:flex;flex-direction:column;gap:14px}
+.topicInput{width:100%;padding:12px 16px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:14px}
+.topicInput:focus{outline:none;border-color:var(--accent1)}
+.crewSelector{padding:14px;background:rgba(255,255,255,.02);border-radius:12px}
+.selectorLabel{font-size:12px;color:var(--muted);margin-bottom:10px}
+.crewCheckboxes{display:flex;flex-wrap:wrap;gap:8px}
+.crewCheckbox{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:all .15s}
+.crewCheckbox:has(input:checked){background:rgba(90,230,255,.1);border-color:rgba(90,230,255,.3)}
+.crewCheckbox input{display:none}
+.checkboxEmoji{font-size:18px}
+.checkboxName{font-size:12px}
+.conveneBtn{padding:14px;font-size:15px;font-weight:600}
+.conveneBtn:disabled{opacity:.5;cursor:not-allowed}
+
+.discussionsList h3{margin:0 0 14px}
+.discussionCard{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.discussionHeader{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.urgencyBadge{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase}
+.discussionTopic{flex:1;font-weight:600}
+.discussionTime{font-size:12px;color:var(--muted)}
+
+.discussionAttendees{display:flex;gap:4px;margin-bottom:12px}
+.attendeeChip{font-size:20px;padding:4px;background:rgba(255,255,255,.05);border-radius:8px}
+
+.contributions{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.contribution{display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(255,255,255,.02);border-radius:10px;font-size:13px}
+.contribEmoji{font-size:18px}
+.contribText{flex:1;color:var(--muted)}
+
+.consensus{padding:12px;background:rgba(40,217,154,.1);border:1px solid rgba(40,217,154,.2);border-radius:10px;margin-bottom:12px}
+.consensusLabel{font-size:12px;font-weight:600;color:var(--ok);margin-bottom:6px}
+.consensusText{font-size:13px}
+
+.actionItems{padding:12px;background:rgba(255,255,255,.02);border-radius:10px}
+.actionLabel{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.actionItem{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.actionItem:last-child{border-bottom:none}
+.actionAssignee{color:var(--good)}
+
+.crewStatusList{display:flex;flex-direction:column;gap:8px}
+.crewStatusRow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.crewStatusRow:last-child{border-bottom:none}
+.crewStatusRow .statusEmoji{font-size:20px}
+.crewStatusRow .statusName{flex:1;font-size:13px}
+.crewStatusRow .statusDot{width:8px;height:8px;border-radius:50%}
+
+.protocolList{margin:0;padding-left:18px;font-size:12px;color:var(--muted)}
+.protocolList li{margin-bottom:6px}
