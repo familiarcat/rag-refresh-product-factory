@@ -202,7 +202,7 @@ export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
             </div>
             <div className="statusInfo">
               <div className="statusName">{c.callName || c.name}</div>
-              <div className="statusRole">{c.role.split(' ')[0]}</div>
+              <div className="statusRole">{c.role}</div>
             </div>
             <div 
               className="statusIndicator"

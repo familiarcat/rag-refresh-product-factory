@@ -118,7 +118,7 @@ button,input,select,textarea{font:inherit}
 .statusEmoji{font-size:24px}
 .statusInfo{flex:1}
 .statusName{font-weight:600;font-size:14px}
-.statusRole{font-size:11px;color:var(--muted)}
+.statusRole{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
 .statusIndicator{width:10px;height:10px;border-radius:50%;box-shadow:0 0 8px currentColor}
 
 /* Crew Card */
