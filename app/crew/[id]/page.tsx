@@ -122,7 +122,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Personality */}
-      <div className="card span-8" style={{ borderColor: `${divisionColor}25` }}>
+      <div className="card span-8" style={{
+        background: `radial-gradient(ellipse 600px 350px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+        borderColor: `${divisionColor}30`
+      }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Personality</h2>
         <div className="profileSection">
           <div className="archetype">
@@ -151,7 +154,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Expertise */}
-      <div className="card span-4" style={{ borderColor: `${divisionColor}25` }}>
+      <div className="card span-4" style={{
+        background: `radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+        borderColor: `${divisionColor}30`
+      }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Expertise</h2>
         <div className="expertiseSection">
           <div className="expertisePrimary">
@@ -172,7 +178,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Specializations */}
-      <div className="card span-6" style={{ borderColor: `${divisionColor}25` }}>
+      <div className="card span-6" style={{
+        background: `radial-gradient(ellipse 500px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+        borderColor: `${divisionColor}30`
+      }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Specializations</h2>
         <div className="specList">
           {crew.specialization.map((s, i) => (
@@ -185,7 +194,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Responsibilities */}
-      <div className="card span-6" style={{ borderColor: `${divisionColor}25` }}>
+      <div className="card span-6" style={{
+        background: `radial-gradient(ellipse 500px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+        borderColor: `${divisionColor}30`
+      }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Responsibilities</h2>
         <ul className="respList">
           {crew.responsibilities.map((r, i) => (
@@ -195,7 +207,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Known For */}
-      <div className="card span-12" style={{ borderColor: `${divisionColor}25` }}>
+      <div className="card span-12" style={{
+        background: `radial-gradient(ellipse 800px 400px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+        borderColor: `${divisionColor}30`
+      }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Known For</h2>
         <div className="knownForGrid">
           {crew.expertise.knownFor.map((k, i) => (
@@ -208,7 +223,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Use Cases */}
-      <div className="card span-8" style={{ borderColor: `${divisionColor}25` }}>
+      <div className="card span-8" style={{
+        background: `radial-gradient(ellipse 600px 350px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+        borderColor: `${divisionColor}30`
+      }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>When to Consult</h2>
         <div className="useCases">
           {crew.typicalUseCases.map((u, i) => (
@@ -221,7 +239,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Works With */}
-      <div className="card span-4" style={{ borderColor: `${divisionColor}25` }}>
+      <div className="card span-4" style={{
+        background: `radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+        borderColor: `${divisionColor}30`
+      }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Collaborates With</h2>
         <div className="collabList">
           {crew.worksWith.filter(w => w !== 'all_crew_members').map((w, i) => (
@@ -243,7 +264,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Memory Alpha */}
       {crew.memoryAlpha && (
-        <div className="card span-12" style={{ borderColor: `${divisionColor}25` }}>
+        <div className="card span-12" style={{
+          background: `radial-gradient(ellipse 800px 400px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
+          borderColor: `${divisionColor}30`
+        }}>
           <h2 style={{ marginTop: 0, color: divisionColor }}>
             📚 Memory Alpha Data
             {crew.memoryAlpha.source && (
