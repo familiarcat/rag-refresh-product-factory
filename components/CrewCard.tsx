@@ -41,9 +41,10 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
           <Image 
             src={getAvatarPath(crew.id)} 
             alt={crew.name}
-            width={48}
-            height={48}
+            fill
+            sizes="48px"
             className="avatarImage"
+            priority
           />
         </div>
         <div className="crewInfo">
@@ -66,9 +67,10 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
           <Image 
             src={getAvatarPath(crew.id)} 
             alt={crew.name}
-            width={72}
-            height={72}
+            fill
+            sizes="72px"
             className="avatarImage"
+            priority
           />
         </div>
         <div className="crewHeaderInfo">
@@ -161,8 +163,8 @@ export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
             <Image 
               src={getAvatarPath(c.id)} 
               alt={c.name}
-              width={40}
-              height={40}
+              fill
+              sizes="40px"
               className="avatarImage"
             />
           </div>

@@ -107,7 +107,7 @@ button,input,select,textarea{font:inherit}
 .crewQuickStatus{margin-top:18px;padding:12px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid var(--line)}
 .quickStatusHeader{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
 .quickStatusAvatars{display:flex;flex-wrap:wrap;gap:6px}
-.quickStatusAvatar{width:28px;height:28px;border-radius:6px;overflow:hidden;border:2px solid transparent;transition:all .15s}
+.quickStatusAvatar{position:relative;width:28px;height:28px;border-radius:6px;overflow:hidden;border:2px solid transparent;transition:all .15s}
 .quickStatusAvatar:hover{border-color:var(--good);transform:scale(1.1)}
 
 /* Crew Status Grid */
@@ -124,10 +124,10 @@ button,input,select,textarea{font:inherit}
 /* Crew Card */
 .crewCard{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 14px 36px rgba(0,0,0,.18)}
 .crewCardHeader{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
-.crewAvatarLarge{width:72px;height:72px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
-.crewAvatarSmall{width:48px;height:48px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
-.avatarImage{width:100%;height:100%;object-fit:cover}
-.statusAvatar{width:40px;height:40px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
+.crewAvatarLarge{position:relative;width:72px;height:72px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
+.crewAvatarSmall{position:relative;width:48px;height:48px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
+.avatarImage{object-fit:cover}
+.statusAvatar{position:relative;width:40px;height:40px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
 .crewHeaderInfo{flex:1}
 .crewHeaderInfo .crewName{font-size:18px;font-weight:700;margin:0}
 .crewHeaderInfo .crewRole{color:var(--good);font-size:14px;margin-top:4px}
@@ -165,8 +165,8 @@ button,input,select,textarea{font:inherit}
 
 /* Crew Profile Page */
 .crewProfileHeader{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
-.profileAvatar{width:100px;height:100px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(0,194,255,.25));border:3px solid var(--line);flex-shrink:0}
-.collabAvatar{width:32px;height:32px;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
+.profileAvatar{position:relative;width:100px;height:100px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(0,194,255,.25));border:3px solid var(--line);flex-shrink:0}
+.collabAvatar{position:relative;width:32px;height:32px;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(0,194,255,.2));border:2px solid var(--line);flex-shrink:0}
 .profileInfo{flex:1}
 .profileRole{color:var(--good);font-size:16px;margin-top:4px}
 .profileDept{color:var(--muted);font-size:14px}

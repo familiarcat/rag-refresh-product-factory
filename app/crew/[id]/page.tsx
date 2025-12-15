@@ -88,9 +88,10 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
             <Image 
               src={`/crew-avatars/${crew.id}.jpg`} 
               alt={crew.name}
-              width={100}
-              height={100}
+              fill
+              sizes="100px"
               className="avatarImage"
+              priority
             />
           </div>
           <div className="profileInfo">
@@ -215,8 +216,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
                 <Image 
                   src={`/crew-avatars/${w}.jpg`} 
                   alt={w}
-                  width={32}
-                  height={32}
+                  fill
+                  sizes="32px"
                   className="avatarImage"
                 />
               </div>

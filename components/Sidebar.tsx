@@ -62,8 +62,8 @@ export function Sidebar() {
               <Image 
                 src={`/crew-avatars/${crew.id}.jpg`} 
                 alt={crew.name}
-                width={28}
-                height={28}
+                fill
+                sizes="28px"
                 className="avatarImage"
               />
             </Link>
