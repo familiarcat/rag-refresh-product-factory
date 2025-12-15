@@ -3,6 +3,13 @@
   "name": "Lieutenant Worf",
   "role": "Chief Security Officer",
   "department": "Security & Tactical",
+  "division": "Operations",
+  "uniformColor": "gold",
+  "rank": {
+    "grade": "O-3",
+    "title": "Lieutenant",
+    "order": 5
+  },
   "specialization": [
     "Security Engineering",
     "Compliance & Governance",

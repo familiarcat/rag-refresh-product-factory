@@ -3,6 +3,13 @@
   "name": "Commander William Riker",
   "role": "First Officer",
   "department": "Command",
+  "division": "Command",
+  "uniformColor": "red",
+  "rank": {
+    "grade": "O-5",
+    "title": "Commander",
+    "order": 2
+  },
   "specialization": [
     "Tactical Execution",
     "Workflow Management",

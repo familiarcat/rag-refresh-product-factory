@@ -1,8 +1,15 @@
 {
   "id": "commander_data",
   "name": "Commander Data",
-  "role": "Operations Officer",
-  "department": "Operations & Science",
+  "role": "Second Officer / Operations",
+  "department": "Operations",
+  "division": "Operations",
+  "uniformColor": "gold",
+  "rank": {
+    "grade": "O-5",
+    "title": "Lieutenant Commander",
+    "order": 3
+  },
   "specialization": [
     "Analytics & Logic",
     "Data Processing",

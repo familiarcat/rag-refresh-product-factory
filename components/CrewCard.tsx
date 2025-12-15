@@ -8,6 +8,10 @@ export interface CrewMemberData {
   name: string;
   role: string;
   department: string;
+  division?: string;
+  uniformColor?: string;
+  rankOrder?: number;
+  rankTitle?: string;
   status: 'active' | 'inactive' | 'busy';
   emoji: string;
   specialty: string[];
@@ -27,12 +31,22 @@ function getAvatarPath(crewId: string): string {
   return `/crew-avatars/${crewId}.jpg`;
 }
 
+// Uniform color mapping (TNG era)
+const uniformColors: Record<string, string> = {
+  red: '#c41e3a',    // Command
+  gold: '#c9a227',   // Operations
+  blue: '#0077b6',   // Sciences
+  brown: '#8b7355',  // Civilian
+};
+
 export function CrewCard({ crew, compact = false }: CrewCardProps) {
   const statusColors = {
     active: 'var(--good)',
     inactive: 'var(--muted)',
     busy: 'var(--warn)',
   };
+  
+  const divisionColor = uniformColors[crew.uniformColor || 'gold'];
 
   if (compact) {
     return (
@@ -74,9 +88,24 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
           />
         </div>
         <div className="crewHeaderInfo">
-          <h3 className="crewName">{crew.name}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span 
+              className="uniformPip" 
+              style={{ 
+                display: 'inline-block',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                backgroundColor: divisionColor,
+                boxShadow: `0 0 4px ${divisionColor}60`,
+                flexShrink: 0
+              }} 
+              title={`${crew.division} Division`}
+            />
+            <h3 className="crewName" style={{ margin: 0 }}>{crew.name}</h3>
+          </div>
           <div className="crewRole">{crew.role}</div>
-          <div className="crewDept">{crew.department}</div>
+          <div className="crewDept">{crew.rankTitle && `${crew.rankTitle} • `}{crew.department}</div>
         </div>
         <div 
           className="crewStatusBadge"
@@ -157,30 +186,33 @@ export function CrewRoster({ crew }: { crew: CrewMemberData[] }) {
 export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
   return (
     <div className="crewStatusGrid">
-      {crew.map(c => (
-        <Link key={c.id} href={`/crew/${c.id}`} className="crewStatusItem">
-          <div className="statusAvatar">
-            <Image 
-              src={getAvatarPath(c.id)} 
-              alt={c.name}
-              fill
-              sizes="40px"
-              className="avatarImage"
+      {crew.map(c => {
+        const divColor = uniformColors[c.uniformColor || 'gold'];
+        return (
+          <Link key={c.id} href={`/crew/${c.id}`} className="crewStatusItem" style={{ borderLeft: `3px solid ${divColor}` }}>
+            <div className="statusAvatar">
+              <Image 
+                src={getAvatarPath(c.id)} 
+                alt={c.name}
+                fill
+                sizes="40px"
+                className="avatarImage"
+              />
+            </div>
+            <div className="statusInfo">
+              <div className="statusName">{c.name.split(' ').pop()}</div>
+              <div className="statusRole">{c.role.split(' ')[0]}</div>
+            </div>
+            <div 
+              className="statusIndicator"
+              style={{ 
+                background: c.status === 'active' ? 'var(--good)' : 
+                           c.status === 'busy' ? 'var(--warn)' : 'var(--muted)'
+              }}
             />
-          </div>
-          <div className="statusInfo">
-            <div className="statusName">{c.name.split(' ').pop()}</div>
-            <div className="statusRole">{c.role.split(' ')[0]}</div>
-          </div>
-          <div 
-            className="statusIndicator"
-            style={{ 
-              background: c.status === 'active' ? 'var(--good)' : 
-                         c.status === 'busy' ? 'var(--warn)' : 'var(--muted)'
-            }}
-          />
-        </Link>
-      ))}
+          </Link>
+        );
+      })}
     </div>
   );
 }

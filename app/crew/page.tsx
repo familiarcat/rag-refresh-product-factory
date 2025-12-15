@@ -3,6 +3,37 @@ import { CrewCard, CrewStatusGrid, type CrewMemberData } from '../../components/
 import fs from 'fs';
 import path from 'path';
 
+// Division configuration with colors and display info
+const divisionConfig: Record<string, { name: string; color: string; emoji: string; description: string }> = {
+  Command: { 
+    name: 'Command Division', 
+    color: '#c41e3a', // TNG Command Red
+    emoji: '🔴',
+    description: 'Strategic leadership and mission coordination'
+  },
+  Operations: { 
+    name: 'Operations Division', 
+    color: '#c9a227', // TNG Operations Gold
+    emoji: '🟡',
+    description: 'Engineering, Security, Tactical, and Communications'
+  },
+  Sciences: { 
+    name: 'Sciences Division', 
+    color: '#0077b6', // TNG Sciences Blue
+    emoji: '🔵',
+    description: 'Medical, Counseling, and Research'
+  },
+  Civilian: { 
+    name: 'Civilian Consultants', 
+    color: '#8b7355', // Ferengi Brown
+    emoji: '🟤',
+    description: 'Non-Starfleet specialists and advisors'
+  },
+};
+
+// Division display order
+const divisionOrder = ['Command', 'Operations', 'Sciences', 'Civilian'];
+
 // Load crew members from JSON files
 function loadCrewMembers(): CrewMemberData[] {
   const crewDir = path.join(process.cwd(), 'crew-members');
@@ -57,6 +88,10 @@ function loadCrewMembers(): CrewMemberData[] {
       name: data.name,
       role: data.role,
       department: data.department,
+      division: data.division || 'Operations',
+      uniformColor: data.uniformColor || 'gold',
+      rankOrder: data.rank?.order || 99,
+      rankTitle: data.rank?.title || '',
       status: 'active' as const,
       emoji: emojiMap[data.id] || '🖖',
       specialty: data.specialization || [],
@@ -65,14 +100,11 @@ function loadCrewMembers(): CrewMemberData[] {
       recentMemories: Math.floor(Math.random() * 50) + 10,
       catchphrases: data.personality?.catchphrases || [],
     };
-  });
+  }).sort((a, b) => a.rankOrder - b.rankOrder); // Sort by rank
 }
 
 export default function CrewPage() {
   const crew = loadCrewMembers();
-  
-  // Group by department
-  const departments = [...new Set(crew.map(c => c.department))];
   
   // Calculate stats
   const activeCrew = crew.filter(c => c.status === 'active').length;
@@ -87,7 +119,7 @@ export default function CrewPage() {
           <div>
             <h1 style={{ marginTop: 0 }}>🖖 Crew Roster</h1>
             <p className="small">
-              The Alex AI crew - 10 specialized agents working together through the Observation Lounge
+              The Alex AI crew - 10 specialized agents organized by Starfleet division colors
             </p>
           </div>
           <Link href="/observation-lounge" className="btnPrimary">
@@ -128,21 +160,75 @@ export default function CrewPage() {
         <CrewStatusGrid crew={crew} />
       </div>
 
-      {/* Crew Cards by Department */}
-      {departments.map(dept => (
-        <div key={dept} className="span-12">
-          <h2 style={{ marginTop: 24, marginBottom: 16 }}>{dept}</h2>
-          <div className="grid">
-            {crew.filter(c => c.department === dept).map(c => (
-              <div key={c.id} className="span-6">
-                <CrewCard crew={c} />
+      {/* Crew Cards by Division (Uniform Color) */}
+      {divisionOrder.map(division => {
+        const divisionCrew = crew.filter(c => c.division === division);
+        if (divisionCrew.length === 0) return null;
+        
+        const config = divisionConfig[division];
+        
+        return (
+          <div key={division} className="span-12">
+            <div className="divisionHeader" style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 12, 
+              marginTop: 24, 
+              marginBottom: 16,
+              paddingBottom: 8,
+              borderBottom: `3px solid ${config.color}`
+            }}>
+              <span style={{ 
+                display: 'inline-block',
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                backgroundColor: config.color,
+                boxShadow: `0 0 8px ${config.color}40`
+              }} />
+              <div>
+                <h2 style={{ margin: 0 }}>{config.emoji} {config.name}</h2>
+                <p className="small" style={{ margin: 0, opacity: 0.7 }}>{config.description}</p>
               </div>
-            ))}
+            </div>
+            <div className="grid">
+              {divisionCrew.map(c => (
+                <div key={c.id} className="span-6">
+                  <CrewCard crew={c} />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
-      {/* Legend */}
+      {/* Division Legend */}
+      <div className="card span-12">
+        <h3 style={{ marginTop: 0 }}>Starfleet Division Colors (TNG Era)</h3>
+        <div className="grid">
+          {divisionOrder.map(division => {
+            const config = divisionConfig[division];
+            return (
+              <div key={division} className="span-3" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  backgroundColor: config.color,
+                  boxShadow: `0 0 6px ${config.color}60`
+                }} />
+                <div>
+                  <strong>{config.emoji} {division}</strong>
+                  <p className="small" style={{ margin: 0 }}>{config.description}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Understanding Section */}
       <div className="card span-12">
         <h3 style={{ marginTop: 0 }}>Understanding the Crew</h3>
         <div className="grid">

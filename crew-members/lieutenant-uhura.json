@@ -3,6 +3,13 @@
   "name": "Lieutenant Uhura",
   "role": "Communications Officer",
   "department": "Communications",
+  "division": "Operations",
+  "uniformColor": "gold",
+  "rank": {
+    "grade": "O-3",
+    "title": "Lieutenant",
+    "order": 5
+  },
   "specialization": [
     "API Communication",
     "I/O Operations",

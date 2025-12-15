@@ -2,7 +2,14 @@
   "id": "dr_crusher",
   "name": "Dr. Beverly Crusher",
   "role": "Chief Medical Officer",
-  "department": "Medical & System Health",
+  "department": "Medical",
+  "division": "Sciences",
+  "uniformColor": "blue",
+  "rank": {
+    "grade": "O-5",
+    "title": "Commander",
+    "order": 7
+  },
   "specialization": [
     "System Health Diagnostics",
     "Performance Optimization",

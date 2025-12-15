@@ -2,7 +2,14 @@
   "id": "counselor_troi",
   "name": "Counselor Deanna Troi",
   "role": "Ship's Counselor",
-  "department": "Medical & User Experience",
+  "department": "Counseling",
+  "division": "Sciences",
+  "uniformColor": "blue",
+  "rank": {
+    "grade": "O-4",
+    "title": "Lieutenant Commander",
+    "order": 8
+  },
   "specialization": [
     "User Experience Design",
     "Empathy Analysis",

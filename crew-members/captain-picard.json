@@ -3,6 +3,13 @@
   "name": "Captain Jean-Luc Picard",
   "role": "Commanding Officer",
   "department": "Command",
+  "division": "Command",
+  "uniformColor": "red",
+  "rank": {
+    "grade": "O-6",
+    "title": "Captain",
+    "order": 1
+  },
   "specialization": [
     "Strategic Leadership",
     "Mission Planning",

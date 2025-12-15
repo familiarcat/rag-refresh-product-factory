@@ -1,8 +1,16 @@
 {
   "id": "quark",
   "name": "Quark",
-  "role": "Business Operations Specialist",
+  "role": "Business Consultant",
   "department": "Business Intelligence",
+  "division": "Civilian",
+  "uniformColor": "brown",
+  "rank": {
+    "grade": "Civilian",
+    "title": "Ferengi Business Consultant",
+    "order": 10,
+    "civilian": true
+  },
   "specialization": [
     "Business Intelligence",
     "ROI Analysis",
