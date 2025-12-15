@@ -3,7 +3,16 @@
   "name": "Chief Miles O'Brien",
   "callName": "O'Brien",
   "role": "Chief of Operations",
-  "department": "Engineering Operations",
+  "department": "Operations",
+  "division": "Operations",
+  "uniformColor": "gold",
+  "rank": {
+    "grade": "E-8",
+    "title": "Senior Chief Petty Officer",
+    "order": 6,
+    "enlisted": true,
+    "note": "Highest-ranking enlisted; served under La Forge on Enterprise-D, Chief of Operations on DS9"
+  },
   "specialization": [
     "Pragmatic Solutions",
     "Hands-On Implementation",
