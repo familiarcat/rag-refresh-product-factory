@@ -10,6 +10,8 @@ interface CrewMember {
   callName?: string;
   role: string;
   department: string;
+  division?: string;
+  uniformColor?: string;
   specialization: string[];
   personality: {
     archetype: string;
@@ -53,6 +55,13 @@ const emojiMap: Record<string, string> = {
   quark: '💰',
 };
 
+const uniformColors: Record<string, string> = {
+  red: '#c41e3a',
+  gold: '#c9a227',
+  blue: '#0077b6',
+  brown: '#8b7355',
+};
+
 function loadCrewMember(id: string): CrewMember | null {
   const crewDir = path.join(process.cwd(), 'crew-members');
   const files = fs.readdirSync(crewDir).filter(f => f.endsWith('.json'));
@@ -76,11 +85,15 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
   }
 
   const emoji = emojiMap[crew.id] || '🖖';
+  const divisionColor = uniformColors[crew.uniformColor || 'gold'] || uniformColors.gold;
 
   return (
     <div className="grid">
       {/* Header */}
-      <div className="card span-12">
+      <div className="card span-12" style={{
+        background: `radial-gradient(ellipse 900px 450px at 0% 0%, ${divisionColor}30 0%, transparent 70%)`,
+        borderColor: `${divisionColor}40`
+      }}>
         <Link href="/crew" className="small" style={{ display: 'inline-block', marginBottom: 12 }}>
           ← Back to Crew Roster
         </Link>
@@ -109,8 +122,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Personality */}
-      <div className="card span-8">
-        <h2 style={{ marginTop: 0 }}>Personality</h2>
+      <div className="card span-8" style={{ borderColor: `${divisionColor}25` }}>
+        <h2 style={{ marginTop: 0, color: divisionColor }}>Personality</h2>
         <div className="profileSection">
           <div className="archetype">
             <span className="archetypeLabel">Archetype:</span>
@@ -138,8 +151,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Expertise */}
-      <div className="card span-4">
-        <h2 style={{ marginTop: 0 }}>Expertise</h2>
+      <div className="card span-4" style={{ borderColor: `${divisionColor}25` }}>
+        <h2 style={{ marginTop: 0, color: divisionColor }}>Expertise</h2>
         <div className="expertiseSection">
           <div className="expertisePrimary">
             <div className="expLabel">Primary</div>
@@ -159,8 +172,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Specializations */}
-      <div className="card span-6">
-        <h2 style={{ marginTop: 0 }}>Specializations</h2>
+      <div className="card span-6" style={{ borderColor: `${divisionColor}25` }}>
+        <h2 style={{ marginTop: 0, color: divisionColor }}>Specializations</h2>
         <div className="specList">
           {crew.specialization.map((s, i) => (
             <div key={i} className="specItem">
@@ -172,8 +185,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Responsibilities */}
-      <div className="card span-6">
-        <h2 style={{ marginTop: 0 }}>Responsibilities</h2>
+      <div className="card span-6" style={{ borderColor: `${divisionColor}25` }}>
+        <h2 style={{ marginTop: 0, color: divisionColor }}>Responsibilities</h2>
         <ul className="respList">
           {crew.responsibilities.map((r, i) => (
             <li key={i}>{r}</li>
@@ -182,8 +195,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Known For */}
-      <div className="card span-12">
-        <h2 style={{ marginTop: 0 }}>Known For</h2>
+      <div className="card span-12" style={{ borderColor: `${divisionColor}25` }}>
+        <h2 style={{ marginTop: 0, color: divisionColor }}>Known For</h2>
         <div className="knownForGrid">
           {crew.expertise.knownFor.map((k, i) => (
             <div key={i} className="knownForItem">
@@ -195,8 +208,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Use Cases */}
-      <div className="card span-8">
-        <h2 style={{ marginTop: 0 }}>When to Consult</h2>
+      <div className="card span-8" style={{ borderColor: `${divisionColor}25` }}>
+        <h2 style={{ marginTop: 0, color: divisionColor }}>When to Consult</h2>
         <div className="useCases">
           {crew.typicalUseCases.map((u, i) => (
             <div key={i} className="useCase">
@@ -208,8 +221,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Works With */}
-      <div className="card span-4">
-        <h2 style={{ marginTop: 0 }}>Collaborates With</h2>
+      <div className="card span-4" style={{ borderColor: `${divisionColor}25` }}>
+        <h2 style={{ marginTop: 0, color: divisionColor }}>Collaborates With</h2>
         <div className="collabList">
           {crew.worksWith.filter(w => w !== 'all_crew_members').map((w, i) => (
             <Link key={i} href={`/crew/${w}`} className="collabItem">
@@ -230,8 +243,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Memory Alpha */}
       {crew.memoryAlpha && (
-        <div className="card span-12">
-          <h2 style={{ marginTop: 0 }}>
+        <div className="card span-12" style={{ borderColor: `${divisionColor}25` }}>
+          <h2 style={{ marginTop: 0, color: divisionColor }}>
             📚 Memory Alpha Data
             {crew.memoryAlpha.source && (
               <a href={crew.memoryAlpha.source} target="_blank" rel="noopener noreferrer" className="sourceLink">
