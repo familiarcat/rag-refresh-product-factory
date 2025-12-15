@@ -76,7 +76,10 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
   }
 
   return (
-    <div className="crewCard">
+    <div className="crewCard" style={{
+      background: `radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}30 0%, transparent 70%)`,
+      borderColor: `${divisionColor}40`
+    }}>
       <div className="crewCardHeader">
         <div className="crewAvatarLarge">
           <Image 
@@ -122,16 +125,23 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
 
       <div className="crewSpecialties">
         {crew.specialty.slice(0, 3).map((s, i) => (
-          <span key={i} className="specialtyTag">{s}</span>
+          <span key={i} className="specialtyTag" style={{ 
+            background: `${divisionColor}20`, 
+            borderColor: `${divisionColor}40`,
+            color: divisionColor 
+          }}>{s}</span>
         ))}
         {crew.specialty.length > 3 && (
-          <span className="specialtyTag more">+{crew.specialty.length - 3}</span>
+          <span className="specialtyTag more" style={{ 
+            background: `${divisionColor}15`, 
+            borderColor: `${divisionColor}30` 
+          }}>+{crew.specialty.length - 3}</span>
         )}
       </div>
 
       {crew.currentObjective && (
-        <div className="crewObjective">
-          <div className="objectiveLabel">🎯 Current Objective</div>
+        <div className="crewObjective" style={{ borderLeftColor: divisionColor }}>
+          <div className="objectiveLabel" style={{ color: divisionColor }}>🎯 Current Objective</div>
           <div className="objectiveText">{crew.currentObjective}</div>
         </div>
       )}
@@ -151,7 +161,7 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
       )}
 
       {crew.recentMemories !== undefined && (
-        <div className="crewMemories">
+        <div className="crewMemories" style={{ color: divisionColor }}>
           <span className="memoriesIcon">🧠</span>
           <span>{crew.recentMemories} RAG memories</span>
         </div>
@@ -190,7 +200,10 @@ export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
       {crew.map(c => {
         const divColor = uniformColors[c.uniformColor || 'gold'];
         return (
-          <Link key={c.id} href={`/crew/${c.id}`} className="crewStatusItem" style={{ borderLeft: `3px solid ${divColor}` }}>
+          <Link key={c.id} href={`/crew/${c.id}`} className="crewStatusItem" style={{ 
+            borderLeft: `3px solid ${divColor}`,
+            background: `radial-gradient(ellipse 200px 150px at 0% 0%, ${divColor}20 0%, transparent 80%)`
+          }}>
             <div className="statusAvatar">
               <Image 
                 src={getAvatarPath(c.id)} 
