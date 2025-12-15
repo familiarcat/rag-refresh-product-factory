@@ -170,8 +170,8 @@ export default function CrewPage() {
         
         return (
           <div key={division} className="card span-12 divisionCard" style={{
-            background: `radial-gradient(ellipse 800px 400px at 0% 0%, ${config.color}35 0%, transparent 70%)`,
-            borderColor: `${config.color}40`,
+            background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 800px 400px at 0% 0%, ${config.color}55 0%, transparent 60%)`,
+            borderColor: `${config.color}50`,
             marginTop: 16
           }}>
             <div className="divisionHeader" style={{ 
@@ -206,8 +206,8 @@ export default function CrewPage() {
                 style={{ 
                   padding: '12px 16px',
                   borderRadius: 12,
-                  background: `radial-gradient(ellipse 300px 200px at 0% 0%, ${config.color}40 0%, transparent 80%)`,
-                  border: `1px solid ${config.color}40`
+                  background: `linear-gradient(180deg, rgba(13,16,34,.9), rgba(11,15,29,.7)), radial-gradient(ellipse 300px 200px at 0% 0%, ${config.color}55 0%, transparent 70%)`,
+                  border: `1px solid ${config.color}50`
                 }}
               >
                 <strong style={{ color: config.color }}>{division}</strong>

@@ -91,8 +91,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
     <div className="grid">
       {/* Header */}
       <div className="card span-12" style={{
-        background: `radial-gradient(ellipse 900px 450px at 0% 0%, ${divisionColor}30 0%, transparent 70%)`,
-        borderColor: `${divisionColor}40`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 900px 450px at 0% 0%, ${divisionColor}55 0%, transparent 60%)`,
+        borderColor: `${divisionColor}50`
       }}>
         <Link href="/crew" className="small" style={{ display: 'inline-block', marginBottom: 12 }}>
           ← Back to Crew Roster
@@ -123,8 +123,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Personality */}
       <div className="card span-8" style={{
-        background: `radial-gradient(ellipse 600px 350px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-        borderColor: `${divisionColor}30`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 600px 350px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+        borderColor: `${divisionColor}40`
       }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Personality</h2>
         <div className="profileSection">
@@ -155,8 +155,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Expertise */}
       <div className="card span-4" style={{
-        background: `radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-        borderColor: `${divisionColor}30`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+        borderColor: `${divisionColor}40`
       }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Expertise</h2>
         <div className="expertiseSection">
@@ -182,8 +182,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Specializations */}
       <div className="card span-6" style={{
-        background: `radial-gradient(ellipse 500px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-        borderColor: `${divisionColor}30`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 500px 300px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+        borderColor: `${divisionColor}40`
       }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Specializations</h2>
         <div className="specList">
@@ -198,8 +198,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Responsibilities */}
       <div className="card span-6" style={{
-        background: `radial-gradient(ellipse 500px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-        borderColor: `${divisionColor}30`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 500px 300px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+        borderColor: `${divisionColor}40`
       }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Responsibilities</h2>
         <ul className="respList">
@@ -211,8 +211,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Known For */}
       <div className="card span-12" style={{
-        background: `radial-gradient(ellipse 800px 400px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-        borderColor: `${divisionColor}30`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 800px 400px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+        borderColor: `${divisionColor}40`
       }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Known For</h2>
         <div className="knownForGrid">
@@ -227,8 +227,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Use Cases */}
       <div className="card span-8" style={{
-        background: `radial-gradient(ellipse 600px 350px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-        borderColor: `${divisionColor}30`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 600px 350px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+        borderColor: `${divisionColor}40`
       }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>When to Consult</h2>
         <div className="useCases">
@@ -243,8 +243,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
 
       {/* Works With */}
       <div className="card span-4" style={{
-        background: `radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-        borderColor: `${divisionColor}30`
+        background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+        borderColor: `${divisionColor}40`
       }}>
         <h2 style={{ marginTop: 0, color: divisionColor }}>Collaborates With</h2>
         <div className="collabList">
@@ -268,8 +268,8 @@ export default async function CrewMemberPage({ params }: { params: Promise<{ id:
       {/* Memory Alpha */}
       {crew.memoryAlpha && (
         <div className="card span-12" style={{
-          background: `radial-gradient(ellipse 800px 400px at 0% 0%, ${divisionColor}25 0%, transparent 70%)`,
-          borderColor: `${divisionColor}30`
+          background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 800px 400px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+          borderColor: `${divisionColor}40`
         }}>
           <h2 style={{ marginTop: 0, color: divisionColor }}>
             📚 Memory Alpha Data

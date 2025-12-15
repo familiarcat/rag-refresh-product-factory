@@ -77,8 +77,8 @@ export function CrewCard({ crew, compact = false }: CrewCardProps) {
 
   return (
     <div className="crewCard" style={{
-      background: `radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}30 0%, transparent 70%)`,
-      borderColor: `${divisionColor}40`
+      background: `linear-gradient(180deg, rgba(13,16,34,.88), rgba(11,15,29,.62)), radial-gradient(ellipse 400px 300px at 0% 0%, ${divisionColor}50 0%, transparent 60%)`,
+      borderColor: `${divisionColor}50`
     }}>
       <div className="crewCardHeader">
         <div className="crewAvatarLarge">
@@ -202,7 +202,7 @@ export function CrewStatusGrid({ crew }: { crew: CrewMemberData[] }) {
         return (
           <Link key={c.id} href={`/crew/${c.id}`} className="crewStatusItem" style={{ 
             borderLeft: `3px solid ${divColor}`,
-            background: `radial-gradient(ellipse 200px 150px at 0% 0%, ${divColor}20 0%, transparent 80%)`
+            background: `linear-gradient(180deg, rgba(13,16,34,.9), rgba(11,15,29,.7)), radial-gradient(ellipse 200px 150px at 0% 0%, ${divColor}45 0%, transparent 70%)`
           }}>
             <div className="statusAvatar">
               <Image 
