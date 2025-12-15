@@ -3,6 +3,12 @@
   "name": "Lieutenant Commander Geordi La Forge",
   "role": "Chief Engineer",
   "department": "Engineering",
+  "hierarchy": {
+    "rank": "Lieutenant Commander (O-4)",
+    "type": "commissioned_officer",
+    "supervises": ["chief_obrien"],
+    "description": "Directs engineering strategy and architecture; O'Brien handles hands-on implementation"
+  },
   "specialization": [
     "Infrastructure Engineering",
     "System Integration",
