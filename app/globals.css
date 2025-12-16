@@ -45,6 +45,12 @@ a:hover{text-decoration:underline}
   overflow-x:hidden;
   transition: all 0.3s ease;
   z-index:100;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.sidebar::-webkit-scrollbar{
+  display: none; /* Chrome/Safari/Opera */
 }
 .sidebar.collapsed{
   padding:14px 8px;
