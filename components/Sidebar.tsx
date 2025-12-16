@@ -169,7 +169,15 @@ export function Sidebar() {
 
         {/* Brand */}
         <div className="brand">
-          <div className="logo" aria-hidden="true" />
+          <div className="logo">
+            <Image 
+              src="/starfleet-delta.svg" 
+              alt="Starfleet Delta" 
+              width={isCollapsed ? 32 : 40}
+              height={isCollapsed ? 38 : 48}
+              priority
+            />
+          </div>
           {!isCollapsed && (
             <div className="brandText">
               <div className="title">RAG Refresh</div>

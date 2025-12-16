@@ -152,8 +152,8 @@ a:hover{text-decoration:underline}
 /* Brand */
 .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px;min-height:44px;padding-right:40px}
 .brandText{overflow:hidden;white-space:nowrap}
-.logo{width:44px;height:44px;min-width:44px;border-radius:14px;background:linear-gradient(135deg,var(--accent1),var(--accent2),var(--accent3));box-shadow:0 14px 36px rgba(0,0,0,.38);}
-.sidebar.collapsed .logo{width:36px;height:36px;min-width:36px;border-radius:10px}
+.logo{display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 4px 12px rgba(124,92,255,0.4));}
+.sidebar.collapsed .logo{margin:0 auto}
 .sidebar.collapsed .brand{padding-right:0;justify-content:center;margin-bottom:8px;min-height:auto}
 .title{font-weight:800;font-size:15px}
 .subtitle{color:var(--muted);font-size:11px;margin-top:3px}
