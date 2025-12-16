@@ -67,6 +67,10 @@ export interface Project {
   tagline: string;
   description: string;
   
+  // Hierarchy
+  parentId?: string; // Parent project ID (null for root/factory)
+  isFactory?: boolean; // True for the meta-factory project
+  
   // Creation context
   source: ProjectSource;
   sourceUrl?: string; // For YouTube-derived projects
@@ -128,6 +132,9 @@ export interface ProjectSummary {
   createdAt: string;
   updatedAt: string;
   source: ProjectSource;
+  parentId?: string;
+  isFactory?: boolean;
+  domainCount: number;
 }
 
 /**
@@ -242,6 +249,9 @@ export function toProjectSummary(project: Project): ProjectSummary {
     createdAt: project.createdAt,
     updatedAt: project.updatedAt,
     source: project.source,
+    parentId: project.parentId,
+    isFactory: project.isFactory,
+    domainCount: project.domains.length,
   };
 }
 
@@ -291,4 +301,142 @@ export function getStatusIcon(status: ProjectStatus): string {
     case 'archived': return '📦';
     default: return '📄';
   }
+}
+
+// Factory Project ID (constant)
+export const FACTORY_PROJECT_ID = 'factory';
+
+/**
+ * The Factory Project - the meta-project that manages all other projects
+ * Uses categories as its domains
+ */
+export function createFactoryProject(): Project {
+  const factoryDomains: ProjectDomain[] = categories.map(cat => ({
+    slug: cat.slug,
+    name: cat.name,
+    description: cat.tagline,
+    scores: { ...cat.scores },
+    features: cat.buyers,
+    status: 'in-progress' as const,
+    progress: 25, // Default progress
+  }));
+
+  const avgScores = calculateProjectScores(factoryDomains);
+
+  return {
+    id: FACTORY_PROJECT_ID,
+    name: 'RAG Refresh Product Factory',
+    tagline: 'The meta-application that builds and maintains domain-driven projects',
+    description: `This is the factory itself - the project that generates and manages all other projects. 
+Its domains are the core categories that define the types of projects we can create.
+Each generated project inherits this same structure, enabling recursive self-improvement.`,
+    
+    isFactory: true,
+    
+    source: 'imported',
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: new Date().toISOString(),
+    
+    status: 'active',
+    progress: calculateProjectProgress(factoryDomains),
+    
+    primaryCategory: '',
+    domains: factoryDomains,
+    scores: avgScores,
+    
+    crew: [
+      { crewMemberId: 'captain_picard', role: 'Strategic Leadership', assignedAt: '2024-01-01', contributions: ['Vision', 'Architecture decisions'] },
+      { crewMemberId: 'commander_data', role: 'Technical Implementation', assignedAt: '2024-01-01', contributions: ['RAG system', 'Analytics'] },
+      { crewMemberId: 'geordi_la_forge', role: 'Infrastructure', assignedAt: '2024-01-01', contributions: ['AWS', 'Docker', 'CI/CD'] },
+      { crewMemberId: 'counselor_troi', role: 'UX Design', assignedAt: '2024-01-01', contributions: ['UI patterns', 'User research'] },
+      { crewMemberId: 'quark', role: 'Business Strategy', assignedAt: '2024-01-01', contributions: ['Monetization', 'Cost analysis'] },
+    ],
+    
+    monetization: {
+      model: 'platform',
+      targetPrice: 'Variable per project',
+      revenueStreams: ['SaaS subscriptions', 'Consulting', 'Implementation packages'],
+      timeline: 'Ongoing',
+    },
+    targetMarket: ['AI teams', 'Enterprise', 'Startups'],
+    
+    techStack: {
+      frontend: ['Next.js 16', 'React 19', 'TypeScript'],
+      backend: ['Next.js API Routes', 'Node.js'],
+      infrastructure: ['AWS EC2', 'Docker', 'Terraform', 'GitHub Actions'],
+      ai: ['RAG', 'TF-IDF', 'Supabase pgvector'],
+      other: ['n8n workflows'],
+    },
+    
+    mvpFeatures: [
+      'Multi-project management',
+      'Category scorecards',
+      'RAG-powered search',
+      'Natural language deployment',
+      'Crew collaboration system',
+    ],
+    completedFeatures: [
+      'Project creation wizard',
+      'Domain dashboards',
+      'CI/CD pipeline',
+      'Cost tracking',
+    ],
+    milestones: [],
+    
+    successMetrics: [
+      'Projects generated',
+      'Domain coverage',
+      'Deployment frequency',
+      'RAG query accuracy',
+    ],
+    notes: 'The factory that builds factories.',
+    tags: ['meta', 'factory', 'platform'],
+  };
+}
+
+/**
+ * Get all child projects of a parent
+ */
+export function getChildProjects(projects: Project[], parentId: string): Project[] {
+  return projects.filter(p => p.parentId === parentId);
+}
+
+/**
+ * Build a project tree structure
+ */
+export interface ProjectTreeNode {
+  project: Project;
+  children: ProjectTreeNode[];
+  depth: number;
+}
+
+export function buildProjectTree(projects: Project[], rootId: string = FACTORY_PROJECT_ID, depth: number = 0): ProjectTreeNode | null {
+  const project = projects.find(p => p.id === rootId);
+  if (!project) return null;
+  
+  const children = projects
+    .filter(p => p.parentId === rootId)
+    .map(child => buildProjectTree(projects, child.id, depth + 1))
+    .filter((node): node is ProjectTreeNode => node !== null);
+  
+  return {
+    project,
+    children,
+    depth,
+  };
+}
+
+/**
+ * Calculate aggregate progress across a project tree
+ */
+export function calculateTreeProgress(node: ProjectTreeNode): number {
+  if (node.children.length === 0) {
+    return node.project.progress;
+  }
+  
+  const childProgress = node.children.reduce((sum, child) => sum + calculateTreeProgress(child), 0);
+  const avgChildProgress = childProgress / node.children.length;
+  
+  // Weight: 60% own progress, 40% children progress
+  return Math.round(node.project.progress * 0.6 + avgChildProgress * 0.4);
 }

@@ -129,7 +129,8 @@ export function Sidebar() {
         <div className="navBlock">
           {!isCollapsed && <div className="navHeader">Core</div>}
           <NavItem href="/" icon="🏠" label="Home" isCollapsed={isCollapsed} isActive={isActive('/')} />
-          <NavItem href="/categories" icon="📂" label="Categories" isCollapsed={isCollapsed} isActive={isActive('/categories')} />
+          <NavItem href="/portfolio" icon="🌳" label="Portfolio" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} />
+          <NavItem href="/categories" icon="🏗️" label="Factory Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} />
           <NavItem href="/create" icon="🚀" label="Create" isCollapsed={isCollapsed} isActive={isActive('/create')} />
           <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} />
           <NavItem href="/deploy-metrics" icon="📊" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} />
@@ -168,34 +169,46 @@ export function Sidebar() {
           {!isCollapsed && projects.length > 0 && (
             <div style={{ marginTop: 4 }}>
               {projects.slice(0, 5).map(project => (
-                <Link
-                  key={project.id}
-                  href={`/projects/${project.id}`}
-                  className={`navItem ${isActive(`/projects/${project.id}`) ? 'active' : ''}`}
-                  style={{ paddingLeft: 20 }}
-                >
-                  <span className="navIcon" style={{ fontSize: 12 }}>
-                    {getStatusIcon(project.status)}
-                  </span>
-                  <span className="navLabel" style={{ 
-                    fontSize: 12,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {project.name}
-                  </span>
-                  <span style={{
-                    marginLeft: 'auto',
-                    fontSize: 10,
-                    padding: '1px 4px',
-                    background: `${getStatusColor(project.status)}20`,
-                    color: getStatusColor(project.status),
-                    borderRadius: 3,
-                  }}>
-                    {project.progress}%
-                  </span>
-                </Link>
+                <div key={project.id}>
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className={`navItem ${isActive(`/projects/${project.id}`) && !pathname.includes('/domains') ? 'active' : ''}`}
+                    style={{ paddingLeft: 20 }}
+                  >
+                    <span className="navIcon" style={{ fontSize: 12 }}>
+                      {getStatusIcon(project.status)}
+                    </span>
+                    <span className="navLabel" style={{ 
+                      fontSize: 12,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {project.name}
+                    </span>
+                    <span style={{
+                      marginLeft: 'auto',
+                      fontSize: 10,
+                      padding: '1px 4px',
+                      background: `${getStatusColor(project.status)}20`,
+                      color: getStatusColor(project.status),
+                      borderRadius: 3,
+                    }}>
+                      {project.progress}%
+                    </span>
+                  </Link>
+                  {/* Domains sub-link */}
+                  <Link
+                    href={`/projects/${project.id}/domains`}
+                    className={`navItem ${pathname === `/projects/${project.id}/domains` ? 'active' : ''}`}
+                    style={{ paddingLeft: 36, fontSize: 11 }}
+                  >
+                    <span className="navIcon" style={{ fontSize: 10 }}>🏗️</span>
+                    <span className="navLabel" style={{ fontSize: 11, color: 'var(--muted)' }}>
+                      Domains
+                    </span>
+                  </Link>
+                </div>
               ))}
               {projects.length > 5 && (
                 <Link 
