@@ -158,7 +158,7 @@
   },
   
   "lesson_for_future_ai_agents": {
-    "critical_rule": "NEVER use terminal_tool in alex-ai-universal project - it has 100% failure rate",
+    "critical_rule": "NEVER use terminal_tool in rag-refresh-product-factory project - it has 100% failure rate",
     "enforcement": "If AI agent attempts terminal execution, hard block and force fast-path",
     "evidence": "4 failures, 0 successes, standing order violated, user confidence damaged",
     "alternative": "Use delete_file, write, search_replace, read_file - these work 100% of the time",

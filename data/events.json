@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "type": "ask",
+    "at": "2025-12-15T23:58:42.638Z",
+    "question": "What is the fastest path to monetization?",
+    "trace": {
+      "retrieval": [
+        {
+          "id": "roadmap.md",
+          "source": "content/roadmap.md",
+          "score": 0.2807
+        },
+        {
+          "id": "timeline.md",
+          "source": "content/timeline.md",
+          "score": 0.1352
+        },
+        {
+          "id": "categories.md",
+          "source": "content/categories.md",
+          "score": 0.093
+        },
+        {
+          "id": "overview.md",
+          "source": "content/overview.md",
+          "score": 0.0679
+        }
+      ],
+      "docs_loaded": 7
+    }
+  }
+]
