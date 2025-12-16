@@ -127,20 +127,37 @@ export function Sidebar() {
           <NavItem href="/observation-lounge" icon="🖖" label="Observation Lounge" isCollapsed={isCollapsed} isActive={isActive('/observation-lounge')} />
         </div>
 
-        {/* Docs Navigation */}
+        {/* Factory Docs Navigation */}
         <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">Docs</div>}
+          {!isCollapsed && <div className="navHeader">🏭 Factory Docs</div>}
           {docsNav.map(it => (
             <NavItem 
               key={it.route} 
               href={it.route} 
-              icon={navIcons[it.route] || '📄'} 
+              icon={(it as any).icon || navIcons[it.route] || '📄'} 
               label={it.label} 
               isCollapsed={isCollapsed} 
               isActive={isActive(it.route)} 
             />
           ))}
         </div>
+
+        {/* Projects Section - Placeholder for future managed projects */}
+        {!isCollapsed && (
+          <div className="navBlock">
+            <div className="navHeader">📦 Projects</div>
+            <div style={{ 
+              padding: '12px 14px', 
+              fontSize: 12, 
+              color: 'var(--muted)',
+              background: 'rgba(255,255,255,.02)',
+              borderRadius: 8,
+              border: '1px dashed rgba(255,255,255,.1)'
+            }}>
+              No projects yet. Use <strong>Create</strong> to generate your first domain-driven project.
+            </div>
+          </div>
+        )}
 
         {/* Crew Quick Status - Only when expanded */}
         {!isCollapsed && (
