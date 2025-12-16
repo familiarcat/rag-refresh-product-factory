@@ -158,6 +158,19 @@ a:hover{text-decoration:underline}
 .title{font-weight:800;font-size:15px}
 .subtitle{color:var(--muted);font-size:11px;margin-top:3px}
 
+/* Icon System */
+.icon{transition:color 0.2s, transform 0.2s}
+.icon-primary{color:var(--accent1)}
+.icon-secondary{color:var(--accent2)}
+.icon-muted{color:var(--muted)}
+.icon-success{color:var(--ok)}
+.icon-warning{color:var(--warn)}
+.icon-error{color:var(--risk)}
+.icon-gold{color:#ffd700}
+.navItem .icon{color:var(--text);opacity:0.85}
+.navItem:hover .icon{color:var(--accent1);opacity:1;transform:scale(1.1)}
+.navItem.active .icon{color:var(--accent1);opacity:1}
+
 /* Navigation */
 .navBlock{margin-top:18px}
 .navHeader{color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:12px 0 8px;white-space:nowrap;overflow:hidden;font-weight:600}

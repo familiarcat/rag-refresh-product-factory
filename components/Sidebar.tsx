@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { docsNav } from '../lib/nav';
-import { ProjectSummary, getStatusIcon, getStatusColor } from '../lib/projects';
+import { ProjectSummary, getStatusColor } from '../lib/projects';
+import { Icon, IconName } from '../lib/icons';
 
 const crewIds = [
   { id: 'captain_picard', name: 'Captain Picard' },
@@ -20,30 +21,38 @@ const crewIds = [
   { id: 'quark', name: 'Quark' },
 ];
 
-// Icon mapping for nav items
-const navIcons: Record<string, string> = {
-  '/': '🏠',
-  '/categories': '📂',
-  '/create': '🚀',
-  '/ask': '💬',
-  '/diagnostics': '⚙️',
-  '/env': '🔧',
-  '/crew': '👥',
-  '/observation-lounge': '🖖',
-  // Docs icons
-  '/docs/overview': '📋',
-  '/docs/timeline': '📅',
-  '/docs/categories': '🏷️',
-  '/docs/portfolio': '💼',
-  '/docs/roadmap': '🗺️',
-  '/docs/nextjs_product_factory_best_practices': '📘',
-  '/docs/assumptions': '💡',
+// Icon mapping for nav items - now using IconName
+const navIconMap: Record<string, IconName> = {
+  '/': 'home',
+  '/categories': 'domains',
+  '/create': 'create',
+  '/ask': 'ask',
+  '/diagnostics': 'diagnostics',
+  '/env': 'environment',
+  '/crew': 'crew',
+  '/observation-lounge': 'observation',
+  '/docs/overview': 'list',
+  '/docs/timeline': 'timeline',
+  '/docs/categories': 'domains',
+  '/docs/portfolio': 'portfolio',
+  '/docs/roadmap': 'roadmap',
+  '/docs/nextjs_product_factory_best_practices': 'bestpractices',
+  '/docs/assumptions': 'assumptions',
+};
+
+// Status icon mapping
+const statusIconMap: Record<string, IconName> = {
+  'active': 'active',
+  'draft': 'draft',
+  'paused': 'paused',
+  'completed': 'completed',
+  'archived': 'archived',
 };
 
 // Nav Item Component - defined before main export for Turbopack compatibility
 function NavItem({ 
   href, 
-  icon, 
+  iconName, 
   label, 
   isCollapsed, 
   isActive,
@@ -51,7 +60,7 @@ function NavItem({
   onLeave,
 }: { 
   href: string; 
-  icon: string; 
+  iconName: IconName; 
   label: string; 
   isCollapsed: boolean; 
   isActive: boolean;
@@ -74,7 +83,9 @@ function NavItem({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={onLeave}
     >
-      <span className="navIcon">{icon}</span>
+      <span className="navIcon">
+        <Icon name={iconName} size={18} />
+      </span>
       {!isCollapsed && <span className="navLabel">{label}</span>}
     </Link>
   );
@@ -188,10 +199,10 @@ export function Sidebar() {
 
         {/* Projects Section - TOP PRIORITY */}
         <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">📦 Projects</div>}
-          <NavItem href="/portfolio" icon="🌳" label="Portfolio Overview" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/projects" icon="📋" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects') && pathname === '/projects'} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/create" icon="🚀" label="Create New" isCollapsed={isCollapsed} isActive={isActive('/create')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          {!isCollapsed && <div className="navHeader"><Icon name="projects" size={14} style={{marginRight: 6}} /> Projects</div>}
+          <NavItem href="/portfolio" iconName="portfolio" label="Portfolio Overview" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/projects" iconName="list" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects') && pathname === '/projects'} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/create" iconName="create" label="Create New" isCollapsed={isCollapsed} isActive={isActive('/create')} onHover={handleNavHover} onLeave={handleNavLeave} />
           
           {/* Active Projects List */}
           {!isCollapsed && projects.length > 0 && (
@@ -207,7 +218,7 @@ export function Sidebar() {
                     style={{ paddingLeft: 20 }}
                   >
                     <span className="navIcon" style={{ fontSize: 12 }}>
-                      {getStatusIcon(project.status)}
+                      <Icon name={statusIconMap[project.status] || 'active'} size={14} />
                     </span>
                     <span className="navLabel" style={{ 
                       fontSize: 12,
@@ -234,7 +245,9 @@ export function Sidebar() {
                     className={`navItem ${pathname === `/projects/${project.id}/domains` ? 'active' : ''}`}
                     style={{ paddingLeft: 36, fontSize: 11 }}
                   >
-                    <span className="navIcon" style={{ fontSize: 10 }}>🏗️</span>
+                    <span className="navIcon" style={{ fontSize: 10 }}>
+                      <Icon name="domains" size={12} />
+                    </span>
                     <span className="navLabel" style={{ fontSize: 11, color: 'var(--muted)' }}>
                       Domains
                     </span>
@@ -276,32 +289,32 @@ export function Sidebar() {
 
         {/* Factory Navigation */}
         <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">🏭 Factory</div>}
-          <NavItem href="/" icon="🏠" label="Home" isCollapsed={isCollapsed} isActive={isActive('/') && pathname === '/'} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/categories" icon="🏗️" label="Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/diagnostics" icon="⚙️" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/deploy-metrics" icon="📊" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/env" icon="🔧" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          {!isCollapsed && <div className="navHeader"><Icon name="delta" size={14} style={{marginRight: 6}} /> Factory</div>}
+          <NavItem href="/" iconName="home" label="Home" isCollapsed={isCollapsed} isActive={isActive('/') && pathname === '/'} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/categories" iconName="domains" label="Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/ask" iconName="ask" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/diagnostics" iconName="diagnostics" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/deploy-metrics" iconName="metrics" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/env" iconName="environment" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} onHover={handleNavHover} onLeave={handleNavLeave} />
         </div>
 
         {/* Crew Navigation */}
         <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">🖖 Crew</div>}
-          <NavItem href="/crew" icon="👥" label="Crew Roster" isCollapsed={isCollapsed} isActive={isActive('/crew')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/observation-lounge" icon="🖖" label="Observation Lounge" isCollapsed={isCollapsed} isActive={isActive('/observation-lounge')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          {!isCollapsed && <div className="navHeader"><Icon name="crew" size={14} style={{marginRight: 6}} /> Crew</div>}
+          <NavItem href="/crew" iconName="crew" label="Crew Roster" isCollapsed={isCollapsed} isActive={isActive('/crew')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/observation-lounge" iconName="observation" label="Observation Lounge" isCollapsed={isCollapsed} isActive={isActive('/observation-lounge')} onHover={handleNavHover} onLeave={handleNavLeave} />
         </div>
 
         {/* Factory Docs Navigation */}
         <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">📚 Docs</div>}
+          {!isCollapsed && <div className="navHeader"><Icon name="docs" size={14} style={{marginRight: 6}} /> Docs</div>}
           {docsNav.map(it => (
-            <NavItem 
-              key={it.route} 
-              href={it.route} 
-              icon={(it as any).icon || navIcons[it.route] || '📄'} 
-              label={it.label} 
-              isCollapsed={isCollapsed} 
+            <NavItem
+              key={it.route}
+              href={it.route}
+              iconName={navIconMap[it.route] || 'docs'}
+              label={it.label}
+              isCollapsed={isCollapsed}
               isActive={isActive(it.route)}
               onHover={handleNavHover}
               onLeave={handleNavLeave}
