@@ -40,5 +40,47 @@
       "SkillForge",
       "InsightAPI"
     ]
+  },
+  {
+    "type": "ask",
+    "at": "2025-12-16T23:27:00.409Z",
+    "question": "What is the fastest path to monetization?",
+    "trace": {
+      "retrieval": [
+        {
+          "id": "roadmap.md",
+          "source": "content/roadmap.md",
+          "score": 0.2807
+        },
+        {
+          "id": "timeline.md",
+          "source": "content/timeline.md",
+          "score": 0.1175
+        },
+        {
+          "id": "overview.md",
+          "source": "content/overview.md",
+          "score": 0.0862
+        },
+        {
+          "id": "categories.md",
+          "source": "content/categories.md",
+          "score": 0.0769
+        }
+      ],
+      "docs_loaded": 7
+    }
+  },
+  {
+    "type": "youtube-projects",
+    "at": "2025-12-16T23:27:32.617Z",
+    "videoId": "S8a7gkFhoBA",
+    "videoTitle": "I'm REVEALING ALL the Vibe Marketing Secrets (NO Gatekeeping)",
+    "projectCount": 3,
+    "projectNames": [
+      "ContentMind AI",
+      "SkillForge",
+      "InsightAPI"
+    ]
   }
 ]
