@@ -120,54 +120,24 @@ export function Sidebar() {
           {!isCollapsed && (
             <div className="brandText">
               <div className="title">RAG Refresh</div>
-              <div className="subtitle">Alex AI Crew</div>
+              <div className="subtitle">Product Factory</div>
             </div>
           )}
         </div>
 
-        {/* Core Navigation */}
-        <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">Core</div>}
-          <NavItem href="/" icon="🏠" label="Home" isCollapsed={isCollapsed} isActive={isActive('/')} />
-          <NavItem href="/portfolio" icon="🌳" label="Portfolio" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} />
-          <NavItem href="/categories" icon="🏗️" label="Factory Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} />
-          <NavItem href="/create" icon="🚀" label="Create" isCollapsed={isCollapsed} isActive={isActive('/create')} />
-          <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} />
-          <NavItem href="/deploy-metrics" icon="📊" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} />
-          <NavItem href="/diagnostics" icon="⚙️" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} />
-          <NavItem href="/env" icon="🔧" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} />
-        </div>
-
-        {/* Crew Navigation */}
-        <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">🖖 Crew</div>}
-          <NavItem href="/crew" icon="👥" label="Crew Roster" isCollapsed={isCollapsed} isActive={isActive('/crew')} />
-          <NavItem href="/observation-lounge" icon="🖖" label="Observation Lounge" isCollapsed={isCollapsed} isActive={isActive('/observation-lounge')} />
-        </div>
-
-        {/* Factory Docs Navigation */}
-        <div className="navBlock">
-          {!isCollapsed && <div className="navHeader">🏭 Factory Docs</div>}
-          {docsNav.map(it => (
-            <NavItem 
-              key={it.route} 
-              href={it.route} 
-              icon={(it as any).icon || navIcons[it.route] || '📄'} 
-              label={it.label} 
-              isCollapsed={isCollapsed} 
-              isActive={isActive(it.route)} 
-            />
-          ))}
-        </div>
-
-        {/* Projects Section */}
+        {/* Projects Section - TOP PRIORITY */}
         <div className="navBlock">
           {!isCollapsed && <div className="navHeader">📦 Projects</div>}
+          <NavItem href="/portfolio" icon="🌳" label="Portfolio Overview" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} />
           <NavItem href="/projects" icon="📋" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects') && pathname === '/projects'} />
+          <NavItem href="/create" icon="🚀" label="Create New" isCollapsed={isCollapsed} isActive={isActive('/create')} />
           
           {/* Active Projects List */}
           {!isCollapsed && projects.length > 0 && (
-            <div style={{ marginTop: 4 }}>
+            <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 10, color: 'var(--muted)', padding: '0 14px 4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Active ({projects.length})
+              </div>
               {projects.slice(0, 5).map(project => (
                 <div key={project.id}>
                   <Link
@@ -238,9 +208,42 @@ export function Sidebar() {
               border: '1px dashed rgba(255,255,255,.1)',
               marginTop: 4,
             }}>
-              No active projects
+              No active projects yet
             </div>
           )}
+        </div>
+
+        {/* Factory Navigation */}
+        <div className="navBlock">
+          {!isCollapsed && <div className="navHeader">🏭 Factory</div>}
+          <NavItem href="/" icon="🏠" label="Home" isCollapsed={isCollapsed} isActive={isActive('/') && pathname === '/'} />
+          <NavItem href="/categories" icon="🏗️" label="Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} />
+          <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} />
+          <NavItem href="/diagnostics" icon="⚙️" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} />
+          <NavItem href="/deploy-metrics" icon="📊" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} />
+          <NavItem href="/env" icon="🔧" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} />
+        </div>
+
+        {/* Crew Navigation */}
+        <div className="navBlock">
+          {!isCollapsed && <div className="navHeader">🖖 Crew</div>}
+          <NavItem href="/crew" icon="👥" label="Crew Roster" isCollapsed={isCollapsed} isActive={isActive('/crew')} />
+          <NavItem href="/observation-lounge" icon="🖖" label="Observation Lounge" isCollapsed={isCollapsed} isActive={isActive('/observation-lounge')} />
+        </div>
+
+        {/* Factory Docs Navigation */}
+        <div className="navBlock">
+          {!isCollapsed && <div className="navHeader">📚 Docs</div>}
+          {docsNav.map(it => (
+            <NavItem 
+              key={it.route} 
+              href={it.route} 
+              icon={(it as any).icon || navIcons[it.route] || '📄'} 
+              label={it.label} 
+              isCollapsed={isCollapsed} 
+              isActive={isActive(it.route)} 
+            />
+          ))}
         </div>
 
         {/* Crew Quick Status - Only when expanded */}
