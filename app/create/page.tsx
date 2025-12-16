@@ -268,149 +268,148 @@ export default function CreatePage() {
 
   // Path selection screen
   if (path === 'select') {
+    // Bento card style with flex grow for equal heights
+    const bentoCardStyle = (pathKey: keyof typeof pathThemes, disabled = false) => ({
+      ...cardStyle('medium', pathThemes[pathKey].accent, pathThemes[pathKey].glow),
+      display: 'flex',
+      flexDirection: 'column' as const,
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      transition: 'all 0.2s',
+      opacity: disabled ? 0.6 : 1,
+      flex: '1 1 0',
+      minWidth: 220,
+    });
+
     return (
-      <div className="grid">
-        <div className="card span-12" style={cardStyle('large')}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Header */}
+        <div className="card" style={cardStyle('large')}>
           <h1 style={{ marginTop: 0, color: theme.accent }}>🚀 Create New Project</h1>
-          <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 700 }}>
+          <p style={{ fontSize: 16, color: 'var(--muted)', maxWidth: 700, margin: 0 }}>
             Choose your creation path. Each approach is designed for different workflows and preferences.
-            <span style={{ display: 'block', marginTop: 8, fontSize: 13, opacity: 0.7 }}>
-              💭 <em>"Understanding your creative process helps us serve you better." — Counselor Troi</em>
-            </span>
           </p>
         </div>
 
-        {/* Path Selection Cards */}
-        <div 
-          className="card span-3" 
-          style={{ 
-            ...cardStyle('medium', pathThemes.conceptualize.accent, pathThemes.conceptualize.glow),
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          onClick={() => setPath('conceptualize')}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-        >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>💡</div>
-          <h2 style={{ marginTop: 0, color: pathThemes.conceptualize.accent }}>Conceptualize</h2>
-          <p className="small" style={{ color: 'var(--muted)' }}>
-            <strong>Best for:</strong> Ideation, vibe coding
-          </p>
-          <p className="small">
-            Generate structured prompts for AI coding assistants. 
-            Perfect for articulating ideas.
-          </p>
-          <div style={{ 
-            marginTop: 16, 
-            padding: '8px 12px', 
-            background: `${pathThemes.conceptualize.accent}20`,
-            borderRadius: 8,
-            fontSize: 12,
-            color: pathThemes.conceptualize.accent
-          }}>
-            ✨ 4 templates
+        {/* Path Selection Cards - Bento Grid */}
+        <div style={{ 
+          display: 'flex', 
+          gap: 16, 
+          alignItems: 'stretch',
+          flexWrap: 'wrap',
+        }}>
+          {/* Conceptualize */}
+          <div 
+            style={bentoCardStyle('conceptualize')}
+            onClick={() => setPath('conceptualize')}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <div style={{ fontSize: 48, marginBottom: 12 }}>💡</div>
+            <h2 style={{ marginTop: 0, marginBottom: 8, color: pathThemes.conceptualize.accent }}>Conceptualize</h2>
+            <p className="small" style={{ color: 'var(--muted)', margin: '0 0 8px' }}>
+              <strong>Best for:</strong> Ideation, vibe coding
+            </p>
+            <p className="small" style={{ flex: 1, margin: 0 }}>
+              Generate structured prompts for AI coding assistants. Perfect for articulating ideas.
+            </p>
+            <div style={{ 
+              marginTop: 16, 
+              padding: '8px 12px', 
+              background: `${pathThemes.conceptualize.accent}20`,
+              borderRadius: 8,
+              fontSize: 12,
+              color: pathThemes.conceptualize.accent,
+              textAlign: 'center',
+            }}>
+              ✨ 4 templates
+            </div>
           </div>
-        </div>
 
-        <div 
-          className="card span-3" 
-          style={{ 
-            ...cardStyle('medium', pathThemes.structured.accent, pathThemes.structured.glow),
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          onClick={() => setPath('structured')}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-        >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🏗️</div>
-          <h2 style={{ marginTop: 0, color: pathThemes.structured.accent }}>Structured</h2>
-          <p className="small" style={{ color: 'var(--muted)' }}>
-            <strong>Best for:</strong> Category-based, n8n
-          </p>
-          <p className="small">
-            Select a category for templated briefs. 
-            Triggers n8n crew scaffolding.
-          </p>
-          <div style={{ 
-            marginTop: 16, 
-            padding: '8px 12px', 
-            background: `${pathThemes.structured.accent}20`,
-            borderRadius: 8,
-            fontSize: 12,
-            color: pathThemes.structured.accent
-          }}>
-            🔧 {categories.length} categories
+          {/* Structured */}
+          <div 
+            style={bentoCardStyle('structured')}
+            onClick={() => setPath('structured')}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🏗️</div>
+            <h2 style={{ marginTop: 0, marginBottom: 8, color: pathThemes.structured.accent }}>Structured</h2>
+            <p className="small" style={{ color: 'var(--muted)', margin: '0 0 8px' }}>
+              <strong>Best for:</strong> Category-based, n8n
+            </p>
+            <p className="small" style={{ flex: 1, margin: 0 }}>
+              Select a category for templated briefs. Triggers n8n crew scaffolding.
+            </p>
+            <div style={{ 
+              marginTop: 16, 
+              padding: '8px 12px', 
+              background: `${pathThemes.structured.accent}20`,
+              borderRadius: 8,
+              fontSize: 12,
+              color: pathThemes.structured.accent,
+              textAlign: 'center',
+            }}>
+              🔧 {categories.length} categories
+            </div>
           </div>
-        </div>
 
-        <div 
-          className="card span-3" 
-          style={{ 
-            ...cardStyle('medium', pathThemes.rapid.accent, pathThemes.rapid.glow),
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            opacity: 0.6,
-          }}
-          title="Coming soon"
-        >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⚡</div>
-          <h2 style={{ marginTop: 0, color: pathThemes.rapid.accent }}>Rapid Prototype</h2>
-          <p className="small" style={{ color: 'var(--muted)' }}>
-            <strong>Best for:</strong> Quick experiments, MVPs
-          </p>
-          <p className="small">
-            One-click project generation with sensible defaults. 
-            Get a working prototype in minutes.
-          </p>
-          <div style={{ 
-            marginTop: 16, 
-            padding: '8px 12px', 
-            background: `${pathThemes.rapid.accent}20`,
-            borderRadius: 8,
-            fontSize: 12,
-            color: pathThemes.rapid.accent
-          }}>
-            🔜 Coming soon
+          {/* Rapid Prototype */}
+          <div 
+            style={bentoCardStyle('rapid', true)}
+            title="Coming soon"
+          >
+            <div style={{ fontSize: 48, marginBottom: 12 }}>⚡</div>
+            <h2 style={{ marginTop: 0, marginBottom: 8, color: pathThemes.rapid.accent }}>Rapid Prototype</h2>
+            <p className="small" style={{ color: 'var(--muted)', margin: '0 0 8px' }}>
+              <strong>Best for:</strong> Quick experiments, MVPs
+            </p>
+            <p className="small" style={{ flex: 1, margin: 0 }}>
+              One-click project generation with sensible defaults. Get a working prototype in minutes.
+            </p>
+            <div style={{ 
+              marginTop: 16, 
+              padding: '8px 12px', 
+              background: `${pathThemes.rapid.accent}20`,
+              borderRadius: 8,
+              fontSize: 12,
+              color: pathThemes.rapid.accent,
+              textAlign: 'center',
+            }}>
+              🔜 Coming soon
+            </div>
           </div>
-        </div>
 
-        {/* YouTube → Projects Path */}
-        <div 
-          className="card span-3" 
-          style={{ 
-            ...cardStyle('medium', pathThemes.youtube.accent, pathThemes.youtube.glow),
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          onClick={() => setPath('youtube')}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-        >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🎬</div>
-          <h2 style={{ marginTop: 0, color: pathThemes.youtube.accent }}>Content-Driven</h2>
-          <p className="small" style={{ color: 'var(--muted)' }}>
-            <strong>Best for:</strong> Learning from existing content
-          </p>
-          <p className="small">
-            Paste a YouTube URL and let the crew analyze the content to generate 
-            actionable project proposals with monetization strategies.
-          </p>
-          <div style={{ 
-            marginTop: 16, 
-            padding: '8px 12px', 
-            background: `${pathThemes.youtube.accent}20`,
-            borderRadius: 8,
-            fontSize: 12,
-            color: pathThemes.youtube.accent
-          }}>
-            🖖 Full crew collaboration
+          {/* Content-Driven */}
+          <div 
+            style={bentoCardStyle('youtube')}
+            onClick={() => setPath('youtube')}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🎬</div>
+            <h2 style={{ marginTop: 0, marginBottom: 8, color: pathThemes.youtube.accent }}>Content-Driven</h2>
+            <p className="small" style={{ color: 'var(--muted)', margin: '0 0 8px' }}>
+              <strong>Best for:</strong> Learning from content
+            </p>
+            <p className="small" style={{ flex: 1, margin: 0 }}>
+              Paste a YouTube URL and let the crew analyze content to generate project proposals.
+            </p>
+            <div style={{ 
+              marginTop: 16, 
+              padding: '8px 12px', 
+              background: `${pathThemes.youtube.accent}20`,
+              borderRadius: 8,
+              fontSize: 12,
+              color: pathThemes.youtube.accent,
+              textAlign: 'center',
+            }}>
+              🖖 Full crew collaboration
+            </div>
           </div>
         </div>
 
         {/* Troi's Insight */}
-        <div className="card span-12" style={{ ...cardStyle('small'), marginTop: 8 }}>
+        <div className="card" style={cardStyle('small')}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
             <div style={{ fontSize: 32 }}>🧠</div>
             <div>
