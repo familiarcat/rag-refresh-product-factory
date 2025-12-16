@@ -14,6 +14,7 @@ const pathThemes = {
   conceptualize: { accent: '#a78bfa', glow: 'rgba(167,139,250,.50)', icon: '💡' }, // Purple - creative
   structured: { accent: '#00c2ff', glow: 'rgba(0,194,255,.50)', icon: '🏗️' },     // Cyan - technical
   rapid: { accent: '#f59e0b', glow: 'rgba(245,158,11,.50)', icon: '⚡' },          // Amber - speed
+  youtube: { accent: '#ff5c93', glow: 'rgba(255,92,147,.50)', icon: '🎬' },        // Magenta - content
 };
 
 const cardStyle = (size: 'large' | 'medium' | 'small' = 'medium', accent = theme.accent, glow = theme.glow) => {
@@ -149,7 +150,25 @@ As a [user type], I want to [action] so that [benefit].
   }
 ];
 
-type CreationPath = 'select' | 'conceptualize' | 'structured' | 'rapid';
+type CreationPath = 'select' | 'conceptualize' | 'structured' | 'rapid' | 'youtube';
+
+// YouTube project types
+interface YouTubeProject {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  domain: string;
+  crewAnalysis: {
+    consensus: string;
+    [key: string]: any;
+  };
+  techStack: string[];
+  estimatedEffort: { mvpDays: number; fullDays: number; teamSize: number; complexity: string };
+  monetization: { primaryModel: string; estimatedMRR: string; timeToRevenue: string; revenueStreams: any[] };
+  mvpFeatures: string[];
+  successMetrics: string[];
+}
 
 export default function CreatePage() {
   const [path, setPath] = useState<CreationPath>('select');
@@ -163,6 +182,13 @@ export default function CreatePage() {
   const [category, setCategory] = useState<string>('');
   const [projectName, setProjectName] = useState<string>('');
   const [projectDraft, setProjectDraft] = useState<string>('');
+  
+  // YouTube state
+  const [youtubeUrl, setYoutubeUrl] = useState('https://www.youtube.com/watch?v=S8a7gkFhoBA');
+  const [youtubeLoading, setYoutubeLoading] = useState(false);
+  const [youtubeProjects, setYoutubeProjects] = useState<YouTubeProject[]>([]);
+  const [selectedYoutubeProject, setSelectedYoutubeProject] = useState(0);
+  const [showCrewDetails, setShowCrewDetails] = useState(false);
   
   const [saving, setSaving] = useState(false);
 
@@ -219,6 +245,27 @@ export default function CreatePage() {
     else alert('Project created (or queued via n8n). Check diagnostics + your filesystem target.');
   }
 
+  async function generateYoutubeProjects() {
+    setYoutubeLoading(true);
+    setYoutubeProjects([]);
+    try {
+      const res = await fetch('/api/youtube-projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: youtubeUrl }),
+      });
+      const data = await res.json();
+      if (data.projects) {
+        setYoutubeProjects(data.projects);
+        setSelectedYoutubeProject(0);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setYoutubeLoading(false);
+    }
+  }
+
   // Path selection screen
   if (path === 'select') {
     return (
@@ -235,7 +282,7 @@ export default function CreatePage() {
 
         {/* Path Selection Cards */}
         <div 
-          className="card span-4" 
+          className="card span-3" 
           style={{ 
             ...cardStyle('medium', pathThemes.conceptualize.accent, pathThemes.conceptualize.glow),
             cursor: 'pointer',
@@ -248,11 +295,11 @@ export default function CreatePage() {
           <div style={{ fontSize: 48, marginBottom: 16 }}>💡</div>
           <h2 style={{ marginTop: 0, color: pathThemes.conceptualize.accent }}>Conceptualize</h2>
           <p className="small" style={{ color: 'var(--muted)' }}>
-            <strong>Best for:</strong> Ideation, vibe coding, creative exploration
+            <strong>Best for:</strong> Ideation, vibe coding
           </p>
           <p className="small">
-            Generate structured prompts optimized for AI coding assistants. 
-            Perfect when you have an idea but need to articulate it.
+            Generate structured prompts for AI coding assistants. 
+            Perfect for articulating ideas.
           </p>
           <div style={{ 
             marginTop: 16, 
@@ -262,12 +309,12 @@ export default function CreatePage() {
             fontSize: 12,
             color: pathThemes.conceptualize.accent
           }}>
-            ✨ 4 prompt templates available
+            ✨ 4 templates
           </div>
         </div>
 
         <div 
-          className="card span-4" 
+          className="card span-3" 
           style={{ 
             ...cardStyle('medium', pathThemes.structured.accent, pathThemes.structured.glow),
             cursor: 'pointer',
@@ -280,11 +327,11 @@ export default function CreatePage() {
           <div style={{ fontSize: 48, marginBottom: 16 }}>🏗️</div>
           <h2 style={{ marginTop: 0, color: pathThemes.structured.accent }}>Structured</h2>
           <p className="small" style={{ color: 'var(--muted)' }}>
-            <strong>Best for:</strong> Category-based projects, n8n workflows
+            <strong>Best for:</strong> Category-based, n8n
           </p>
           <p className="small">
-            Select a category to get a templated project brief. 
-            Triggers your n8n crew to scaffold a complete project repo.
+            Select a category for templated briefs. 
+            Triggers n8n crew scaffolding.
           </p>
           <div style={{ 
             marginTop: 16, 
@@ -294,12 +341,12 @@ export default function CreatePage() {
             fontSize: 12,
             color: pathThemes.structured.accent
           }}>
-            🔧 {categories.length} categories • n8n integration
+            🔧 {categories.length} categories
           </div>
         </div>
 
         <div 
-          className="card span-4" 
+          className="card span-3" 
           style={{ 
             ...cardStyle('medium', pathThemes.rapid.accent, pathThemes.rapid.glow),
             cursor: 'pointer',
@@ -326,6 +373,39 @@ export default function CreatePage() {
             color: pathThemes.rapid.accent
           }}>
             🔜 Coming soon
+          </div>
+        </div>
+
+        {/* YouTube → Projects Path */}
+        <div 
+          className="card span-3" 
+          style={{ 
+            ...cardStyle('medium', pathThemes.youtube.accent, pathThemes.youtube.glow),
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          onClick={() => setPath('youtube')}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🎬</div>
+          <h2 style={{ marginTop: 0, color: pathThemes.youtube.accent }}>Content-Driven</h2>
+          <p className="small" style={{ color: 'var(--muted)' }}>
+            <strong>Best for:</strong> Learning from existing content
+          </p>
+          <p className="small">
+            Paste a YouTube URL and let the crew analyze the content to generate 
+            actionable project proposals with monetization strategies.
+          </p>
+          <div style={{ 
+            marginTop: 16, 
+            padding: '8px 12px', 
+            background: `${pathThemes.youtube.accent}20`,
+            borderRadius: 8,
+            fontSize: 12,
+            color: pathThemes.youtube.accent
+          }}>
+            🖖 Full crew collaboration
           </div>
         </div>
 
@@ -668,6 +748,266 @@ export default function CreatePage() {
             or copy them into <code>.env.local</code> (not committed).
           </p>
         </div>
+      </div>
+    );
+  }
+
+  // YouTube → Projects Path
+  if (path === 'youtube') {
+    const currentTheme = pathThemes.youtube;
+    const currentProject = youtubeProjects[selectedYoutubeProject];
+    
+    return (
+      <div className="grid">
+        <div className="card span-12" style={cardStyle('large', currentTheme.accent, currentTheme.glow)}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <button 
+                onClick={() => setPath('select')} 
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  color: currentTheme.accent, 
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  marginBottom: 8,
+                  padding: 0,
+                }}
+              >
+                ← Back to paths
+              </button>
+              <h1 style={{ marginTop: 0, color: currentTheme.accent }}>🎬 Content-Driven Projects</h1>
+            </div>
+            <div style={{ 
+              padding: '8px 16px', 
+              background: `${currentTheme.accent}15`, 
+              borderRadius: 20,
+              border: `1px solid ${currentTheme.accent}40`,
+              fontSize: 13,
+              color: currentTheme.accent
+            }}>
+              🖖 Full Crew Collaboration
+            </div>
+          </div>
+          <p className="small">
+            Paste a YouTube URL and the crew will analyze the content to generate actionable project proposals with monetization strategies.
+          </p>
+          
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 16 }}>
+            <input
+              value={youtubeUrl}
+              onChange={e => setYoutubeUrl(e.target.value)}
+              placeholder="Paste YouTube URL..."
+              style={{
+                flex: 1,
+                minWidth: 300,
+                padding: 14,
+                borderRadius: 12,
+                border: `1px solid ${currentTheme.accent}40`,
+                background: `${currentTheme.accent}10`,
+                color: 'var(--text)',
+                fontSize: 14,
+              }}
+            />
+            <button
+              onClick={generateYoutubeProjects}
+              disabled={youtubeLoading}
+              style={{
+                padding: '14px 24px',
+                borderRadius: 12,
+                border: `1px solid ${currentTheme.accent}60`,
+                background: youtubeLoading ? `${currentTheme.accent}10` : `${currentTheme.accent}25`,
+                color: currentTheme.accent,
+                fontWeight: 600,
+                cursor: youtubeLoading ? 'wait' : 'pointer',
+              }}
+            >
+              {youtubeLoading ? '🔄 Analyzing...' : '🚀 Generate Projects'}
+            </button>
+          </div>
+        </div>
+
+        {/* Crew Participants */}
+        {youtubeProjects.length > 0 && (
+          <div className="card span-12" style={cardStyle('small', '#7c5cff', 'rgba(124,92,255,.3)')}>
+            <h3 style={{ marginTop: 0, color: '#7c5cff' }}>👥 Crew Analysis Complete</h3>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {[
+                { emoji: '👨‍✈️', name: 'Picard', role: 'Strategy' },
+                { emoji: '🤖', name: 'Data', role: 'Analytics' },
+                { emoji: '🔧', name: 'La Forge', role: 'Infrastructure' },
+                { emoji: '💜', name: 'Troi', role: 'UX' },
+                { emoji: '💰', name: 'Quark', role: 'Business' },
+              ].map(crew => (
+                <div
+                  key={crew.name}
+                  style={{
+                    padding: '10px 14px',
+                    background: 'rgba(255,255,255,.05)',
+                    borderRadius: 10,
+                    border: '1px solid rgba(255,255,255,.1)',
+                    fontSize: 13,
+                  }}
+                >
+                  <span>{crew.emoji}</span>
+                  <span style={{ marginLeft: 6, fontWeight: 500 }}>{crew.name}</span>
+                  <span style={{ marginLeft: 6, opacity: 0.6, fontSize: 11 }}>{crew.role}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Project Selection */}
+        {youtubeProjects.length > 0 && (
+          <div className="card span-12" style={cardStyle('small', '#00d4ff', 'rgba(0,212,255,.3)')}>
+            <h3 style={{ marginTop: 0, color: '#00d4ff' }}>📊 Generated Projects</h3>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {youtubeProjects.map((project, idx) => (
+                <button
+                  key={project.id}
+                  onClick={() => setSelectedYoutubeProject(idx)}
+                  style={{
+                    padding: '14px 18px',
+                    borderRadius: 12,
+                    border: selectedYoutubeProject === idx 
+                      ? '2px solid #00d4ff' 
+                      : '1px solid rgba(255,255,255,.2)',
+                    background: selectedYoutubeProject === idx 
+                      ? 'rgba(0,212,255,.2)' 
+                      : 'rgba(255,255,255,.05)',
+                    color: 'var(--text)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    flex: '1 1 220px',
+                  }}
+                >
+                  <div style={{ fontWeight: 600, marginBottom: 4 }}>{project.name}</div>
+                  <div style={{ fontSize: 12, opacity: 0.7 }}>{project.tagline}</div>
+                  <div style={{ 
+                    marginTop: 8, 
+                    fontSize: 11, 
+                    padding: '3px 8px', 
+                    background: 'rgba(0,212,255,.2)', 
+                    borderRadius: 6,
+                    display: 'inline-block',
+                  }}>
+                    {project.domain}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Project Details */}
+        {currentProject && (
+          <>
+            {/* Overview + Effort */}
+            <div className="card span-8" style={cardStyle('medium', '#27ae60', 'rgba(39,174,96,.3)')}>
+              <h2 style={{ marginTop: 0, color: '#27ae60' }}>💡 {currentProject.name}</h2>
+              <p style={{ fontSize: 16, fontStyle: 'italic', color: '#27ae60', marginBottom: 12 }}>
+                &quot;{currentProject.tagline}&quot;
+              </p>
+              <p className="small" style={{ lineHeight: 1.7 }}>{currentProject.description}</p>
+              
+              <h4 style={{ color: '#27ae60', marginTop: 20 }}>Tech Stack</h4>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {currentProject.techStack.map((tech, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      padding: '5px 10px',
+                      background: 'rgba(39,174,96,.2)',
+                      borderRadius: 6,
+                      fontSize: 12,
+                    }}
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="card span-4" style={cardStyle('small', '#ff9500', 'rgba(255,149,0,.3)')}>
+              <h3 style={{ marginTop: 0, color: '#ff9500' }}>⏱️ Effort</h3>
+              <div style={{ display: 'grid', gap: 10 }}>
+                <div style={{ padding: 10, background: 'rgba(255,149,0,.1)', borderRadius: 8 }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#ff9500' }}>
+                    {currentProject.estimatedEffort.mvpDays} days
+                  </div>
+                  <div style={{ fontSize: 11, opacity: 0.7 }}>MVP Timeline</div>
+                </div>
+                <div style={{ padding: 10, background: 'rgba(255,149,0,.1)', borderRadius: 8 }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#ff9500' }}>
+                    {currentProject.estimatedEffort.teamSize} people
+                  </div>
+                  <div style={{ fontSize: 11, opacity: 0.7 }}>Team Size</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Monetization + Features */}
+            <div className="card span-6" style={cardStyle('medium', '#27ae60', 'rgba(39,174,96,.3)')}>
+              <h3 style={{ marginTop: 0, color: '#27ae60' }}>💰 Monetization</h3>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 13, opacity: 0.7 }}>Model</div>
+                <div style={{ fontSize: 16, fontWeight: 600 }}>{currentProject.monetization.primaryModel}</div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div style={{ padding: 10, background: 'rgba(39,174,96,.1)', borderRadius: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#27ae60' }}>
+                    {currentProject.monetization.estimatedMRR}
+                  </div>
+                  <div style={{ fontSize: 10, opacity: 0.7 }}>Est. MRR</div>
+                </div>
+                <div style={{ padding: 10, background: 'rgba(39,174,96,.1)', borderRadius: 8 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#27ae60' }}>
+                    {currentProject.monetization.timeToRevenue}
+                  </div>
+                  <div style={{ fontSize: 10, opacity: 0.7 }}>Time to Revenue</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card span-6" style={cardStyle('medium', '#9b59b6', 'rgba(155,89,182,.3)')}>
+              <h3 style={{ marginTop: 0, color: '#9b59b6' }}>✨ MVP Features</h3>
+              <ul style={{ paddingLeft: 18, margin: 0, fontSize: 13 }}>
+                {currentProject.mvpFeatures.map((feature, i) => (
+                  <li key={i} style={{ marginBottom: 6 }}>{feature}</li>
+                ))}
+              </ul>
+              
+              <h4 style={{ marginTop: 16, color: '#9b59b6' }}>🎯 Success Metrics</h4>
+              <ul style={{ paddingLeft: 18, margin: 0, fontSize: 13 }}>
+                {currentProject.successMetrics.map((metric, i) => (
+                  <li key={i} style={{ marginBottom: 6 }}>{metric}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Crew Consensus */}
+            <div className="card span-12" style={cardStyle('small', '#ffd700', 'rgba(255,215,0,.2)')}>
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setShowCrewDetails(!showCrewDetails)}
+              >
+                <h3 style={{ margin: 0, color: '#ffd700' }}>
+                  🖖 Crew Consensus
+                </h3>
+                <span>{showCrewDetails ? '▼' : '▶'}</span>
+              </div>
+              <p style={{ marginTop: 12, marginBottom: 0, lineHeight: 1.7, fontSize: 14 }}>
+                {currentProject.crewAnalysis.consensus}
+              </p>
+            </div>
+          </>
+        )}
       </div>
     );
   }
