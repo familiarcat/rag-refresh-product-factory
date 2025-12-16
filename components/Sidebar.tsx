@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -299,7 +299,7 @@ export function Sidebar() {
   );
 }
 
-// Nav Item Component
+// Nav Item Component with tooltip support
 function NavItem({ 
   href, 
   icon, 
@@ -313,14 +313,61 @@ function NavItem({
   isCollapsed: boolean; 
   isActive: boolean;
 }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
+  const itemRef = useRef<HTMLAnchorElement>(null);
+
+  const handleMouseEnter = () => {
+    if (isCollapsed && itemRef.current) {
+      const rect = itemRef.current.getBoundingClientRect();
+      setTooltipPos({
+        top: rect.top + rect.height / 2,
+        left: rect.right + 8,
+      });
+      setShowTooltip(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
   return (
-    <Link 
-      href={href} 
-      className={`navItem ${isActive ? 'active' : ''}`}
-      data-tooltip={label}
-    >
-      <span className="navIcon">{icon}</span>
-      {!isCollapsed && <span className="navLabel">{label}</span>}
-    </Link>
+    <>
+      <Link 
+        ref={itemRef}
+        href={href} 
+        className={`navItem ${isActive ? 'active' : ''}`}
+        aria-label={label}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <span className="navIcon">{icon}</span>
+        {!isCollapsed && <span className="navLabel">{label}</span>}
+      </Link>
+      {showTooltip && isCollapsed && (
+        <div
+          style={{
+            position: 'fixed',
+            top: tooltipPos.top,
+            left: tooltipPos.left,
+            transform: 'translateY(-50%)',
+            background: 'var(--panel)',
+            border: '1px solid var(--accent1)',
+            padding: '6px 12px',
+            borderRadius: 8,
+            fontSize: 12,
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            zIndex: 9999,
+            boxShadow: '0 4px 16px rgba(0,0,0,.4)',
+            color: 'var(--text)',
+            pointerEvents: 'none',
+          }}
+        >
+          {label}
+        </div>
+      )}
+    </>
   );
 }

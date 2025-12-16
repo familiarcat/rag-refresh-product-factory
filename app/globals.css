@@ -169,34 +169,17 @@ a:hover{text-decoration:underline}
 .sidebar.collapsed .navItem{padding:12px;justify-content:center}
 .sidebar.collapsed .navItem .navIcon{font-size:20px}
 
-/* Collapsed Tooltip */
-.sidebar.collapsed .navItem::after{
-  content:attr(data-tooltip);
-  position:absolute;
-  left:calc(100% + 8px);
-  top:50%;
-  transform:translateY(-50%);
-  background:var(--panel);
-  border:1px solid var(--line);
-  padding:6px 12px;
-  border-radius:8px;
-  font-size:12px;
-  white-space:nowrap;
-  opacity:0;
-  visibility:hidden;
-  transition:all 0.15s ease;
-  z-index:1000;
-  box-shadow:0 4px 12px rgba(0,0,0,.3);
-  pointer-events:none;
+/* Collapsed Nav Item Hover Enhancement */
+.sidebar.collapsed .navItem{
+  position:relative;
 }
-.sidebar.collapsed .navItem:hover::after{
-  opacity:1;
-  visibility:visible;
-}
-.sidebar.collapsed .navItem.active::after{
-  background:rgba(124,92,255,.25);
+.sidebar.collapsed .navItem:hover{
+  background:rgba(124,92,255,.15);
   border-color:var(--accent1);
-  color:var(--accent1);
+  transform:scale(1.08);
+}
+.sidebar.collapsed .navItem:hover .navIcon{
+  transform:scale(1.1);
 }
 
 /* Collapsed Crew Avatars */
