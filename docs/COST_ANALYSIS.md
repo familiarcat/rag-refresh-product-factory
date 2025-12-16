@@ -122,20 +122,42 @@ Total: 10 seconds
 
 > *"Rule of Acquisition #62: The riskier the road, the greater the profit."*
 
-**For a project in active development:**
+### Development Phase Strategy
+
+**Smart Approach: Decouple milestones from deployments**
+
+| Activity | What Happens | Cost Impact |
+|----------|--------------|-------------|
+| Milestone push | Git + Supabase only | $0 |
+| Local development | Run locally | $0 |
+| Manual deploy | When ready to test prod | ~$0.05/deploy |
+| Auto CI/CD | Re-enable for production | ~$0.05/deploy |
+
+**Recommended Workflow:**
+```bash
+# Development (milestones without deploy)
+./scripts/milestone/run_milestone.sh "Feature X complete"
+
+# When ready to test on production
+./scripts/deploy-app.sh
+# OR
+./scripts/milestone/run_milestone.sh "Ready for testing" --deploy
+```
+
+### Production Phase Strategy
 
 | Approach | Recommendation |
 |----------|----------------|
 | Keep EC2 always running | ✅ Developer time > $39/month |
-| Use CI/CD auto-deploy | ✅ Saves 8+ hours/month |
-| Manual Terraform deploys | ❌ False economy |
+| Use CI/CD auto-deploy | ✅ Re-enable for production releases |
+| Batch deployments | ✅ Deploy at milestones, not every commit |
 | Run locally only | ❌ No production presence |
 
 **The $39/month buys you:**
 - 24/7 production availability
 - SSL/HTTPS via ACM (free)
 - Professional infrastructure
-- Instant deploys via CI/CD
+- Deploy when YOU decide
 - Credibility with clients
 
 *"Remember, hu-mon: Time is money. And your time is worth more than $39/month."*

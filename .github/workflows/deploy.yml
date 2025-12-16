@@ -1,22 +1,41 @@
 name: Deploy to EC2 (SSM)
 
-on:
-  push:
-    branches: [ "main" ]
-    paths:
-      # Only deploy when app code changes
-      - 'app/**'
-      - 'components/**'
-      - 'lib/**'
-      - 'public/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'Dockerfile'
-      - 'next.config.js'
-      - 'tsconfig.json'
+# ============================================================================
+# DEPLOYMENT STRATEGY (Development Mode)
+# ============================================================================
+# Auto-deploy is DISABLED for cost/speed efficiency during development.
+# Milestones push to git + Supabase but don't trigger AWS deployment.
+#
+# To deploy:
+#   Local:  ./scripts/deploy-app.sh
+#   GitHub: Run workflow manually via Actions tab or:
+#           gh workflow run deploy.yml
+#
+# To re-enable auto-deploy for production, uncomment the 'push' trigger below.
+# ============================================================================
 
-  # Allow manual trigger
+on:
+  # Auto-deploy disabled during development (uncomment for production)
+  # push:
+  #   branches: [ "main" ]
+  #   paths:
+  #     - 'app/**'
+  #     - 'components/**'
+  #     - 'lib/**'
+  #     - 'public/**'
+  #     - 'package.json'
+  #     - 'package-lock.json'
+  #     - 'Dockerfile'
+  #     - 'next.config.js'
+  #     - 'tsconfig.json'
+
+  # Manual trigger only (via GitHub Actions UI or CLI)
   workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for deployment'
+        required: false
+        default: 'Manual deployment'
 
 env:
   AWS_REGION: us-east-2
