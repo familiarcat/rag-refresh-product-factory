@@ -2,13 +2,14 @@ import { categories } from '../../../lib/categories';
 import { OpportunityMatrix } from '../../../components/Charts';
 import Link from 'next/link';
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const cat = categories.find(c => c.slug === params.slug);
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const cat = categories.find(c => c.slug === slug);
   if (!cat) {
     return (
       <div className="card">
         <div className="badge risk">Missing category</div>
-        <p className="small" style={{marginTop:10}}>No category found for <code>{params.slug}</code>.</p>
+        <p className="small" style={{marginTop:10}}>No category found for <code>{slug}</code>.</p>
         <p><Link href="/categories">Back to Categories →</Link></p>
       </div>
     );
