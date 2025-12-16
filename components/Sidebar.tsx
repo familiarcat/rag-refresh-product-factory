@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -44,6 +44,7 @@ export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [tooltip, setTooltip] = useState<{ label: string; top: number; left: number } | null>(null);
   const pathname = usePathname();
 
   // Fetch projects
@@ -77,6 +78,18 @@ export function Sidebar() {
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
+  };
+
+  const handleNavHover = (label: string, rect: DOMRect) => {
+    setTooltip({
+      label,
+      top: rect.top + rect.height / 2,
+      left: rect.right + 8,
+    });
+  };
+
+  const handleNavLeave = () => {
+    setTooltip(null);
   };
 
   return (
@@ -128,9 +141,9 @@ export function Sidebar() {
         {/* Projects Section - TOP PRIORITY */}
         <div className="navBlock">
           {!isCollapsed && <div className="navHeader">📦 Projects</div>}
-          <NavItem href="/portfolio" icon="🌳" label="Portfolio Overview" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} />
-          <NavItem href="/projects" icon="📋" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects') && pathname === '/projects'} />
-          <NavItem href="/create" icon="🚀" label="Create New" isCollapsed={isCollapsed} isActive={isActive('/create')} />
+          <NavItem href="/portfolio" icon="🌳" label="Portfolio Overview" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/projects" icon="📋" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects') && pathname === '/projects'} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/create" icon="🚀" label="Create New" isCollapsed={isCollapsed} isActive={isActive('/create')} onHover={handleNavHover} onLeave={handleNavLeave} />
           
           {/* Active Projects List */}
           {!isCollapsed && projects.length > 0 && (
@@ -216,19 +229,19 @@ export function Sidebar() {
         {/* Factory Navigation */}
         <div className="navBlock">
           {!isCollapsed && <div className="navHeader">🏭 Factory</div>}
-          <NavItem href="/" icon="🏠" label="Home" isCollapsed={isCollapsed} isActive={isActive('/') && pathname === '/'} />
-          <NavItem href="/categories" icon="🏗️" label="Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} />
-          <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} />
-          <NavItem href="/diagnostics" icon="⚙️" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} />
-          <NavItem href="/deploy-metrics" icon="📊" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} />
-          <NavItem href="/env" icon="🔧" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} />
+          <NavItem href="/" icon="🏠" label="Home" isCollapsed={isCollapsed} isActive={isActive('/') && pathname === '/'} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/categories" icon="🏗️" label="Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/diagnostics" icon="⚙️" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/deploy-metrics" icon="📊" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/env" icon="🔧" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} onHover={handleNavHover} onLeave={handleNavLeave} />
         </div>
 
         {/* Crew Navigation */}
         <div className="navBlock">
           {!isCollapsed && <div className="navHeader">🖖 Crew</div>}
-          <NavItem href="/crew" icon="👥" label="Crew Roster" isCollapsed={isCollapsed} isActive={isActive('/crew')} />
-          <NavItem href="/observation-lounge" icon="🖖" label="Observation Lounge" isCollapsed={isCollapsed} isActive={isActive('/observation-lounge')} />
+          <NavItem href="/crew" icon="👥" label="Crew Roster" isCollapsed={isCollapsed} isActive={isActive('/crew')} onHover={handleNavHover} onLeave={handleNavLeave} />
+          <NavItem href="/observation-lounge" icon="🖖" label="Observation Lounge" isCollapsed={isCollapsed} isActive={isActive('/observation-lounge')} onHover={handleNavHover} onLeave={handleNavLeave} />
         </div>
 
         {/* Factory Docs Navigation */}
@@ -241,7 +254,9 @@ export function Sidebar() {
               icon={(it as any).icon || navIcons[it.route] || '📄'} 
               label={it.label} 
               isCollapsed={isCollapsed} 
-              isActive={isActive(it.route)} 
+              isActive={isActive(it.route)}
+              onHover={handleNavHover}
+              onLeave={handleNavLeave}
             />
           ))}
         </div>
@@ -295,79 +310,71 @@ export function Sidebar() {
           </div>
         )}
       </aside>
-    </>
-  );
-}
 
-// Nav Item Component with tooltip support
-function NavItem({ 
-  href, 
-  icon, 
-  label, 
-  isCollapsed, 
-  isActive 
-}: { 
-  href: string; 
-  icon: string; 
-  label: string; 
-  isCollapsed: boolean; 
-  isActive: boolean;
-}) {
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
-  const itemRef = useRef<HTMLAnchorElement>(null);
-
-  const handleMouseEnter = () => {
-    if (isCollapsed && itemRef.current) {
-      const rect = itemRef.current.getBoundingClientRect();
-      setTooltipPos({
-        top: rect.top + rect.height / 2,
-        left: rect.right + 8,
-      });
-      setShowTooltip(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setShowTooltip(false);
-  };
-
-  return (
-    <>
-      <Link 
-        ref={itemRef}
-        href={href} 
-        className={`navItem ${isActive ? 'active' : ''}`}
-        aria-label={label}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <span className="navIcon">{icon}</span>
-        {!isCollapsed && <span className="navLabel">{label}</span>}
-      </Link>
-      {showTooltip && isCollapsed && (
+      {/* Fixed Tooltip for collapsed state */}
+      {tooltip && isCollapsed && (
         <div
           style={{
             position: 'fixed',
-            top: tooltipPos.top,
-            left: tooltipPos.left,
+            top: tooltip.top,
+            left: tooltip.left,
             transform: 'translateY(-50%)',
-            background: 'var(--panel)',
-            border: '1px solid var(--accent1)',
+            background: '#1a1f35',
+            border: '1px solid #7c5cff',
             padding: '6px 12px',
             borderRadius: 8,
             fontSize: 12,
             fontWeight: 500,
             whiteSpace: 'nowrap',
             zIndex: 9999,
-            boxShadow: '0 4px 16px rgba(0,0,0,.4)',
-            color: 'var(--text)',
+            boxShadow: '0 4px 16px rgba(0,0,0,.5)',
+            color: '#eef1ff',
             pointerEvents: 'none',
           }}
         >
-          {label}
+          {tooltip.label}
         </div>
       )}
     </>
+  );
+}
+
+// Nav Item Component - renders inside Sidebar which handles tooltip state
+function NavItem({ 
+  href, 
+  icon, 
+  label, 
+  isCollapsed, 
+  isActive,
+  onHover,
+  onLeave,
+}: { 
+  href: string; 
+  icon: string; 
+  label: string; 
+  isCollapsed: boolean; 
+  isActive: boolean;
+  onHover?: (label: string, rect: DOMRect) => void;
+  onLeave?: () => void;
+}) {
+  const handleMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isCollapsed && onHover) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      onHover(label, rect);
+    }
+  };
+
+  return (
+    <Link 
+      href={href} 
+      className={`navItem ${isActive ? 'active' : ''}`}
+      aria-label={label}
+      title={isCollapsed ? label : undefined}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={onLeave}
+    >
+      <span className="navIcon">{icon}</span>
+      {!isCollapsed && <span className="navLabel">{label}</span>}
+    </Link>
   );
 }
