@@ -28,6 +28,23 @@ export const defaultConfig: DeployConfig = {
 
 // Intent patterns for natural language parsing
 export const deploymentIntents = {
+  // Milestone with deploy (check this BEFORE milestone-only)
+  milestoneAndDeploy: [
+    /milestone.*(?:and|with|then).*deploy/i,
+    /milestone.*push.*deploy/i,
+    /push.*milestone.*deploy/i,
+    /milestone.*also.*deploy/i,
+    /milestone.*\+.*deploy/i,
+  ],
+  // Milestone only (no deploy)
+  milestone: [
+    /make.*milestone/i,
+    /milestone.*push/i,
+    /push.*milestone/i,
+    /create.*milestone/i,
+    /save.*milestone/i,
+    /record.*milestone/i,
+  ],
   redeploy: [
     /redeploy/i,
     /deploy.*docker/i,
@@ -82,6 +99,22 @@ export function detectDeployIntent(query: string): DeployIntent | null {
 }
 
 /**
+ * Extract milestone title from natural language query
+ */
+export function extractMilestoneTitle(query: string): string {
+  // Try to extract quoted title
+  const quotedMatch = query.match(/["']([^"']+)["']/);
+  if (quotedMatch) return quotedMatch[1];
+  
+  // Try to extract title after "called" or "named" or "titled"
+  const namedMatch = query.match(/(?:called|named|titled)\s+(.+?)(?:\s+and|\s*$)/i);
+  if (namedMatch) return namedMatch[1].trim();
+  
+  // Default title based on timestamp
+  return `Milestone ${new Date().toISOString().split('T')[0]}`;
+}
+
+/**
  * Generate human-readable response for deployment actions
  */
 export function formatDeployResponse(result: DeployResult): string {
@@ -90,6 +123,32 @@ export function formatDeployResponse(result: DeployResult): string {
   }
 
   switch (result.action) {
+    case 'milestoneAndDeploy':
+      return `📦 **Milestone + Deploy**
+
+${result.message}
+
+**What's happening:**
+1. ✅ Changes committed to Git
+2. ✅ Milestone saved to Supabase RAG
+3. 🚀 Deploying to AWS...
+
+${result.details?.commandId ? `Command ID: \`${result.details.commandId}\`` : ''}
+
+Check https://rag.pbradygeorgen.com in ~2 minutes.`;
+
+    case 'milestone':
+      return `📦 **Milestone Saved**
+
+${result.message}
+
+**What happened:**
+- ✅ Changes committed to Git
+- ✅ Milestone saved to Supabase RAG
+- ⏸️ No deployment (development mode)
+
+To deploy later: \`./scripts/deploy-app.sh\``;
+
     case 'redeploy':
       return `🚀 **Deployment Initiated!**
 
