@@ -116,6 +116,7 @@ export function Sidebar() {
           <NavItem href="/categories" icon="📂" label="Categories" isCollapsed={isCollapsed} isActive={isActive('/categories')} />
           <NavItem href="/create" icon="🚀" label="Create" isCollapsed={isCollapsed} isActive={isActive('/create')} />
           <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} />
+          <NavItem href="/deploy-metrics" icon="📊" label="Deploy Metrics" isCollapsed={isCollapsed} isActive={isActive('/deploy-metrics')} />
           <NavItem href="/diagnostics" icon="⚙️" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} />
           <NavItem href="/env" icon="🔧" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} />
         </div>
