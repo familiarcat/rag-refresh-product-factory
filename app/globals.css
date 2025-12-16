@@ -65,8 +65,8 @@ a:hover{text-decoration:underline}
 /* Collapse Button */
 .collapseBtn{
   position:absolute;
-  top:20px;
-  right:8px;
+  top:16px;
+  right:12px;
   width:28px;
   height:28px;
   border-radius:8px;
@@ -87,12 +87,16 @@ a:hover{text-decoration:underline}
   transform:scale(1.05);
 }
 .sidebar.collapsed .collapseBtn{
-  right:50%;
-  transform:translateX(50%);
-  top:60px;
+  position:relative;
+  right:auto;
+  top:auto;
+  margin:0 auto 12px;
+  width:36px;
+  height:36px;
+  font-size:16px;
 }
 .sidebar.collapsed .collapseBtn:hover{
-  transform:translateX(50%) scale(1.05);
+  transform:scale(1.05);
 }
 
 /* Mobile Menu Button */
@@ -149,21 +153,51 @@ a:hover{text-decoration:underline}
 .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px;min-height:44px;padding-right:40px}
 .brandText{overflow:hidden;white-space:nowrap}
 .logo{width:44px;height:44px;min-width:44px;border-radius:14px;background:linear-gradient(135deg,var(--accent1),var(--accent2),var(--accent3));box-shadow:0 14px 36px rgba(0,0,0,.38);}
-.sidebar.collapsed .logo{width:40px;height:40px;min-width:40px}
-.sidebar.collapsed .brand{padding-right:0;justify-content:center}
+.sidebar.collapsed .logo{width:36px;height:36px;min-width:36px;border-radius:10px}
+.sidebar.collapsed .brand{padding-right:0;justify-content:center;margin-bottom:8px;min-height:auto}
 .title{font-weight:800;font-size:15px}
 .subtitle{color:var(--muted);font-size:11px;margin-top:3px}
 
 /* Navigation */
 .navBlock{margin-top:18px}
 .navHeader{color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:12px 0 8px;white-space:nowrap;overflow:hidden;font-weight:600}
-.navItem{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;margin:5px 0;border:1px solid transparent;background:rgba(255,255,255,.03);color:var(--text);transition:all 0.2s;white-space:nowrap;overflow:hidden;font-size:14px}
+.navItem{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;margin:5px 0;border:1px solid transparent;background:rgba(255,255,255,.03);color:var(--text);transition:all 0.2s;white-space:nowrap;overflow:hidden;font-size:14px;position:relative}
 .navItem:hover{border-color:var(--line);background:rgba(255,255,255,.07);text-decoration:none}
 .navItem.active{border-color:var(--accent1);background:rgba(124,92,255,.18);color:var(--accent1);font-weight:500}
 .navIcon{font-size:18px;min-width:24px;text-align:center}
 .navLabel{overflow:hidden;text-overflow:ellipsis}
 .sidebar.collapsed .navItem{padding:12px;justify-content:center}
 .sidebar.collapsed .navItem .navIcon{font-size:20px}
+
+/* Collapsed Tooltip */
+.sidebar.collapsed .navItem::after{
+  content:attr(data-tooltip);
+  position:absolute;
+  left:calc(100% + 8px);
+  top:50%;
+  transform:translateY(-50%);
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:12px;
+  white-space:nowrap;
+  opacity:0;
+  visibility:hidden;
+  transition:all 0.15s ease;
+  z-index:1000;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+  pointer-events:none;
+}
+.sidebar.collapsed .navItem:hover::after{
+  opacity:1;
+  visibility:visible;
+}
+.sidebar.collapsed .navItem.active::after{
+  background:rgba(124,92,255,.25);
+  border-color:var(--accent1);
+  color:var(--accent1);
+}
 
 /* Collapsed Crew Avatars */
 .collapsedCrewAvatars{

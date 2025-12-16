@@ -317,7 +317,7 @@ function NavItem({
     <Link 
       href={href} 
       className={`navItem ${isActive ? 'active' : ''}`}
-      title={isCollapsed ? label : undefined}
+      data-tooltip={label}
     >
       <span className="navIcon">{icon}</span>
       {!isCollapsed && <span className="navLabel">{label}</span>}
