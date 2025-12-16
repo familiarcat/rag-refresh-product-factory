@@ -21,6 +21,7 @@
     "infra:plan": "cd infra && terraform plan"
   },
   "dependencies": {
+    "@aws-sdk/client-ssm": "^3.952.0",
     "marked": "12.0.2",
     "next": "^16.0.10",
     "react": "18.2.0",
