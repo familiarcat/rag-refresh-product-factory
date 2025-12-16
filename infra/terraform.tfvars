@@ -5,7 +5,7 @@
 aws_region = "us-east-2"
 
 # EC2 Configuration
-key_name       = "alexai-key"
+key_name       = "AlexKeyPair"
 instance_type  = "t3.small"
 root_volume_gb = 40
 
@@ -23,3 +23,6 @@ route53_zone_id = "Z0759101F61W3MIFHSWK"
 # Subdomains
 app_subdomain = "rag"
 n8n_subdomain = "n8n"
+
+# Disable alarms until CloudWatch permissions are added
+enable_alarms = false
