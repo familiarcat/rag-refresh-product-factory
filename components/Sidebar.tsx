@@ -40,6 +40,46 @@ const navIcons: Record<string, string> = {
   '/docs/assumptions': '💡',
 };
 
+// Nav Item Component - defined before main export for Turbopack compatibility
+function NavItem({ 
+  href, 
+  icon, 
+  label, 
+  isCollapsed, 
+  isActive,
+  onHover,
+  onLeave,
+}: { 
+  href: string; 
+  icon: string; 
+  label: string; 
+  isCollapsed: boolean; 
+  isActive: boolean;
+  onHover?: (label: string, rect: DOMRect) => void;
+  onLeave?: () => void;
+}) {
+  const handleMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isCollapsed && onHover) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      onHover(label, rect);
+    }
+  };
+
+  return (
+    <Link 
+      href={href} 
+      className={`navItem ${isActive ? 'active' : ''}`}
+      aria-label={label}
+      title={isCollapsed ? label : undefined}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={onLeave}
+    >
+      <span className="navIcon">{icon}</span>
+      {!isCollapsed && <span className="navLabel">{label}</span>}
+    </Link>
+  );
+}
+
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -336,45 +376,5 @@ export function Sidebar() {
         </div>
       )}
     </>
-  );
-}
-
-// Nav Item Component - renders inside Sidebar which handles tooltip state
-function NavItem({ 
-  href, 
-  icon, 
-  label, 
-  isCollapsed, 
-  isActive,
-  onHover,
-  onLeave,
-}: { 
-  href: string; 
-  icon: string; 
-  label: string; 
-  isCollapsed: boolean; 
-  isActive: boolean;
-  onHover?: (label: string, rect: DOMRect) => void;
-  onLeave?: () => void;
-}) {
-  const handleMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (isCollapsed && onHover) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      onHover(label, rect);
-    }
-  };
-
-  return (
-    <Link 
-      href={href} 
-      className={`navItem ${isActive ? 'active' : ''}`}
-      aria-label={label}
-      title={isCollapsed ? label : undefined}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={onLeave}
-    >
-      <span className="navIcon">{icon}</span>
-      {!isCollapsed && <span className="navLabel">{label}</span>}
-    </Link>
   );
 }
