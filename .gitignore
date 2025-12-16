@@ -16,14 +16,17 @@ dist/
 .env.*.local
 .secrets/
 
-# --- Terraform state (keep state out of git) ---
+# --- Terraform state & plans (keep out of git) ---
 infra/.terraform/
 infra/.terraform.lock.hcl
 infra/terraform.tfstate
 infra/terraform.tfstate.*
+infra/tfplan
+infra/terraform.tfvars
 **/.terraform/
 **/terraform.tfstate
 **/terraform.tfstate.*
+**/tfplan
 
 # --- Milestones (keep folder, not artifacts) ---
 milestones/*.md
