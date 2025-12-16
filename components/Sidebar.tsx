@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { docsNav } from '../lib/nav';
+import { ProjectSummary, getStatusIcon, getStatusColor } from '../lib/projects';
 
 const crewIds = [
   { id: 'captain_picard', name: 'Captain Picard' },
@@ -42,7 +43,22 @@ const navIcons: Record<string, string> = {
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const pathname = usePathname();
+
+  // Fetch projects
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const res = await fetch('/api/projects?status=active');
+        const data = await res.json();
+        setProjects(data.projects || []);
+      } catch (error) {
+        console.error('Failed to load projects:', error);
+      }
+    }
+    loadProjects();
+  }, [pathname]); // Refresh when navigating
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -143,22 +159,76 @@ export function Sidebar() {
           ))}
         </div>
 
-        {/* Projects Section - Placeholder for future managed projects */}
-        {!isCollapsed && (
-          <div className="navBlock">
-            <div className="navHeader">📦 Projects</div>
+        {/* Projects Section */}
+        <div className="navBlock">
+          {!isCollapsed && <div className="navHeader">📦 Projects</div>}
+          <NavItem href="/projects" icon="📋" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects') && pathname === '/projects'} />
+          
+          {/* Active Projects List */}
+          {!isCollapsed && projects.length > 0 && (
+            <div style={{ marginTop: 4 }}>
+              {projects.slice(0, 5).map(project => (
+                <Link
+                  key={project.id}
+                  href={`/projects/${project.id}`}
+                  className={`navItem ${isActive(`/projects/${project.id}`) ? 'active' : ''}`}
+                  style={{ paddingLeft: 20 }}
+                >
+                  <span className="navIcon" style={{ fontSize: 12 }}>
+                    {getStatusIcon(project.status)}
+                  </span>
+                  <span className="navLabel" style={{ 
+                    fontSize: 12,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {project.name}
+                  </span>
+                  <span style={{
+                    marginLeft: 'auto',
+                    fontSize: 10,
+                    padding: '1px 4px',
+                    background: `${getStatusColor(project.status)}20`,
+                    color: getStatusColor(project.status),
+                    borderRadius: 3,
+                  }}>
+                    {project.progress}%
+                  </span>
+                </Link>
+              ))}
+              {projects.length > 5 && (
+                <Link 
+                  href="/projects" 
+                  style={{ 
+                    display: 'block',
+                    padding: '6px 14px 6px 20px',
+                    fontSize: 11,
+                    color: 'var(--muted)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  +{projects.length - 5} more...
+                </Link>
+              )}
+            </div>
+          )}
+          
+          {/* Empty state */}
+          {!isCollapsed && projects.length === 0 && (
             <div style={{ 
-              padding: '12px 14px', 
-              fontSize: 12, 
+              padding: '8px 14px', 
+              fontSize: 11, 
               color: 'var(--muted)',
               background: 'rgba(255,255,255,.02)',
-              borderRadius: 8,
-              border: '1px dashed rgba(255,255,255,.1)'
+              borderRadius: 6,
+              border: '1px dashed rgba(255,255,255,.1)',
+              marginTop: 4,
             }}>
-              No projects yet. Use <strong>Create</strong> to generate your first domain-driven project.
+              No active projects
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Crew Quick Status - Only when expanded */}
         {!isCollapsed && (

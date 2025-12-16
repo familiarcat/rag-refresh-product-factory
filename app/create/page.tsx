@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { categories } from '../../lib/categories';
 import { templateForCategorySlug } from '../../lib/projectTemplates';
 
@@ -171,8 +172,9 @@ interface YouTubeProject {
 }
 
 export default function CreatePage() {
+  const router = useRouter();
   const [path, setPath] = useState<CreationPath>('select');
-  
+
   // Conceptualize state
   const [topic, setTopic] = useState('a Next.js AI studio for DJs');
   const [tpl, setTpl] = useState(conceptualizeTemplates[0].name);
@@ -233,16 +235,129 @@ export default function CreatePage() {
   }
 
   async function createProject() {
+    if (!projectName.trim()) {
+      alert('Please enter a project name');
+      return;
+    }
+    
     setSaving(true);
-    const res = await fetch('/api/projects/create', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ category, name: projectName, draft: projectDraft })
-    });
-    const j = await res.json();
-    setSaving(false);
-    if (!j.ok) alert('Project creation failed: ' + (j.error || 'unknown'));
-    else alert('Project created (or queued via n8n). Check diagnostics + your filesystem target.');
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: projectName,
+          category: category || 'ai-observability-diagnostics',
+          source: 'structured',
+          tagline: `A ${categories.find(c => c.slug === category)?.name || 'new'} project`,
+          description: projectDraft,
+          status: 'draft',
+        }),
+      });
+      const data = await res.json();
+      setSaving(false);
+      
+      if (data.ok && data.id) {
+        router.push(`/projects/${data.id}`);
+      } else {
+        alert('Project creation failed: ' + (data.error || 'unknown'));
+      }
+    } catch (error) {
+      setSaving(false);
+      alert('Project creation failed: ' + (error instanceof Error ? error.message : 'unknown'));
+    }
+  }
+  
+  async function createConceptualizeProject() {
+    if (!topic.trim()) {
+      alert('Please enter a topic');
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: topic,
+          source: 'conceptualize',
+          tagline: `Conceptualized: ${tpl}`,
+          description: draft,
+          status: 'draft',
+        }),
+      });
+      const data = await res.json();
+      setSaving(false);
+      
+      if (data.ok && data.id) {
+        // Also save to RAG
+        await fetch('/api/notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: `${tpl}: ${topic}`, text: draft }),
+        });
+        router.push(`/projects/${data.id}`);
+      } else {
+        alert('Project creation failed: ' + (data.error || 'unknown'));
+      }
+    } catch (error) {
+      setSaving(false);
+      alert('Project creation failed: ' + (error instanceof Error ? error.message : 'unknown'));
+    }
+  }
+  
+  async function createYoutubeProject(projectIndex: number) {
+    const project = youtubeProjects[projectIndex];
+    if (!project) return;
+    
+    setSaving(true);
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: project.name,
+          source: 'youtube',
+          sourceUrl: youtubeUrl,
+          tagline: project.tagline,
+          description: project.description,
+          techStack: {
+            frontend: project.techStack.filter((t: string) => ['React', 'Next.js', 'Vue', 'Angular', 'TypeScript'].some(f => t.includes(f))),
+            backend: project.techStack.filter((t: string) => ['Node', 'Python', 'API', 'Server'].some(f => t.includes(f))),
+            infrastructure: project.techStack.filter((t: string) => ['AWS', 'Docker', 'Cloud', 'Deploy'].some(f => t.includes(f))),
+            ai: project.techStack.filter((t: string) => ['AI', 'ML', 'OpenAI', 'GPT', 'LLM', 'RAG'].some(f => t.includes(f))),
+            other: project.techStack.filter((t: string) => !['React', 'Next.js', 'Node', 'AWS', 'AI', 'ML'].some(f => t.includes(f))),
+          },
+          monetization: {
+            model: project.monetization?.primaryModel || 'saas',
+            targetPrice: project.monetization?.estimatedMRR || 'TBD',
+            revenueStreams: project.monetization?.revenueStreams?.map((r: { name: string }) => r.name) || [],
+            timeline: project.monetization?.timeToRevenue || 'TBD',
+          },
+          mvpFeatures: project.mvpFeatures || [],
+          successMetrics: project.successMetrics || [],
+          crew: project.crewAnalysis ? Object.entries(project.crewAnalysis).map(([id, analysis]) => ({
+            crewMemberId: id,
+            role: (analysis as { role?: string }).role || 'Advisor',
+            assignedAt: new Date().toISOString(),
+            contributions: [(analysis as { insight?: string }).insight || ''],
+          })) : [],
+          status: 'draft',
+        }),
+      });
+      const data = await res.json();
+      setSaving(false);
+      
+      if (data.ok && data.id) {
+        router.push(`/projects/${data.id}`);
+      } else {
+        alert('Project creation failed: ' + (data.error || 'unknown'));
+      }
+    } catch (error) {
+      setSaving(false);
+      alert('Project creation failed: ' + (error instanceof Error ? error.message : 'unknown'));
+    }
   }
 
   async function generateYoutubeProjects() {
@@ -572,6 +687,22 @@ export default function CreatePage() {
                 }}
               >
                 {saving ? 'Saving…' : '💾 Save to RAG'}
+              </button>
+              <button 
+                onClick={createConceptualizeProject} 
+                disabled={saving} 
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 8,
+                  border: `1px solid ${currentTheme.accent}`,
+                  background: currentTheme.accent,
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  cursor: 'pointer'
+                }}
+              >
+                {saving ? 'Creating…' : '🚀 Create Project'}
               </button>
             </div>
           </div>
@@ -1004,6 +1135,36 @@ export default function CreatePage() {
               <p style={{ marginTop: 12, marginBottom: 0, lineHeight: 1.7, fontSize: 14 }}>
                 {currentProject.crewAnalysis.consensus}
               </p>
+            </div>
+
+            {/* Create Project Button */}
+            <div className="card span-12" style={{ 
+              ...cardStyle('small', '#00c2ff', 'rgba(0,194,255,.3)'),
+              textAlign: 'center',
+              padding: '24px',
+            }}>
+              <h3 style={{ margin: '0 0 12px', color: '#00c2ff' }}>
+                Ready to start this project?
+              </h3>
+              <p style={{ margin: '0 0 16px', color: 'var(--muted)', fontSize: 14 }}>
+                Add &quot;{currentProject.name}&quot; to your active projects and begin development.
+              </p>
+              <button
+                onClick={() => createYoutubeProject(selectedYoutubeProject)}
+                disabled={saving}
+                style={{
+                  padding: '14px 28px',
+                  borderRadius: 10,
+                  border: 'none',
+                  background: '#00c2ff',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: 15,
+                  cursor: 'pointer',
+                }}
+              >
+                {saving ? 'Creating Project...' : '🚀 Create Project'}
+              </button>
             </div>
           </>
         )}
