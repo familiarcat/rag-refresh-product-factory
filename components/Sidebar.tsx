@@ -23,9 +23,8 @@ const crewIds = [
 const navIcons: Record<string, string> = {
   '/': '🏠',
   '/categories': '📂',
-  '/projects/new': '➕',
+  '/create': '🚀',
   '/ask': '💬',
-  '/create': '✨',
   '/diagnostics': '⚙️',
   '/env': '🔧',
   '/crew': '👥',
@@ -115,9 +114,8 @@ export function Sidebar() {
           {!isCollapsed && <div className="navHeader">Core</div>}
           <NavItem href="/" icon="🏠" label="Home" isCollapsed={isCollapsed} isActive={isActive('/')} />
           <NavItem href="/categories" icon="📂" label="Categories" isCollapsed={isCollapsed} isActive={isActive('/categories')} />
-          <NavItem href="/projects/new" icon="➕" label="New Project" isCollapsed={isCollapsed} isActive={isActive('/projects/new')} />
+          <NavItem href="/create" icon="🚀" label="Create" isCollapsed={isCollapsed} isActive={isActive('/create')} />
           <NavItem href="/ask" icon="💬" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} />
-          <NavItem href="/create" icon="✨" label="Create" isCollapsed={isCollapsed} isActive={isActive('/create')} />
           <NavItem href="/diagnostics" icon="⚙️" label="Diagnostics" isCollapsed={isCollapsed} isActive={isActive('/diagnostics')} />
           <NavItem href="/env" icon="🔧" label="Environment" isCollapsed={isCollapsed} isActive={isActive('/env')} />
         </div>
