@@ -90,3 +90,4 @@ echo "  1. Remove AWS exports from ~/.zshrc"
 echo "  2. Remove [rag-refresh-deploy] from ~/.aws/credentials"
 echo "  3. Run: source ~/.zshrc"
 echo ""
+

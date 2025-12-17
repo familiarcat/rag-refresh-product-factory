@@ -444,3 +444,4 @@ export function calculateTreeProgress(node: ProjectTreeNode): number {
   // Weight: 60% own progress, 40% children progress
   return Math.round(node.project.progress * 0.6 + avgChildProgress * 0.4);
 }
+

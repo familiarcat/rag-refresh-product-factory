@@ -497,3 +497,4 @@ export class RikerCoordinator {
 export function createRikerCoordinator(memories: RAGMemory[] = []): RikerCoordinator {
   return new RikerCoordinator(memories);
 }
+

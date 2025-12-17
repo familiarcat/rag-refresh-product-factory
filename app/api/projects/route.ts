@@ -212,3 +212,4 @@ export async function DELETE(req: Request) {
     action: permanent ? 'deleted' : 'archived',
   });
 }
+

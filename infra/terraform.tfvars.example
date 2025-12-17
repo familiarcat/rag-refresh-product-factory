@@ -25,3 +25,4 @@ route53_zone_id = "Z0123456789ABCDEFGHIJ"
 # Subdomains for app and n8n
 app_subdomain = "app"
 n8n_subdomain = "n8n"
+

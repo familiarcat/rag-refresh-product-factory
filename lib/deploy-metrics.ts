@@ -257,3 +257,4 @@ export function getTroiInsight(summary: DeploymentSummary): string {
 
   return insights.join(' ');
 }
+
