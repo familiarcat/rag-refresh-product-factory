@@ -37,10 +37,12 @@ export interface ProjectDomain {
 
 // Crew member assignment to a project
 export interface CrewAssignment {
-  crewMemberId: string;
+  crewMemberId?: string; // Legacy support
+  memberId?: string;     // Alternate field name
   role: string;
-  assignedAt: string;
-  contributions: string[];
+  assignedAt?: string;
+  assignment?: string;   // Task description
+  contributions?: string[];
 }
 
 // Monetization strategy for a project
@@ -113,9 +115,11 @@ export interface Project {
 
 export interface ProjectMilestone {
   id: string;
-  title: string;
-  description: string;
+  title?: string;       // Original field
+  name?: string;        // Alternate field name
+  description?: string;
   targetDate?: string;
+  date?: string;        // Alternate field name
   completedAt?: string;
   status: 'pending' | 'in-progress' | 'completed';
 }

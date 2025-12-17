@@ -1,0 +1,122 @@
+[
+  {
+    "id": "mem_data_rag_1",
+    "crewId": "commander_data",
+    "content": "RAG systems perform optimally with chunk sizes between 500-1000 tokens for semantic search accuracy. Larger chunks preserve context but reduce precision.",
+    "type": "lesson",
+    "createdAt": "2024-12-01T00:00:00Z"
+  },
+  {
+    "id": "mem_data_llm_1",
+    "crewId": "commander_data",
+    "content": "When selecting LLMs for code generation, Claude 3.5 Sonnet excels at understanding complex contexts while GPT-4 Turbo is superior for edge case handling.",
+    "type": "pattern",
+    "createdAt": "2024-12-03T00:00:00Z"
+  },
+  {
+    "id": "mem_geordi_infra_1",
+    "crewId": "geordi_la_forge",
+    "content": "Docker builds for Next.js should use standalone output mode for 3x smaller images. Always build with --platform linux/amd64 for AWS EC2 compatibility.",
+    "type": "pattern",
+    "createdAt": "2024-12-05T00:00:00Z"
+  },
+  {
+    "id": "mem_geordi_cicd_1",
+    "crewId": "geordi_la_forge",
+    "content": "SSM deployment via GitHub Actions is more reliable than SSH. Use instance profiles with minimal IAM permissions for security.",
+    "type": "solution",
+    "createdAt": "2024-12-10T00:00:00Z"
+  },
+  {
+    "id": "mem_troi_ux_1",
+    "crewId": "counselor_troi",
+    "content": "Users prefer progressive disclosure - show essential info first, details on demand. Wizard flows increase completion rates by 40% over single-page forms.",
+    "type": "pattern",
+    "createdAt": "2024-12-08T00:00:00Z"
+  },
+  {
+    "id": "mem_troi_sidebar_1",
+    "crewId": "counselor_troi",
+    "content": "Collapsible sidebars need clear tooltips on hover. Users feel lost without navigation labels - always provide context in collapsed state.",
+    "type": "lesson",
+    "createdAt": "2024-12-14T00:00:00Z"
+  },
+  {
+    "id": "mem_quark_pricing_1",
+    "crewId": "quark",
+    "content": "Freemium with 3-tier pricing converts 5-8% of free users. Target $19-49 sweet spot for B2B SaaS. Rule of Acquisition #1: Once you have their money, never give it back.",
+    "type": "lesson",
+    "createdAt": "2024-12-10T00:00:00Z"
+  },
+  {
+    "id": "mem_quark_cost_1",
+    "crewId": "quark",
+    "content": "Development-phase CI/CD costs can exceed $50/month. Manual milestone pushes during active development save 40% on infrastructure costs.",
+    "type": "decision",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T00:00:00Z"
+  },
+  {
+    "id": "mem_worf_security_1",
+    "crewId": "lieutenant_worf",
+    "content": "Always validate auth tokens server-side. Never trust client-side validation for security. Defense in depth is not optional.",
+    "type": "warning",
+    "createdAt": "2024-12-12T00:00:00Z"
+  },
+  {
+    "id": "mem_worf_iam_1",
+    "crewId": "lieutenant_worf",
+    "content": "AWS IAM policies should follow least-privilege principle. Deployer users need only specific permissions - never use AdministratorAccess.",
+    "type": "pattern",
+    "createdAt": "2024-12-13T00:00:00Z"
+  },
+  {
+    "id": "mem_obrien_debug_1",
+    "crewId": "chief_obrien",
+    "content": "When SSM commands fail, check instance profile and IAM roles first - 90% of issues are permissions. Always verify the instance is running and SSM agent is active.",
+    "type": "solution",
+    "createdAt": "2024-12-14T00:00:00Z"
+  },
+  {
+    "id": "mem_obrien_turbopack_1",
+    "crewId": "chief_obrien",
+    "content": "Turbopack has issues with helper components defined after main exports. Always define helper components before the main export function.",
+    "type": "solution",
+    "createdAt": "2024-12-15T00:00:00Z"
+  },
+  {
+    "id": "mem_picard_strategy_1",
+    "crewId": "captain_picard",
+    "content": "Start with one excellent feature rather than many mediocre ones. Quality begets trust. A ship is only as strong as its foundation.",
+    "type": "decision",
+    "createdAt": "2024-12-15T00:00:00Z"
+  },
+  {
+    "id": "mem_picard_crew_1",
+    "crewId": "captain_picard",
+    "content": "Cross-functional teams outperform siloed experts. Pair mentors with generalists for knowledge transfer. The whole is greater than the sum of its parts.",
+    "type": "pattern",
+    "createdAt": "2024-12-16T00:00:00Z"
+  },
+  {
+    "id": "mem_riker_collab_1",
+    "crewId": "commander_riker",
+    "content": "Parallel work on similar domains across projects multiplies learning. When Data works on AI for one project, those insights accelerate all AI work.",
+    "type": "lesson",
+    "createdAt": "2024-12-17T00:00:00Z"
+  },
+  {
+    "id": "mem_crusher_health_1",
+    "crewId": "dr_crusher",
+    "content": "System health checks should run at multiple levels: unit, integration, and end-to-end. Early detection prevents cascading failures.",
+    "type": "pattern",
+    "createdAt": "2024-12-11T00:00:00Z"
+  },
+  {
+    "id": "mem_uhura_api_1",
+    "crewId": "lieutenant_uhura",
+    "content": "API error messages should be actionable. Tell the user what went wrong AND how to fix it. Good communication prevents support tickets.",
+    "type": "lesson",
+    "createdAt": "2024-12-09T00:00:00Z"
+  }
+]

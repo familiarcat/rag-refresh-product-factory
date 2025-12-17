@@ -22,6 +22,14 @@ export async function appendEvent(evt: any) {
   await writeJSON(file, arr);
 }
 
+// Alias for appendEvent with structured format
+export async function addEvent(event: { type: string; payload: Record<string, unknown> }) {
+  await appendEvent({
+    ...event,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 export async function appendFeedback(fb: any) {
   const file = path.join(process.cwd(), 'data', 'feedback.json');
   const arr = await readJSON(file);
