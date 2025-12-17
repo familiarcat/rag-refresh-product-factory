@@ -289,7 +289,7 @@ export function Sidebar() {
 
         {/* Factory Navigation */}
         <div className="navBlock">
-          {!isCollapsed && <div className="navHeader"><Icon name="delta" size={14} style={{marginRight: 6}} /> Factory</div>}
+          {!isCollapsed && <div className="navHeader"><Icon name="delta" size={14} style={{marginRight: 6}} /> Application Factory</div>}
           <NavItem href="/" iconName="home" label="Home" isCollapsed={isCollapsed} isActive={isActive('/') && pathname === '/'} onHover={handleNavHover} onLeave={handleNavLeave} />
           <NavItem href="/categories" iconName="domains" label="Domains" isCollapsed={isCollapsed} isActive={isActive('/categories')} onHover={handleNavHover} onLeave={handleNavLeave} />
           <NavItem href="/ask" iconName="ask" label="Ask" isCollapsed={isCollapsed} isActive={isActive('/ask')} onHover={handleNavHover} onLeave={handleNavLeave} />
