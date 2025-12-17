@@ -1,5 +1,404 @@
 {
-  "projects": [],
+  "projects": [
+    {
+      "id": "proj_1765948227414_iw68yf",
+      "name": "AI Writing Assistant",
+      "tagline": "Intelligent writing companion for creative professionals",
+      "description": "An AI-powered writing assistant that helps creative professionals overcome writers block, generate ideas, and refine their prose with contextual suggestions.",
+      "source": "conceptualize",
+      "createdAt": "2025-12-17T05:10:27.405Z",
+      "updatedAt": "2025-12-17T05:10:49.132Z",
+      "status": "active",
+      "progress": 0,
+      "primaryCategory": "",
+      "domains": [],
+      "scores": {
+        "demand": 5,
+        "effort": 5,
+        "monetization": 5,
+        "differentiation": 5,
+        "risk": 5
+      },
+      "crew": [],
+      "monetization": {
+        "model": "freemium",
+        "targetPrice": "$19/mo",
+        "revenueStreams": [
+          "Subscriptions",
+          "API Access"
+        ],
+        "timeline": "3 months to MVP"
+      },
+      "targetMarket": [
+        "Writers",
+        "Content Creators",
+        "Marketing Teams"
+      ],
+      "techStack": {
+        "frontend": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ],
+        "backend": [
+          "Node.js",
+          "Next.js API"
+        ],
+        "infrastructure": [
+          "AWS",
+          "Docker"
+        ],
+        "ai": [],
+        "other": []
+      },
+      "mvpFeatures": [],
+      "completedFeatures": [],
+      "milestones": [],
+      "successMetrics": [],
+      "notes": "",
+      "tags": []
+    },
+    {
+      "id": "proj_1765948227455_bqe52g",
+      "name": "DocuSearch Enterprise",
+      "tagline": "Enterprise document search with RAG",
+      "description": "A scalable RAG platform for enterprise document retrieval with IaC deployment and domain boundaries.",
+      "source": "structured",
+      "createdAt": "2025-12-17T05:10:27.455Z",
+      "updatedAt": "2025-12-17T05:10:49.160Z",
+      "status": "active",
+      "progress": 0,
+      "primaryCategory": "enterprise-rag-platform-foundation",
+      "domains": [
+        {
+          "slug": "core",
+          "name": "Core Functionality",
+          "description": "Primary Enterprise RAG Platform Foundation implementation",
+          "scores": {
+            "demand": 8,
+            "effort": 7,
+            "monetization": 7,
+            "differentiation": 6,
+            "risk": 4
+          },
+          "features": [],
+          "status": "planned",
+          "progress": 0
+        }
+      ],
+      "scores": {
+        "demand": 8,
+        "effort": 7,
+        "monetization": 7,
+        "differentiation": 6,
+        "risk": 4
+      },
+      "crew": [],
+      "monetization": {
+        "model": "saas",
+        "targetPrice": "TBD",
+        "revenueStreams": [],
+        "timeline": "TBD"
+      },
+      "targetMarket": [],
+      "techStack": {
+        "frontend": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ],
+        "backend": [
+          "Node.js",
+          "Supabase",
+          "pgvector"
+        ],
+        "infrastructure": [
+          "Terraform",
+          "AWS",
+          "Docker"
+        ],
+        "ai": [
+          "OpenAI",
+          "Langchain"
+        ]
+      },
+      "mvpFeatures": [],
+      "completedFeatures": [],
+      "milestones": [],
+      "successMetrics": [],
+      "notes": "",
+      "tags": []
+    },
+    {
+      "id": "proj_1765948227482_u3gf4c",
+      "name": "Feedback Widget",
+      "tagline": "Embeddable user feedback collector",
+      "description": "A lightweight, embeddable widget for collecting user feedback on any website. 24-hour MVP challenge.",
+      "source": "rapid",
+      "createdAt": "2025-12-17T05:10:27.482Z",
+      "updatedAt": "2025-12-17T05:10:49.217Z",
+      "status": "active",
+      "progress": 0,
+      "primaryCategory": "",
+      "domains": [],
+      "scores": {
+        "demand": 5,
+        "effort": 5,
+        "monetization": 5,
+        "differentiation": 5,
+        "risk": 5
+      },
+      "crew": [],
+      "monetization": {
+        "model": "usage-based",
+        "targetPrice": "$0.001/feedback",
+        "revenueStreams": [
+          "Usage fees"
+        ],
+        "timeline": "24 hours"
+      },
+      "targetMarket": [],
+      "techStack": {
+        "frontend": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ],
+        "backend": [
+          "Node.js",
+          "Next.js API"
+        ],
+        "infrastructure": [
+          "AWS",
+          "Docker"
+        ],
+        "ai": [],
+        "other": []
+      },
+      "mvpFeatures": [],
+      "completedFeatures": [],
+      "milestones": [],
+      "successMetrics": [],
+      "notes": "",
+      "tags": []
+    },
+    {
+      "id": "proj_1765948227502_1m0gpk",
+      "name": "Code Review Automation",
+      "tagline": "Automated code review with AI insights",
+      "description": "Inspired by YouTube content on code review best practices. Uses AI to provide automated code reviews with actionable feedback.",
+      "source": "youtube",
+      "sourceUrl": "https://youtube.com/watch?v=example",
+      "createdAt": "2025-12-17T05:10:27.502Z",
+      "updatedAt": "2025-12-17T05:10:49.250Z",
+      "status": "active",
+      "progress": 0,
+      "primaryCategory": "",
+      "domains": [],
+      "scores": {
+        "demand": 5,
+        "effort": 5,
+        "monetization": 5,
+        "differentiation": 5,
+        "risk": 5
+      },
+      "crew": [
+        {
+          "memberId": "commander_data",
+          "role": "lead",
+          "assignment": "AI model integration"
+        },
+        {
+          "memberId": "geordi_la_forge",
+          "role": "contributor",
+          "assignment": "CI/CD pipeline"
+        }
+      ],
+      "monetization": {
+        "model": "saas",
+        "targetPrice": "TBD",
+        "revenueStreams": [],
+        "timeline": "TBD"
+      },
+      "targetMarket": [],
+      "techStack": {
+        "frontend": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ],
+        "backend": [
+          "Node.js",
+          "Next.js API"
+        ],
+        "infrastructure": [
+          "AWS",
+          "Docker"
+        ],
+        "ai": [],
+        "other": []
+      },
+      "mvpFeatures": [],
+      "completedFeatures": [],
+      "milestones": [],
+      "successMetrics": [],
+      "notes": "",
+      "tags": []
+    },
+    {
+      "id": "proj_1765948227523_ch3w6f",
+      "name": "Minimal Test Project",
+      "tagline": "A new project",
+      "description": "",
+      "source": "conceptualize",
+      "createdAt": "2025-12-17T05:10:27.523Z",
+      "updatedAt": "2025-12-17T05:10:27.523Z",
+      "status": "draft",
+      "progress": 0,
+      "primaryCategory": "",
+      "domains": [],
+      "scores": {
+        "demand": 5,
+        "effort": 5,
+        "monetization": 5,
+        "differentiation": 5,
+        "risk": 5
+      },
+      "crew": [],
+      "monetization": {
+        "model": "saas",
+        "targetPrice": "TBD",
+        "revenueStreams": [],
+        "timeline": "TBD"
+      },
+      "targetMarket": [],
+      "techStack": {
+        "frontend": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ],
+        "backend": [
+          "Node.js",
+          "Next.js API"
+        ],
+        "infrastructure": [
+          "AWS",
+          "Docker"
+        ],
+        "ai": [],
+        "other": []
+      },
+      "mvpFeatures": [],
+      "completedFeatures": [],
+      "milestones": [],
+      "successMetrics": [],
+      "notes": "",
+      "tags": []
+    },
+    {
+      "id": "proj_1765948227561_cxwynk",
+      "name": "This Is A Very Long Project Name That Tests The UI Rendering And Database Storage Capabilities Of Our Multi-Project Management System",
+      "tagline": "A new project",
+      "description": "",
+      "source": "conceptualize",
+      "createdAt": "2025-12-17T05:10:27.561Z",
+      "updatedAt": "2025-12-17T05:10:27.561Z",
+      "status": "draft",
+      "progress": 0,
+      "primaryCategory": "",
+      "domains": [],
+      "scores": {
+        "demand": 5,
+        "effort": 5,
+        "monetization": 5,
+        "differentiation": 5,
+        "risk": 5
+      },
+      "crew": [],
+      "monetization": {
+        "model": "saas",
+        "targetPrice": "TBD",
+        "revenueStreams": [],
+        "timeline": "TBD"
+      },
+      "targetMarket": [],
+      "techStack": {
+        "frontend": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ],
+        "backend": [
+          "Node.js",
+          "Next.js API"
+        ],
+        "infrastructure": [
+          "AWS",
+          "Docker"
+        ],
+        "ai": [],
+        "other": []
+      },
+      "mvpFeatures": [],
+      "completedFeatures": [],
+      "milestones": [],
+      "successMetrics": [],
+      "notes": "",
+      "tags": []
+    },
+    {
+      "id": "proj_1765948227585_ihp4di",
+      "name": "Project: Test (v2.0) - Alpha & Beta [Draft]",
+      "tagline": "A new project",
+      "description": "",
+      "source": "conceptualize",
+      "createdAt": "2025-12-17T05:10:27.585Z",
+      "updatedAt": "2025-12-17T05:10:27.585Z",
+      "status": "draft",
+      "progress": 0,
+      "primaryCategory": "",
+      "domains": [],
+      "scores": {
+        "demand": 5,
+        "effort": 5,
+        "monetization": 5,
+        "differentiation": 5,
+        "risk": 5
+      },
+      "crew": [],
+      "monetization": {
+        "model": "saas",
+        "targetPrice": "TBD",
+        "revenueStreams": [],
+        "timeline": "TBD"
+      },
+      "targetMarket": [],
+      "techStack": {
+        "frontend": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ],
+        "backend": [
+          "Node.js",
+          "Next.js API"
+        ],
+        "infrastructure": [
+          "AWS",
+          "Docker"
+        ],
+        "ai": [],
+        "other": []
+      },
+      "mvpFeatures": [],
+      "completedFeatures": [],
+      "milestones": [],
+      "successMetrics": [],
+      "notes": "",
+      "tags": []
+    }
+  ],
   "meta": {
     "version": "1.0",
     "createdAt": "2024-12-15T00:00:00.000Z",
