@@ -13,6 +13,12 @@ import {
   ProjectStatus,
 } from '../../../lib/projects';
 import { categories } from '../../../lib/categories';
+import { 
+  DomainStatusBar, 
+  ScoreBar, 
+  DomainProgressList, 
+  DomainSummaryStrip 
+} from '../../../components/DomainStatusBar';
 
 export default function ProjectDashboard() {
   const params = useParams();
@@ -326,9 +332,39 @@ export default function ProjectDashboard() {
       {/* Tab Content */}
       {activeTab === 'overview' && (
         <>
-          {/* Scorecard */}
+          {/* Domain Status Overview - Horizontal Bar */}
+          {project.domains.length > 0 && (
+            <div className="card">
+              <h2 style={{ margin: '0 0 16px', fontSize: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                🏗️ Domain Status Overview
+                <span style={{ 
+                  fontSize: 12, 
+                  fontWeight: 'normal', 
+                  padding: '2px 8px', 
+                  background: 'var(--surface)', 
+                  borderRadius: 4 
+                }}>
+                  {project.domains.length} domains
+                </span>
+              </h2>
+              <DomainStatusBar domains={project.domains} height={48} />
+              
+              {/* Domain Summary Strip */}
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+                <DomainSummaryStrip domains={project.domains} />
+              </div>
+            </div>
+          )}
+
+          {/* Scorecard with Horizontal Bars */}
           <div className="card">
             <h2 style={{ margin: '0 0 16px', fontSize: 16 }}>📊 Project Scorecard</h2>
+            <ScoreBar scores={project.scores} />
+          </div>
+          
+          {/* Legacy Grid Scorecard (compact) */}
+          <div className="card">
+            <h3 style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--muted)' }}>Score Summary</h3>
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(5, 1fr)', 
@@ -433,38 +469,54 @@ export default function ProjectDashboard() {
       )}
 
       {activeTab === 'domains' && (
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div style={{ display: 'grid', gap: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ margin: 0, fontSize: 16 }}>🏗️ Project Domains</h2>
-            <button style={{
-              padding: '8px 16px',
-              background: 'var(--accent)',
-              border: 'none',
-              borderRadius: 6,
-              color: 'white',
-              cursor: 'pointer',
-              fontSize: 12,
-            }}>
-              ➕ Add Domain
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Link href={`/projects/${project.id}/domains`}>
+                <button style={{
+                  padding: '8px 16px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                }}>
+                  🌳 Full View
+                </button>
+              </Link>
+              <button style={{
+                padding: '8px 16px',
+                background: 'var(--accent)',
+                border: 'none',
+                borderRadius: 6,
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: 12,
+              }}>
+                ➕ Add Domain
+              </button>
+            </div>
           </div>
+          
+          {/* Domain Status Bar at top */}
+          {project.domains.length > 0 && (
+            <DomainStatusBar domains={project.domains} height={40} />
+          )}
           
           {project.domains.length === 0 ? (
             <div className="card" style={{ textAlign: 'center', padding: 32 }}>
               <p style={{ color: 'var(--muted)' }}>No domains defined yet. Add domains to track progress by area.</p>
             </div>
           ) : (
-            project.domains.map((domain, i) => (
-              <DomainCard 
-                key={domain.slug} 
-                domain={domain} 
-                onUpdate={(d) => {
-                  const newDomains = [...project.domains];
-                  newDomains[i] = d;
-                  updateProject({ domains: newDomains });
-                }}
-              />
-            ))
+            <DomainProgressList 
+              domains={project.domains}
+              onDomainClick={(domain) => {
+                // Could open a modal or navigate to domain detail
+                console.log('Clicked domain:', domain.slug);
+              }}
+            />
           )}
         </div>
       )}

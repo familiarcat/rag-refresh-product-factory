@@ -14,6 +14,12 @@ import {
   FACTORY_PROJECT_ID,
   createFactoryProject,
 } from '../../../../lib/projects';
+import { 
+  DomainStatusBar, 
+  ScoreBar, 
+  DomainProgressList,
+  DomainSummaryStrip,
+} from '../../../../components/DomainStatusBar';
 
 export default function ProjectDomainsPage() {
   const params = useParams();
@@ -287,7 +293,13 @@ export default function ProjectDomainsPage() {
         </div>
       </div>
 
-      {/* Domain Status Summary */}
+      {/* Domain Status Summary - Horizontal Bar */}
+      <div className="card">
+        <h3 style={{ margin: '0 0 16px', fontSize: 14 }}>Domain Progress Overview</h3>
+        <DomainStatusBar domains={project.domains} height={56} />
+      </div>
+
+      {/* Status Counts */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
         <div className="card" style={{ textAlign: 'center', padding: 16 }}>
           <div style={{ fontSize: 28, fontWeight: 'bold', color: '#6b7280' }}>
@@ -309,11 +321,16 @@ export default function ProjectDomainsPage() {
         </div>
       </div>
 
-      {/* Domains Grid */}
-      <div style={{ display: 'grid', gap: 16 }}>
-        {project.domains.map((domain, i) => (
-          <DomainCard key={domain.slug} domain={domain} index={i} />
-        ))}
+      {/* Project Scorecard */}
+      <div className="card">
+        <h3 style={{ margin: '0 0 16px', fontSize: 14 }}>📊 Aggregated Scores</h3>
+        <ScoreBar scores={project.scores} />
+      </div>
+
+      {/* Domains List with Progress Bars */}
+      <div className="card">
+        <h3 style={{ margin: '0 0 16px', fontSize: 14 }}>🏗️ All Domains</h3>
+        <DomainProgressList domains={project.domains} />
       </div>
 
       {/* Child Projects */}

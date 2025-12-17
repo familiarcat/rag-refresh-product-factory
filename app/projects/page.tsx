@@ -150,6 +150,38 @@ export default function ProjectsPage() {
             <ScoreBar label="Δ" value={project.scores.differentiation} />
           </div>
 
+          {/* Domain Count Strip */}
+          {project.domainCount > 0 && (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 8,
+              marginBottom: 8,
+              paddingBottom: 8,
+              borderBottom: '1px solid var(--border)',
+            }}>
+              <span style={{ fontSize: 11, color: 'var(--muted)' }}>
+                🏗️ {project.domainCount} domain{project.domainCount !== 1 ? 's' : ''}
+              </span>
+              {/* Mini domain bar */}
+              <div style={{ 
+                flex: 1, 
+                height: 6, 
+                background: 'var(--surface)', 
+                borderRadius: 3,
+                overflow: 'hidden',
+                display: 'flex',
+              }}>
+                <div style={{ 
+                  width: `${project.progress}%`, 
+                  height: '100%', 
+                  background: `linear-gradient(90deg, ${getStatusColor(project.status)}, var(--accent))`,
+                  borderRadius: 3,
+                }} />
+              </div>
+            </div>
+          )}
+
           {/* Footer */}
           <div style={{ 
             display: 'flex', 
