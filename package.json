@@ -9,24 +9,18 @@
     "lint": "next lint",
     "check:env": "node scripts/check-env.mjs",
     "dev:check": "npm run check:env && next dev",
-    
     "alex-ai:activate": "node scripts/alex-ai/activate.mjs",
     "alex-ai:memories": "node scripts/alex-ai/memories.mjs",
     "alex-ai:coordinate": "node scripts/alex-ai/coordinate.mjs",
-    
     "milestone": "bash scripts/milestone/run_milestone.sh",
     "milestone:deploy": "bash scripts/milestone/run_milestone.sh --deploy",
     "milestone:prune": "node scripts/milestone/prune_local.mjs",
-    
     "deploy": "bash scripts/deploy-app.sh",
-    
     "secrets:sync": "bash scripts/secrets/sync_from_zshrc.sh && cp .secrets/.env.local .env.local",
     "secrets:gh": "bash scripts/secrets/gh_sync_secrets.sh",
-    
     "doctor": "bash scripts/bootstrap/doctor.sh",
     "bootstrap:init": "bash scripts/bootstrap/init_repo.sh",
     "bootstrap:setup": "bash scripts/bootstrap/unify_setup.sh",
-    
     "infra:init": "cd infra && terraform init",
     "infra:apply": "cd infra && terraform apply",
     "infra:plan": "cd infra && terraform plan"
