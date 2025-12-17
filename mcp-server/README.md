@@ -17,16 +17,16 @@ The Alex AI Crew System as an MCP (Model Context Protocol) server for Cursor and
 
 Each crew member uses an optimal LLM:
 
-| Crew Member | Model | Reason |
-|-------------|-------|--------|
-| Captain Picard | `claude-3.5-sonnet` | Strategic thinking |
-| Commander Riker | `claude-3.5-sonnet` | Coordination |
-| Commander Data | `gpt-4-turbo` | Technical analysis |
-| Lt. Cmdr. La Forge | `claude-3.5-sonnet` | Engineering |
-| Counselor Troi | `claude-3.5-sonnet` | Empathy/UX |
-| Lt. Worf | `gpt-4-turbo` | Security (thorough) |
-| Chief O'Brien | `gpt-4-turbo` | Implementation |
-| Quark | `gpt-4-turbo` | Business analysis |
+| Crew Member        | Model               | Reason              |
+| ------------------ | ------------------- | ------------------- |
+| Captain Picard     | `claude-3.5-sonnet` | Strategic thinking  |
+| Commander Riker    | `claude-3.5-sonnet` | Coordination        |
+| Commander Data     | `gpt-4-turbo`       | Technical analysis  |
+| Lt. Cmdr. La Forge | `claude-3.5-sonnet` | Engineering         |
+| Counselor Troi     | `claude-3.5-sonnet` | Empathy/UX          |
+| Lt. Worf           | `gpt-4-turbo`       | Security (thorough) |
+| Chief O'Brien      | `gpt-4-turbo`       | Implementation      |
+| Quark              | `gpt-4-turbo`       | Business analysis   |
 
 ## Installation
 

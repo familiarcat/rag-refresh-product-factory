@@ -118,5 +118,61 @@
     "content": "API error messages should be actionable. Tell the user what went wrong AND how to fix it. Good communication prevents support tickets.",
     "type": "lesson",
     "createdAt": "2024-12-09T00:00:00Z"
+  },
+  {
+    "id": "mem_data_mcp_1",
+    "crewId": "commander_data",
+    "content": "MCP (Model Context Protocol) servers enable AI agents to be IDE-independent. The @modelcontextprotocol/sdk package provides Server, StdioServerTransport for stdio-based communication with tools and prompts capabilities.",
+    "type": "pattern",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T18:00:00Z"
+  },
+  {
+    "id": "mem_data_openrouter_1",
+    "crewId": "commander_data",
+    "content": "OpenRouter API (https://openrouter.ai/api/v1/chat/completions) provides unified access to multiple LLMs. Requires OPENROUTER_API_KEY header. Response format follows OpenAI structure with choices[0].message.content.",
+    "type": "solution",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T18:30:00Z"
+  },
+  {
+    "id": "mem_geordi_mcp_1",
+    "crewId": "geordi_la_forge",
+    "content": "MCP server in Cursor requires ~/.cursor/mcp.json config with command, args, and env. Environment variables can use ${VAR} syntax for passthrough from shell. Restart Cursor after config changes.",
+    "type": "solution",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T18:15:00Z"
+  },
+  {
+    "id": "mem_picard_alexai_1",
+    "crewId": "captain_picard",
+    "content": "Alex AI independence achieved through MCP server with OpenRouter integration. Each crew member now has their own LLM assignment - Claude for strategic/empathetic roles, GPT-4 for analytical/thorough tasks. The crew is no longer bound to any single AI provider.",
+    "type": "decision",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T19:00:00Z"
+  },
+  {
+    "id": "mem_riker_mcp_session_1",
+    "crewId": "commander_riker",
+    "content": "Session completed: Created Alex AI MCP server (mcp-server/index.mjs) with 7 tools - alex_ai_chat, alex_ai_coordinate, alex_ai_memories, alex_ai_save_memory, alex_ai_projects, alex_ai_milestone, alex_ai_observation_lounge. Server v2.0 uses OpenRouter for independent LLM responses.",
+    "type": "lesson",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T19:30:00Z"
+  },
+  {
+    "id": "mem_data_crew_models_1",
+    "crewId": "commander_data",
+    "content": "Crew LLM assignments: Picard/Riker/Geordi/Troi use anthropic/claude-3.5-sonnet (strategic, coordination, engineering, empathy). Data/Worf/O'Brien/Quark use openai/gpt-4-turbo (analysis, security, implementation, business). Each has custom temperature settings.",
+    "type": "pattern",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T19:15:00Z"
+  },
+  {
+    "id": "mem_troi_observation_lounge_1",
+    "crewId": "counselor_troi",
+    "content": "The Observation Lounge tool creates multi-agent discussions where crew members respond sequentially, each building on previous perspectives. This models real collaborative decision-making and provides diverse viewpoints on complex topics.",
+    "type": "pattern",
+    "projectContext": "factory",
+    "createdAt": "2024-12-15T19:20:00Z"
   }
 ]

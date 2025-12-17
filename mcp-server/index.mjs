@@ -411,7 +411,13 @@ async function generateCoordinationPlan() {
   // Generate Riker's briefing via OpenRouter
   const rikerResponse = await generateCrewResponse(
     "commander_riker",
-    `Provide a tactical coordination briefing. We have ${activeProjects.length} active projects and ${opportunities.length} collaboration opportunities requiring attention: ${JSON.stringify(opportunities.slice(0, 5))}. What are your recommendations for crew assignment and prioritization?`,
+    `Provide a tactical coordination briefing. We have ${
+      activeProjects.length
+    } active projects and ${
+      opportunities.length
+    } collaboration opportunities requiring attention: ${JSON.stringify(
+      opportunities.slice(0, 5)
+    )}. What are your recommendations for crew assignment and prioritization?`,
     { additionalContext: "This is a coordination briefing request." }
   );
 
@@ -445,7 +451,9 @@ async function generateObservationLoungeSession(topic, urgency, attendees) {
 
     const response = await generateCrewResponse(
       crewId,
-      `We are in the Observation Lounge discussing: "${topic}" (Urgency: ${urgency}). Please provide your perspective based on your expertise in ${crew.expertise.join(", ")}.`,
+      `We are in the Observation Lounge discussing: "${topic}" (Urgency: ${urgency}). Please provide your perspective based on your expertise in ${crew.expertise.join(
+        ", "
+      )}.`,
       { additionalContext: context }
     );
 
@@ -676,7 +684,9 @@ ${response.suggestion}`
 ${response.response}
 
 ---
-*Model: ${response.model} | ${new Date(response.timestamp).toLocaleTimeString()}*`;
+*Model: ${response.model} | ${new Date(
+              response.timestamp
+            ).toLocaleTimeString()}*`;
 
         return {
           content: [
@@ -707,7 +717,8 @@ ${
   plan.opportunities.length > 0
     ? plan.opportunities
         .map(
-          (o) => `- **${o.project}** → ${o.domain} (${o.progress}% - ${o.priority} priority)`
+          (o) =>
+            `- **${o.project}** → ${o.domain} (${o.progress}% - ${o.priority} priority)`
         )
         .join("\n")
     : "✅ All projects on track"
@@ -748,7 +759,9 @@ ${memories
   .slice(0, 20)
   .map(
     (m) =>
-      `### [${m.type.toUpperCase()}] ${CREW_MEMBERS[m.crewId]?.icon || "👤"} ${CREW_MEMBERS[m.crewId]?.name || m.crewId}
+      `### [${m.type.toUpperCase()}] ${CREW_MEMBERS[m.crewId]?.icon || "👤"} ${
+        CREW_MEMBERS[m.crewId]?.name || m.crewId
+      }
 ${m.content}
 *${new Date(m.createdAt).toLocaleDateString()}*`
   )
