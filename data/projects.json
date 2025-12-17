@@ -7,56 +7,84 @@
       "description": "An AI-powered writing assistant that helps creative professionals overcome writers block, generate ideas, and refine their prose with contextual suggestions.",
       "source": "conceptualize",
       "createdAt": "2025-12-17T05:10:27.405Z",
-      "updatedAt": "2025-12-17T05:10:49.132Z",
+      "updatedAt": "2025-12-17T06:30:00.000Z",
       "status": "active",
-      "progress": 0,
-      "primaryCategory": "",
-      "domains": [],
-      "scores": {
-        "demand": 5,
-        "effort": 5,
-        "monetization": 5,
-        "differentiation": 5,
-        "risk": 5
-      },
-      "crew": [],
+      "progress": 45,
+      "primaryCategory": "ai-observability-diagnostics-layer",
+      "domains": [
+        {
+          "slug": "core-editor",
+          "name": "Core Editor",
+          "description": "Rich text editor with AI-powered suggestions and real-time assistance",
+          "scores": { "demand": 9, "effort": 7, "monetization": 8, "differentiation": 7, "risk": 3 },
+          "features": ["Rich text editing", "AI autocomplete", "Style suggestions", "Grammar check"],
+          "status": "in-progress",
+          "progress": 65
+        },
+        {
+          "slug": "ai-engine",
+          "name": "AI Engine",
+          "description": "LLM integration for content generation, summarization, and style transfer",
+          "scores": { "demand": 8, "effort": 8, "monetization": 9, "differentiation": 8, "risk": 4 },
+          "features": ["GPT-4 integration", "Context window management", "Prompt templates", "Response streaming"],
+          "status": "in-progress",
+          "progress": 50
+        },
+        {
+          "slug": "user-management",
+          "name": "User Management",
+          "description": "Authentication, profiles, and subscription handling",
+          "scores": { "demand": 6, "effort": 5, "monetization": 7, "differentiation": 3, "risk": 2 },
+          "features": ["OAuth login", "User profiles", "Subscription tiers", "Usage tracking"],
+          "status": "planned",
+          "progress": 20
+        }
+      ],
+      "scores": { "demand": 8, "effort": 7, "monetization": 8, "differentiation": 6, "risk": 3 },
+      "crew": [
+        { "memberId": "commander_data", "role": "lead", "assignment": "AI model integration and prompt engineering" },
+        { "memberId": "counselor_troi", "role": "contributor", "assignment": "UX research and user experience design" },
+        { "memberId": "geordi_la_forge", "role": "contributor", "assignment": "Backend infrastructure and API design" }
+      ],
       "monetization": {
         "model": "freemium",
         "targetPrice": "$19/mo",
-        "revenueStreams": [
-          "Subscriptions",
-          "API Access"
-        ],
+        "revenueStreams": ["Subscriptions", "API Access", "Enterprise licenses"],
         "timeline": "3 months to MVP"
       },
-      "targetMarket": [
-        "Writers",
-        "Content Creators",
-        "Marketing Teams"
-      ],
+      "targetMarket": ["Writers", "Content Creators", "Marketing Teams", "Bloggers"],
       "techStack": {
-        "frontend": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ],
-        "backend": [
-          "Node.js",
-          "Next.js API"
-        ],
-        "infrastructure": [
-          "AWS",
-          "Docker"
-        ],
-        "ai": [],
-        "other": []
+        "frontend": ["Next.js", "React", "TypeScript", "TipTap Editor"],
+        "backend": ["Node.js", "Next.js API", "Supabase"],
+        "infrastructure": ["AWS", "Docker", "Vercel"],
+        "ai": ["OpenAI GPT-4", "Langchain"],
+        "other": ["Stripe", "Posthog"]
       },
-      "mvpFeatures": [],
-      "completedFeatures": [],
-      "milestones": [],
-      "successMetrics": [],
-      "notes": "",
-      "tags": []
+      "mvpFeatures": [
+        "Basic text editor with AI suggestions",
+        "User authentication",
+        "3 AI writing modes",
+        "Export to common formats"
+      ],
+      "completedFeatures": [
+        "Project setup and architecture",
+        "Basic editor integration",
+        "OpenAI API connection"
+      ],
+      "milestones": [
+        { "id": "ms1", "name": "Project Kickoff", "date": "2025-12-01", "status": "completed", "description": "Initial planning and architecture" },
+        { "id": "ms2", "name": "Editor MVP", "date": "2025-12-15", "status": "completed", "description": "Basic editor with AI integration" },
+        { "id": "ms3", "name": "Beta Launch", "date": "2026-01-15", "status": "in-progress", "description": "Private beta with 50 users" },
+        { "id": "ms4", "name": "Public Launch", "date": "2026-02-28", "status": "planned", "description": "Public launch with freemium model" }
+      ],
+      "successMetrics": [
+        { "name": "Daily Active Users", "target": "1000", "current": "0", "unit": "users" },
+        { "name": "Conversion Rate", "target": "5%", "current": "0%", "unit": "percent" },
+        { "name": "MRR", "target": "$5000", "current": "$0", "unit": "USD" },
+        { "name": "NPS Score", "target": "50", "current": "N/A", "unit": "score" }
+      ],
+      "notes": "Focus on writer experience first, expand to marketing teams in Q2. Consider partnership with writing communities.",
+      "tags": ["AI", "SaaS", "Writing", "Productivity", "B2C"]
     },
     {
       "id": "proj_1765948227455_bqe52g",
@@ -65,69 +93,95 @@
       "description": "A scalable RAG platform for enterprise document retrieval with IaC deployment and domain boundaries.",
       "source": "structured",
       "createdAt": "2025-12-17T05:10:27.455Z",
-      "updatedAt": "2025-12-17T05:10:49.160Z",
+      "updatedAt": "2025-12-17T06:30:00.000Z",
       "status": "active",
-      "progress": 0,
+      "progress": 30,
       "primaryCategory": "enterprise-rag-platform-foundation",
       "domains": [
         {
-          "slug": "core",
-          "name": "Core Functionality",
-          "description": "Primary Enterprise RAG Platform Foundation implementation",
-          "scores": {
-            "demand": 8,
-            "effort": 7,
-            "monetization": 7,
-            "differentiation": 6,
-            "risk": 4
-          },
-          "features": [],
+          "slug": "document-ingestion",
+          "name": "Document Ingestion",
+          "description": "Multi-format document parsing and chunking pipeline",
+          "scores": { "demand": 9, "effort": 6, "monetization": 7, "differentiation": 5, "risk": 3 },
+          "features": ["PDF parsing", "Word/Excel support", "OCR for images", "Automatic chunking"],
+          "status": "in-progress",
+          "progress": 60
+        },
+        {
+          "slug": "vector-search",
+          "name": "Vector Search",
+          "description": "Semantic search with pgvector and hybrid retrieval",
+          "scores": { "demand": 9, "effort": 7, "monetization": 8, "differentiation": 7, "risk": 4 },
+          "features": ["Embedding generation", "Semantic search", "Hybrid search", "Relevance tuning"],
+          "status": "in-progress",
+          "progress": 45
+        },
+        {
+          "slug": "rag-pipeline",
+          "name": "RAG Pipeline",
+          "description": "Question answering with citations and source tracking",
+          "scores": { "demand": 8, "effort": 8, "monetization": 9, "differentiation": 8, "risk": 5 },
+          "features": ["Context assembly", "LLM integration", "Citation generation", "Answer streaming"],
+          "status": "planned",
+          "progress": 15
+        },
+        {
+          "slug": "admin-dashboard",
+          "name": "Admin Dashboard",
+          "description": "Document management, user access, and analytics",
+          "scores": { "demand": 7, "effort": 5, "monetization": 6, "differentiation": 4, "risk": 2 },
+          "features": ["Document CRUD", "User management", "Usage analytics", "Audit logs"],
           "status": "planned",
           "progress": 0
         }
       ],
-      "scores": {
-        "demand": 8,
-        "effort": 7,
-        "monetization": 7,
-        "differentiation": 6,
-        "risk": 4
-      },
-      "crew": [],
+      "scores": { "demand": 8, "effort": 7, "monetization": 7, "differentiation": 6, "risk": 4 },
+      "crew": [
+        { "memberId": "captain_picard", "role": "sponsor", "assignment": "Strategic direction and enterprise sales" },
+        { "memberId": "commander_data", "role": "lead", "assignment": "RAG architecture and AI integration" },
+        { "memberId": "geordi_la_forge", "role": "lead", "assignment": "Infrastructure and deployment automation" },
+        { "memberId": "chief_obrien", "role": "contributor", "assignment": "Database optimization and scaling" }
+      ],
       "monetization": {
-        "model": "saas",
-        "targetPrice": "TBD",
-        "revenueStreams": [],
-        "timeline": "TBD"
+        "model": "enterprise",
+        "targetPrice": "$2000/mo base + usage",
+        "revenueStreams": ["Enterprise subscriptions", "Professional services", "Custom integrations"],
+        "timeline": "6 months to enterprise-ready"
       },
-      "targetMarket": [],
+      "targetMarket": ["Enterprise IT", "Legal firms", "Healthcare", "Financial services"],
       "techStack": {
-        "frontend": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ],
-        "backend": [
-          "Node.js",
-          "Supabase",
-          "pgvector"
-        ],
-        "infrastructure": [
-          "Terraform",
-          "AWS",
-          "Docker"
-        ],
-        "ai": [
-          "OpenAI",
-          "Langchain"
-        ]
+        "frontend": ["Next.js", "React", "TypeScript", "Tailwind"],
+        "backend": ["Node.js", "Supabase", "pgvector", "Redis"],
+        "infrastructure": ["Terraform", "AWS", "Docker", "Kubernetes"],
+        "ai": ["OpenAI", "Langchain", "Unstructured.io"],
+        "other": ["Auth0", "Datadog"]
       },
-      "mvpFeatures": [],
-      "completedFeatures": [],
-      "milestones": [],
-      "successMetrics": [],
-      "notes": "",
-      "tags": []
+      "mvpFeatures": [
+        "Document upload and parsing",
+        "Basic semantic search",
+        "Simple Q&A interface",
+        "Single-tenant deployment"
+      ],
+      "completedFeatures": [
+        "Infrastructure setup with Terraform",
+        "Supabase + pgvector integration",
+        "Basic PDF parsing"
+      ],
+      "milestones": [
+        { "id": "ms1", "name": "Infrastructure Ready", "date": "2025-12-10", "status": "completed", "description": "IaC and base deployment" },
+        { "id": "ms2", "name": "Ingestion Pipeline", "date": "2025-12-30", "status": "in-progress", "description": "Document processing complete" },
+        { "id": "ms3", "name": "Search MVP", "date": "2026-01-20", "status": "planned", "description": "Semantic search working" },
+        { "id": "ms4", "name": "RAG Complete", "date": "2026-02-15", "status": "planned", "description": "Full Q&A with citations" },
+        { "id": "ms5", "name": "Enterprise Pilot", "date": "2026-03-15", "status": "planned", "description": "First enterprise customer" }
+      ],
+      "successMetrics": [
+        { "name": "Query Latency P95", "target": "2s", "current": "N/A", "unit": "seconds" },
+        { "name": "Relevance Score", "target": "0.85", "current": "N/A", "unit": "score" },
+        { "name": "Enterprise Customers", "target": "3", "current": "0", "unit": "customers" },
+        { "name": "Documents Indexed", "target": "100000", "current": "0", "unit": "documents" }
+      ],
+      "notes": "Target legal and healthcare verticals first due to high document volume. Consider SOC2 certification timeline.",
+      "tags": ["Enterprise", "RAG", "Search", "B2B", "SaaS"]
     },
     {
       "id": "proj_1765948227482_u3gf4c",
@@ -136,51 +190,83 @@
       "description": "A lightweight, embeddable widget for collecting user feedback on any website. 24-hour MVP challenge.",
       "source": "rapid",
       "createdAt": "2025-12-17T05:10:27.482Z",
-      "updatedAt": "2025-12-17T05:10:49.217Z",
+      "updatedAt": "2025-12-17T06:30:00.000Z",
       "status": "active",
-      "progress": 0,
-      "primaryCategory": "",
-      "domains": [],
-      "scores": {
-        "demand": 5,
-        "effort": 5,
-        "monetization": 5,
-        "differentiation": 5,
-        "risk": 5
-      },
-      "crew": [],
+      "progress": 75,
+      "primaryCategory": "ai-observability-diagnostics-layer",
+      "domains": [
+        {
+          "slug": "widget-embed",
+          "name": "Widget Embed",
+          "description": "Lightweight embeddable script for any website",
+          "scores": { "demand": 8, "effort": 4, "monetization": 6, "differentiation": 5, "risk": 2 },
+          "features": ["Script embed", "Custom styling", "Position options", "Mobile responsive"],
+          "status": "completed",
+          "progress": 100
+        },
+        {
+          "slug": "feedback-api",
+          "name": "Feedback API",
+          "description": "Backend for storing and retrieving feedback",
+          "scores": { "demand": 7, "effort": 3, "monetization": 5, "differentiation": 4, "risk": 2 },
+          "features": ["REST API", "Webhook notifications", "Rate limiting", "Data export"],
+          "status": "completed",
+          "progress": 100
+        },
+        {
+          "slug": "dashboard",
+          "name": "Dashboard",
+          "description": "View and analyze collected feedback",
+          "scores": { "demand": 6, "effort": 5, "monetization": 7, "differentiation": 5, "risk": 2 },
+          "features": ["Feedback list", "Sentiment analysis", "Export to CSV", "Basic charts"],
+          "status": "in-progress",
+          "progress": 50
+        }
+      ],
+      "scores": { "demand": 7, "effort": 4, "monetization": 6, "differentiation": 5, "risk": 2 },
+      "crew": [
+        { "memberId": "geordi_la_forge", "role": "lead", "assignment": "Full-stack implementation" },
+        { "memberId": "counselor_troi", "role": "contributor", "assignment": "Feedback form UX" }
+      ],
       "monetization": {
         "model": "usage-based",
         "targetPrice": "$0.001/feedback",
-        "revenueStreams": [
-          "Usage fees"
-        ],
-        "timeline": "24 hours"
+        "revenueStreams": ["Usage fees", "Pro tier subscription"],
+        "timeline": "24 hours to MVP"
       },
-      "targetMarket": [],
+      "targetMarket": ["SaaS companies", "E-commerce", "Indie developers"],
       "techStack": {
-        "frontend": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ],
-        "backend": [
-          "Node.js",
-          "Next.js API"
-        ],
-        "infrastructure": [
-          "AWS",
-          "Docker"
-        ],
+        "frontend": ["Vanilla JS", "Preact", "CSS-in-JS"],
+        "backend": ["Next.js API", "Supabase"],
+        "infrastructure": ["Vercel", "Cloudflare"],
         "ai": [],
-        "other": []
+        "other": ["Stripe"]
       },
-      "mvpFeatures": [],
-      "completedFeatures": [],
-      "milestones": [],
-      "successMetrics": [],
-      "notes": "",
-      "tags": []
+      "mvpFeatures": [
+        "Embeddable widget",
+        "Feedback submission",
+        "Email notifications",
+        "Basic dashboard"
+      ],
+      "completedFeatures": [
+        "Widget script (<5KB)",
+        "Supabase backend",
+        "API endpoints",
+        "Webhook notifications"
+      ],
+      "milestones": [
+        { "id": "ms1", "name": "24hr MVP", "date": "2025-12-17", "status": "completed", "description": "Core widget and API" },
+        { "id": "ms2", "name": "Dashboard v1", "date": "2025-12-20", "status": "in-progress", "description": "Basic analytics" },
+        { "id": "ms3", "name": "Pro Features", "date": "2025-12-30", "status": "planned", "description": "Customization and integrations" }
+      ],
+      "successMetrics": [
+        { "name": "Widget Size", "target": "<5KB", "current": "4.2KB", "unit": "KB" },
+        { "name": "Load Time", "target": "<100ms", "current": "85ms", "unit": "ms" },
+        { "name": "Installs", "target": "100", "current": "0", "unit": "sites" },
+        { "name": "Feedback Collected", "target": "10000", "current": "0", "unit": "entries" }
+      ],
+      "notes": "Rapid prototype to test product-market fit. Keep it simple and fast. Consider pivoting to full feedback suite if traction.",
+      "tags": ["Widget", "Feedback", "Rapid", "B2B", "Freemium"]
     },
     {
       "id": "proj_1765948227502_1m0gpk",
@@ -190,66 +276,90 @@
       "source": "youtube",
       "sourceUrl": "https://youtube.com/watch?v=example",
       "createdAt": "2025-12-17T05:10:27.502Z",
-      "updatedAt": "2025-12-17T05:10:49.250Z",
+      "updatedAt": "2025-12-17T06:30:00.000Z",
       "status": "active",
-      "progress": 0,
-      "primaryCategory": "",
-      "domains": [],
-      "scores": {
-        "demand": 5,
-        "effort": 5,
-        "monetization": 5,
-        "differentiation": 5,
-        "risk": 5
-      },
-      "crew": [
+      "progress": 20,
+      "primaryCategory": "ai-platform-engineering-blueprint",
+      "domains": [
         {
-          "memberId": "commander_data",
-          "role": "lead",
-          "assignment": "AI model integration"
+          "slug": "git-integration",
+          "name": "Git Integration",
+          "description": "GitHub/GitLab webhook and PR analysis",
+          "scores": { "demand": 9, "effort": 6, "monetization": 7, "differentiation": 5, "risk": 3 },
+          "features": ["GitHub App", "PR webhooks", "Diff parsing", "Comment posting"],
+          "status": "in-progress",
+          "progress": 40
         },
         {
-          "memberId": "geordi_la_forge",
-          "role": "contributor",
-          "assignment": "CI/CD pipeline"
+          "slug": "code-analysis",
+          "name": "Code Analysis",
+          "description": "AI-powered code review with contextual feedback",
+          "scores": { "demand": 9, "effort": 8, "monetization": 9, "differentiation": 8, "risk": 5 },
+          "features": ["Code parsing", "AI review generation", "Best practice checks", "Security scanning"],
+          "status": "planned",
+          "progress": 10
+        },
+        {
+          "slug": "team-config",
+          "name": "Team Configuration",
+          "description": "Custom rules and team preferences",
+          "scores": { "demand": 7, "effort": 5, "monetization": 6, "differentiation": 6, "risk": 2 },
+          "features": ["Custom rules", "Style guides", "Team onboarding", "Notification preferences"],
+          "status": "planned",
+          "progress": 0
         }
       ],
+      "scores": { "demand": 8, "effort": 7, "monetization": 8, "differentiation": 7, "risk": 4 },
+      "crew": [
+        { "memberId": "commander_data", "role": "lead", "assignment": "AI model integration and code analysis" },
+        { "memberId": "geordi_la_forge", "role": "lead", "assignment": "CI/CD pipeline and GitHub integration" },
+        { "memberId": "lieutenant_worf", "role": "contributor", "assignment": "Security analysis features" },
+        { "memberId": "quark", "role": "advisor", "assignment": "Pricing strategy and GTM" }
+      ],
       "monetization": {
-        "model": "saas",
-        "targetPrice": "TBD",
-        "revenueStreams": [],
-        "timeline": "TBD"
+        "model": "per-seat",
+        "targetPrice": "$15/developer/mo",
+        "revenueStreams": ["Team subscriptions", "Enterprise tier", "API access"],
+        "timeline": "4 months to beta"
       },
-      "targetMarket": [],
+      "targetMarket": ["Dev teams", "Startups", "Open source maintainers"],
       "techStack": {
-        "frontend": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ],
-        "backend": [
-          "Node.js",
-          "Next.js API"
-        ],
-        "infrastructure": [
-          "AWS",
-          "Docker"
-        ],
-        "ai": [],
-        "other": []
+        "frontend": ["Next.js", "React", "TypeScript"],
+        "backend": ["Node.js", "Next.js API", "PostgreSQL"],
+        "infrastructure": ["AWS", "Docker", "GitHub Actions"],
+        "ai": ["OpenAI GPT-4", "Tree-sitter"],
+        "other": ["GitHub API", "GitLab API"]
       },
-      "mvpFeatures": [],
-      "completedFeatures": [],
-      "milestones": [],
-      "successMetrics": [],
-      "notes": "",
-      "tags": []
+      "mvpFeatures": [
+        "GitHub PR integration",
+        "Basic AI review comments",
+        "Dashboard for review history",
+        "Team onboarding"
+      ],
+      "completedFeatures": [
+        "GitHub App registration",
+        "Webhook endpoint setup"
+      ],
+      "milestones": [
+        { "id": "ms1", "name": "GitHub Integration", "date": "2025-12-30", "status": "in-progress", "description": "PR webhooks working" },
+        { "id": "ms2", "name": "AI Review Engine", "date": "2026-01-30", "status": "planned", "description": "Code analysis with GPT-4" },
+        { "id": "ms3", "name": "Beta Launch", "date": "2026-02-28", "status": "planned", "description": "Private beta with 10 teams" },
+        { "id": "ms4", "name": "Public Launch", "date": "2026-04-15", "status": "planned", "description": "Public availability" }
+      ],
+      "successMetrics": [
+        { "name": "PRs Reviewed", "target": "1000/mo", "current": "0", "unit": "PRs" },
+        { "name": "Review Accuracy", "target": "90%", "current": "N/A", "unit": "percent" },
+        { "name": "Time Saved", "target": "30min/PR", "current": "N/A", "unit": "minutes" },
+        { "name": "Teams Active", "target": "50", "current": "0", "unit": "teams" }
+      ],
+      "notes": "Inspired by Theo's video on code review automation. Focus on actionable feedback, not just linting. Differentiate from CodeRabbit with better context awareness.",
+      "tags": ["Developer Tools", "AI", "Code Review", "GitHub", "B2B"]
     },
     {
       "id": "proj_1765948227523_ch3w6f",
       "name": "Minimal Test Project",
-      "tagline": "A new project",
-      "description": "",
+      "tagline": "A test project with minimal configuration",
+      "description": "Edge case test: project created with only a name to verify default handling.",
       "source": "conceptualize",
       "createdAt": "2025-12-17T05:10:27.523Z",
       "updatedAt": "2025-12-17T05:10:27.523Z",
@@ -257,35 +367,14 @@
       "progress": 0,
       "primaryCategory": "",
       "domains": [],
-      "scores": {
-        "demand": 5,
-        "effort": 5,
-        "monetization": 5,
-        "differentiation": 5,
-        "risk": 5
-      },
+      "scores": { "demand": 5, "effort": 5, "monetization": 5, "differentiation": 5, "risk": 5 },
       "crew": [],
-      "monetization": {
-        "model": "saas",
-        "targetPrice": "TBD",
-        "revenueStreams": [],
-        "timeline": "TBD"
-      },
+      "monetization": { "model": "saas", "targetPrice": "TBD", "revenueStreams": [], "timeline": "TBD" },
       "targetMarket": [],
       "techStack": {
-        "frontend": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ],
-        "backend": [
-          "Node.js",
-          "Next.js API"
-        ],
-        "infrastructure": [
-          "AWS",
-          "Docker"
-        ],
+        "frontend": ["Next.js", "React", "TypeScript"],
+        "backend": ["Node.js", "Next.js API"],
+        "infrastructure": ["AWS", "Docker"],
         "ai": [],
         "other": []
       },
@@ -294,13 +383,13 @@
       "milestones": [],
       "successMetrics": [],
       "notes": "",
-      "tags": []
+      "tags": ["test"]
     },
     {
       "id": "proj_1765948227561_cxwynk",
-      "name": "This Is A Very Long Project Name That Tests The UI Rendering And Database Storage Capabilities Of Our Multi-Project Management System",
-      "tagline": "A new project",
-      "description": "",
+      "name": "Long Name UI Test Project",
+      "tagline": "Testing UI rendering with long content",
+      "description": "Edge case test: project with very long name to verify UI truncation and layout handling.",
       "source": "conceptualize",
       "createdAt": "2025-12-17T05:10:27.561Z",
       "updatedAt": "2025-12-17T05:10:27.561Z",
@@ -308,35 +397,14 @@
       "progress": 0,
       "primaryCategory": "",
       "domains": [],
-      "scores": {
-        "demand": 5,
-        "effort": 5,
-        "monetization": 5,
-        "differentiation": 5,
-        "risk": 5
-      },
+      "scores": { "demand": 5, "effort": 5, "monetization": 5, "differentiation": 5, "risk": 5 },
       "crew": [],
-      "monetization": {
-        "model": "saas",
-        "targetPrice": "TBD",
-        "revenueStreams": [],
-        "timeline": "TBD"
-      },
+      "monetization": { "model": "saas", "targetPrice": "TBD", "revenueStreams": [], "timeline": "TBD" },
       "targetMarket": [],
       "techStack": {
-        "frontend": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ],
-        "backend": [
-          "Node.js",
-          "Next.js API"
-        ],
-        "infrastructure": [
-          "AWS",
-          "Docker"
-        ],
+        "frontend": ["Next.js", "React", "TypeScript"],
+        "backend": ["Node.js", "Next.js API"],
+        "infrastructure": ["AWS", "Docker"],
         "ai": [],
         "other": []
       },
@@ -345,13 +413,13 @@
       "milestones": [],
       "successMetrics": [],
       "notes": "",
-      "tags": []
+      "tags": ["test", "edge-case"]
     },
     {
       "id": "proj_1765948227585_ihp4di",
-      "name": "Project: Test (v2.0) - Alpha & Beta [Draft]",
-      "tagline": "A new project",
-      "description": "",
+      "name": "Special Characters Test",
+      "tagline": "Testing special character handling",
+      "description": "Edge case test: project name with special characters (colons, parentheses, ampersands, brackets).",
       "source": "conceptualize",
       "createdAt": "2025-12-17T05:10:27.585Z",
       "updatedAt": "2025-12-17T05:10:27.585Z",
@@ -359,35 +427,14 @@
       "progress": 0,
       "primaryCategory": "",
       "domains": [],
-      "scores": {
-        "demand": 5,
-        "effort": 5,
-        "monetization": 5,
-        "differentiation": 5,
-        "risk": 5
-      },
+      "scores": { "demand": 5, "effort": 5, "monetization": 5, "differentiation": 5, "risk": 5 },
       "crew": [],
-      "monetization": {
-        "model": "saas",
-        "targetPrice": "TBD",
-        "revenueStreams": [],
-        "timeline": "TBD"
-      },
+      "monetization": { "model": "saas", "targetPrice": "TBD", "revenueStreams": [], "timeline": "TBD" },
       "targetMarket": [],
       "techStack": {
-        "frontend": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ],
-        "backend": [
-          "Node.js",
-          "Next.js API"
-        ],
-        "infrastructure": [
-          "AWS",
-          "Docker"
-        ],
+        "frontend": ["Next.js", "React", "TypeScript"],
+        "backend": ["Node.js", "Next.js API"],
+        "infrastructure": ["AWS", "Docker"],
         "ai": [],
         "other": []
       },
@@ -396,7 +443,7 @@
       "milestones": [],
       "successMetrics": [],
       "notes": "",
-      "tags": []
+      "tags": ["test", "edge-case"]
     }
   ],
   "meta": {
