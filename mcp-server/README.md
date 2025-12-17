@@ -2,47 +2,82 @@
 
 The Alex AI Crew System as an MCP (Model Context Protocol) server for Cursor and VS Code.
 
+**🚀 Now powered by OpenRouter - completely independent of Cursor's AI!**
+
 ## Features
 
-- **Crew Chat**: Ask questions to specific crew members (Picard, Data, Riker, etc.)
-- **Coordination**: Riker's cross-project coordination analysis
-- **RAG Memories**: Access and save crew memories
+- **Crew Chat**: Get actual AI responses from specific crew members via OpenRouter
+- **Coordination**: Riker's cross-project coordination analysis with AI briefings
+- **RAG Memories**: Access and save crew memories for context
 - **Project Management**: View and manage Product Factory projects
 - **Milestones**: Push milestones to Git/Supabase with optional deployment
-- **Observation Lounge**: Convene senior staff for collaborative discussions
+- **Observation Lounge**: Convene senior staff with real multi-agent discussions
+
+## LLM Model Assignments
+
+Each crew member uses an optimal LLM:
+
+| Crew Member | Model | Reason |
+|-------------|-------|--------|
+| Captain Picard | `claude-3.5-sonnet` | Strategic thinking |
+| Commander Riker | `claude-3.5-sonnet` | Coordination |
+| Commander Data | `gpt-4-turbo` | Technical analysis |
+| Lt. Cmdr. La Forge | `claude-3.5-sonnet` | Engineering |
+| Counselor Troi | `claude-3.5-sonnet` | Empathy/UX |
+| Lt. Worf | `gpt-4-turbo` | Security (thorough) |
+| Chief O'Brien | `gpt-4-turbo` | Implementation |
+| Quark | `gpt-4-turbo` | Business analysis |
 
 ## Installation
 
-### For Cursor
+### Prerequisites
 
-1. Open Cursor Settings (Cmd+,)
-2. Go to "MCP" or "Model Context Protocol"
-3. Add a new server with these settings:
+1. Get an OpenRouter API key from [openrouter.ai](https://openrouter.ai)
+2. Set the environment variable:
 
-```json
-{
-  "alex-ai": {
-    "command": "node",
-    "args": ["/path/to/rag-refresh-product-factory/mcp-server/index.mjs"],
-    "env": {}
-  }
-}
+```bash
+export OPENROUTER_API_KEY="sk-or-v1-your-key-here"
 ```
 
-Or add to `~/.cursor/mcp.json`:
+### For Cursor
+
+Add to `~/.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "alex-ai": {
       "command": "node",
-      "args": ["/Users/bradygeorgen/Documents/workspace/rag-refresh-product-factory/mcp-server/index.mjs"]
+      "args": [
+        "/Users/bradygeorgen/Documents/workspace/rag-refresh-product-factory/mcp-server/index.mjs"
+      ],
+      "env": {
+        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
+      }
     }
   }
 }
 ```
 
-4. Restart Cursor
+Or use a hardcoded key (not recommended for shared machines):
+
+```json
+{
+  "mcpServers": {
+    "alex-ai": {
+      "command": "node",
+      "args": [
+        "/Users/bradygeorgen/Documents/workspace/rag-refresh-product-factory/mcp-server/index.mjs"
+      ],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
+      }
+    }
+  }
+}
+```
+
+Restart Cursor after changes.
 
 ### For VS Code
 
@@ -51,62 +86,51 @@ Use the MCP extension and add the same configuration.
 ## Available Tools
 
 ### `alex_ai_chat`
-Chat with the crew system. Optionally specify a crew member.
+
+Chat with the crew system via OpenRouter. Get real AI responses in character!
 
 ```
-@alex-ai chat "How should we architect the new feature?"
-@alex-ai chat "What are the security implications?" --crew_member=worf
+Use alex_ai_chat to ask Data about optimizing our RAG architecture
+Use alex_ai_chat with crew_member=worf to review security implications
 ```
 
 **Crew Members:**
-- `picard` - Strategic leadership
-- `riker` - Tactical coordination
-- `data` - Technical analysis (default)
-- `geordi` - Infrastructure
-- `troi` - UX design
-- `worf` - Security
-- `obrien` - Implementation
-- `quark` - Business strategy
+
+- `picard` - Strategic leadership (claude-3.5-sonnet)
+- `riker` - Tactical coordination (claude-3.5-sonnet)
+- `data` - Technical analysis (gpt-4-turbo, default)
+- `geordi` - Infrastructure (claude-3.5-sonnet)
+- `troi` - UX design (claude-3.5-sonnet)
+- `worf` - Security (gpt-4-turbo)
+- `obrien` - Implementation (gpt-4-turbo)
+- `quark` - Business strategy (gpt-4-turbo)
 
 ### `alex_ai_coordinate`
-Get Riker's coordination briefing for all projects.
+
+Get Riker's coordination briefing with AI-generated tactical analysis.
 
 ### `alex_ai_memories`
-Search crew RAG memories.
 
-```
-@alex-ai memories --search="docker"
-@alex-ai memories --crew_member="geordi_la_forge"
-```
+Search crew RAG memories for lessons learned and patterns.
 
 ### `alex_ai_save_memory`
-Save a new lesson to crew memories.
 
-```
-@alex-ai save_memory --crew_member="commander_data" --content="RAG chunk size of 500 tokens works best" --type="lesson"
-```
+Save a new lesson to crew memories for future context.
 
 ### `alex_ai_projects`
-List Product Factory projects.
 
-```
-@alex-ai projects
-@alex-ai projects --status="active"
-```
+List Product Factory projects and their status.
 
 ### `alex_ai_milestone`
-Push a milestone.
 
-```
-@alex-ai milestone --title="Feature update"
-@alex-ai milestone --title="Release v1.0" --deploy=true
-```
+Push a milestone to Git/Supabase, optionally deploy to AWS.
 
 ### `alex_ai_observation_lounge`
-Convene the senior staff.
+
+**🌟 New!** Convene a full senior staff meeting where multiple crew members discuss a topic sequentially via OpenRouter. Each builds on the previous responses.
 
 ```
-@alex-ai observation_lounge --topic="New architecture decision" --urgency="high"
+Use alex_ai_observation_lounge with topic="Should we migrate to microservices?" and urgency="high"
 ```
 
 ## Running Manually

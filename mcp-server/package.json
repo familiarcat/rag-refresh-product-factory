@@ -14,7 +14,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"
   },
-  "keywords": ["mcp", "alex-ai", "cursor", "vscode", "chat-agent"],
+  "keywords": [
+    "mcp",
+    "alex-ai",
+    "cursor",
+    "vscode",
+    "chat-agent"
+  ],
   "author": "RAG Refresh Product Factory",
   "license": "MIT"
 }
