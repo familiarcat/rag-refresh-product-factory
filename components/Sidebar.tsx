@@ -96,6 +96,7 @@ export function Sidebar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [tooltip, setTooltip] = useState<{ label: string; top: number; left: number } | null>(null);
+  const [projectsExpanded, setProjectsExpanded] = useState(true);
   const pathname = usePathname();
 
   // Fetch projects
@@ -201,90 +202,117 @@ export function Sidebar() {
         <div className="navBlock">
           {!isCollapsed && <div className="navHeader"><Icon name="projects" size={14} style={{marginRight: 6}} /> Projects</div>}
           <NavItem href="/portfolio" iconName="portfolio" label="Portfolio Overview" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/projects" iconName="list" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects') && pathname === '/projects'} onHover={handleNavHover} onLeave={handleNavLeave} />
-          <NavItem href="/create" iconName="create" label="Create New" isCollapsed={isCollapsed} isActive={isActive('/create')} onHover={handleNavHover} onLeave={handleNavLeave} />
           
-          {/* Active Projects List */}
-          {!isCollapsed && projects.length > 0 && (
-            <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 10, color: 'var(--muted)', padding: '0 14px 4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Active ({projects.length})
-              </div>
-              {projects.slice(0, 5).map(project => (
-                <div key={project.id}>
-                  <Link
-                    href={`/projects/${project.id}`}
-                    className={`navItem ${isActive(`/projects/${project.id}`) && !pathname.includes('/domains') ? 'active' : ''}`}
-                    style={{ paddingLeft: 20 }}
-                  >
-                    <span className="navIcon" style={{ fontSize: 12 }}>
-                      <Icon name={statusIconMap[project.status] || 'active'} size={14} />
-                    </span>
-                    <span className="navLabel" style={{ 
-                      fontSize: 12,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+          {/* All Projects Accordion */}
+          {!isCollapsed ? (
+            <div>
+              <button
+                onClick={() => setProjectsExpanded(!projectsExpanded)}
+                className={`navItem ${isActive('/projects') ? 'active' : ''}`}
+                style={{ 
+                  width: '100%', 
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  border: '1px solid transparent',
+                }}
+              >
+                <span className="navIcon">
+                  <Icon name="list" size={18} />
+                </span>
+                <span className="navLabel">All Projects</span>
+                <span style={{ 
+                  marginLeft: 'auto', 
+                  transition: 'transform 0.2s',
+                  transform: projectsExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                  opacity: 0.6,
+                }}>
+                  ▶
+                </span>
+              </button>
+              
+              {/* Expanded Project List */}
+              {projectsExpanded && (
+                <div style={{ 
+                  overflow: 'hidden',
+                  background: 'rgba(0,0,0,0.15)',
+                  borderRadius: 8,
+                  margin: '4px 0',
+                  padding: '4px 0',
+                }}>
+                  {projects.length > 0 ? (
+                    <>
+                      {projects.map(project => (
+                        <div key={project.id}>
+                          <Link
+                            href={`/projects/${project.id}`}
+                            className={`navItem ${isActive(`/projects/${project.id}`) && !pathname.includes('/domains') ? 'active' : ''}`}
+                            style={{ paddingLeft: 24, margin: '2px 4px', borderRadius: 6 }}
+                          >
+                            <span className="navIcon" style={{ fontSize: 12 }}>
+                              <Icon name={statusIconMap[project.status] || 'active'} size={14} />
+                            </span>
+                            <span className="navLabel" style={{ 
+                              fontSize: 12,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}>
+                              {project.name}
+                            </span>
+                            <span style={{
+                              marginLeft: 'auto',
+                              fontSize: 9,
+                              padding: '1px 4px',
+                              background: `${getStatusColor(project.status)}20`,
+                              color: getStatusColor(project.status),
+                              borderRadius: 3,
+                            }}>
+                              {project.progress}%
+                            </span>
+                          </Link>
+                        </div>
+                      ))}
+                      <Link 
+                        href="/projects" 
+                        style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '8px 24px',
+                          fontSize: 11,
+                          color: 'var(--accent1)',
+                          textDecoration: 'none',
+                          borderTop: '1px solid rgba(255,255,255,0.05)',
+                          marginTop: 4,
+                        }}
+                      >
+                        <Icon name="list" size={12} /> View all projects →
+                      </Link>
+                    </>
+                  ) : (
+                    <div style={{ 
+                      padding: '12px 24px', 
+                      fontSize: 11, 
+                      color: 'var(--muted)',
+                      textAlign: 'center',
                     }}>
-                      {project.name}
-                    </span>
-                    <span style={{
-                      marginLeft: 'auto',
-                      fontSize: 10,
-                      padding: '1px 4px',
-                      background: `${getStatusColor(project.status)}20`,
-                      color: getStatusColor(project.status),
-                      borderRadius: 3,
-                    }}>
-                      {project.progress}%
-                    </span>
-                  </Link>
-                  {/* Domains sub-link */}
-                  <Link
-                    href={`/projects/${project.id}/domains`}
-                    className={`navItem ${pathname === `/projects/${project.id}/domains` ? 'active' : ''}`}
-                    style={{ paddingLeft: 36, fontSize: 11 }}
-                  >
-                    <span className="navIcon" style={{ fontSize: 10 }}>
-                      <Icon name="domains" size={12} />
-                    </span>
-                    <span className="navLabel" style={{ fontSize: 11, color: 'var(--muted)' }}>
-                      Domains
-                    </span>
-                  </Link>
+                      <div style={{ marginBottom: 8, opacity: 0.6 }}>
+                        <Icon name="projects" size={24} />
+                      </div>
+                      No projects yet
+                      <div style={{ marginTop: 4, fontSize: 10, opacity: 0.7 }}>
+                        Use &quot;Create New&quot; to start
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
-              {projects.length > 5 && (
-                <Link 
-                  href="/projects" 
-                  style={{ 
-                    display: 'block',
-                    padding: '6px 14px 6px 20px',
-                    fontSize: 11,
-                    color: 'var(--muted)',
-                    textDecoration: 'none',
-                  }}
-                >
-                  +{projects.length - 5} more...
-                </Link>
               )}
             </div>
+          ) : (
+            <NavItem href="/projects" iconName="list" label="All Projects" isCollapsed={isCollapsed} isActive={isActive('/projects')} onHover={handleNavHover} onLeave={handleNavLeave} />
           )}
           
-          {/* Empty state */}
-          {!isCollapsed && projects.length === 0 && (
-            <div style={{ 
-              padding: '8px 14px', 
-              fontSize: 11, 
-              color: 'var(--muted)',
-              background: 'rgba(255,255,255,.02)',
-              borderRadius: 6,
-              border: '1px dashed rgba(255,255,255,.1)',
-              marginTop: 4,
-            }}>
-              No active projects yet
-            </div>
-          )}
+          <NavItem href="/create" iconName="create" label="Create New" isCollapsed={isCollapsed} isActive={isActive('/create')} onHover={handleNavHover} onLeave={handleNavLeave} />
         </div>
 
         {/* Factory Navigation */}
