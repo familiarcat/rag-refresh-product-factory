@@ -1,0 +1,1063 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  Sprint,
+  Story,
+  StoryStatus,
+  SprintMetrics,
+  getStoryStatusColor,
+  getPriorityColor,
+  getStoryTypeIcon,
+} from "../lib/sprints";
+
+interface SprintBoardProps {
+  projectId: string;
+  theme: { accent: string };
+}
+
+const statusColumns: { status: StoryStatus; label: string; icon: string }[] = [
+  { status: "backlog", label: "Backlog", icon: "📋" },
+  { status: "todo", label: "To Do", icon: "📝" },
+  { status: "in_progress", label: "In Progress", icon: "🚀" },
+  { status: "review", label: "Review", icon: "👀" },
+  { status: "done", label: "Done", icon: "✅" },
+  { status: "blocked", label: "Blocked", icon: "🚫" },
+];
+
+export function SprintBoard({ projectId, theme }: SprintBoardProps) {
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
+  const [metrics, setMetrics] = useState<SprintMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showNewSprintModal, setShowNewSprintModal] = useState(false);
+  const [showNewStoryModal, setShowNewStoryModal] = useState(false);
+
+  useEffect(() => {
+    loadSprints();
+  }, [projectId]);
+
+  async function loadSprints() {
+    try {
+      const res = await fetch(`/api/sprints?projectId=${projectId}`);
+      const data = await res.json();
+      setSprints(data.sprints || []);
+
+      // Set active sprint
+      const active = data.sprints?.find(
+        (s: Sprint) => s.status === "active" || s.status === "planning"
+      );
+      if (active) {
+        setActiveSprint(active);
+        loadMetrics(active.id);
+      }
+    } catch (error) {
+      console.error("Failed to load sprints:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadMetrics(sprintId: string) {
+    try {
+      const res = await fetch(`/api/sprints?id=${sprintId}&metrics=true`);
+      const data = await res.json();
+      setMetrics(data.metrics);
+    } catch (error) {
+      console.error("Failed to load metrics:", error);
+    }
+  }
+
+  async function updateStoryStatus(storyId: string, newStatus: StoryStatus) {
+    if (!activeSprint) return;
+
+    try {
+      await fetch("/api/sprints", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: activeSprint.id,
+          action: "update-story",
+          storyId,
+          updates: { status: newStatus },
+        }),
+      });
+      await loadSprints();
+    } catch (error) {
+      console.error("Failed to update story:", error);
+    }
+  }
+
+  async function createSprint(name: string, goal: string, duration: number) {
+    try {
+      await fetch("/api/sprints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId,
+          name,
+          goal,
+          duration,
+          teamCapacity: 40,
+        }),
+      });
+      setShowNewSprintModal(false);
+      await loadSprints();
+    } catch (error) {
+      console.error("Failed to create sprint:", error);
+    }
+  }
+
+  async function createStory(storyData: Partial<Story>) {
+    if (!activeSprint) return;
+
+    try {
+      await fetch("/api/sprints", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: activeSprint.id,
+          action: "add-story",
+          story: storyData,
+        }),
+      });
+      setShowNewStoryModal(false);
+      await loadSprints();
+    } catch (error) {
+      console.error("Failed to create story:", error);
+    }
+  }
+
+  async function assignCrew(storyId: string) {
+    if (!activeSprint) return;
+
+    try {
+      const res = await fetch("/api/sprints/coordinate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "assign-crew",
+          sprintId: activeSprint.id,
+          storyId,
+          teamSize: 3,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        await loadSprints();
+        alert(data.rikerNotes);
+      }
+    } catch (error) {
+      console.error("Failed to assign crew:", error);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="card" style={{ padding: 32, textAlign: "center" }}>
+        <div style={{ fontSize: 32 }}>⏳</div>
+        <p style={{ color: "var(--muted)" }}>Loading sprint board...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Sprint Header */}
+      <div
+        className="card"
+        style={{
+          background: `linear-gradient(135deg, var(--surface) 0%, ${theme.accent}15 100%)`,
+          border: `1px solid ${theme.accent}40`,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <h2
+              style={{
+                margin: 0,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              🏃 Sprint Board
+              {activeSprint && (
+                <span
+                  style={{
+                    fontSize: 14,
+                    padding: "4px 12px",
+                    background: theme.accent,
+                    borderRadius: 12,
+                  }}
+                >
+                  {activeSprint.name}
+                </span>
+              )}
+            </h2>
+            {activeSprint && (
+              <p
+                style={{
+                  margin: "8px 0 0",
+                  color: "var(--muted)",
+                  fontSize: 13,
+                }}
+              >
+                {activeSprint.goal || "No sprint goal set"}
+              </p>
+            )}
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {activeSprint && (
+              <button
+                onClick={() => setShowNewStoryModal(true)}
+                style={{
+                  padding: "8px 16px",
+                  background: theme.accent,
+                  border: "none",
+                  borderRadius: 8,
+                  color: "white",
+                  cursor: "pointer",
+                  fontSize: 13,
+                }}
+              >
+                ➕ Add Story
+              </button>
+            )}
+            <button
+              onClick={() => setShowNewSprintModal(true)}
+              style={{
+                padding: "8px 16px",
+                background: "var(--surface)",
+                border: `1px solid ${theme.accent}40`,
+                borderRadius: 8,
+                color: theme.accent,
+                cursor: "pointer",
+                fontSize: 13,
+              }}
+            >
+              🆕 New Sprint
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Sprint Selector */}
+      {sprints.length > 1 && (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {sprints.slice(0, 5).map((sprint) => (
+            <button
+              key={sprint.id}
+              onClick={() => {
+                setActiveSprint(sprint);
+                loadMetrics(sprint.id);
+              }}
+              style={{
+                padding: "6px 12px",
+                background:
+                  activeSprint?.id === sprint.id
+                    ? theme.accent
+                    : "var(--surface)",
+                border: `1px solid ${theme.accent}40`,
+                borderRadius: 6,
+                color: activeSprint?.id === sprint.id ? "white" : "var(--text)",
+                cursor: "pointer",
+                fontSize: 12,
+              }}
+            >
+              {sprint.name}
+              <span style={{ marginLeft: 8, opacity: 0.7 }}>
+                {sprint.completedPoints}/{sprint.committedPoints} pts
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Metrics Row */}
+      {activeSprint && (
+        <div style={{ display: "flex", gap: 12 }}>
+          <MetricCard
+            label="Committed"
+            value={activeSprint.committedPoints}
+            unit="points"
+            color={theme.accent}
+          />
+          <MetricCard
+            label="Completed"
+            value={activeSprint.completedPoints}
+            unit="points"
+            color="#10b981"
+          />
+          <MetricCard
+            label="Budget"
+            value={`$${(activeSprint.budgetedCost || 0).toLocaleString()}`}
+            unit=""
+            color="#f59e0b"
+          />
+          <MetricCard
+            label="ROI"
+            value={`${(activeSprint.projectedROI || 0).toFixed(0)}%`}
+            unit=""
+            color={activeSprint.projectedROI > 50 ? "#10b981" : "#ef4444"}
+          />
+          {metrics && (
+            <MetricCard
+              label="Velocity"
+              value={metrics.averageVelocity.toFixed(0)}
+              unit="pts/sprint"
+              color="#8b5cf6"
+            />
+          )}
+        </div>
+      )}
+
+      {/* Kanban Board */}
+      {activeSprint ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${statusColumns.length}, 1fr)`,
+            gap: 12,
+            minHeight: 400,
+          }}
+        >
+          {statusColumns.map((column) => (
+            <KanbanColumn
+              key={column.status}
+              column={column}
+              stories={activeSprint.stories.filter(
+                (s) => s.status === column.status
+              )}
+              theme={theme}
+              onStatusChange={updateStoryStatus}
+              onAssignCrew={assignCrew}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="card" style={{ textAlign: "center", padding: 48 }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🏃</div>
+          <h3>No Active Sprint</h3>
+          <p style={{ color: "var(--muted)", marginBottom: 24 }}>
+            Create a sprint to start tracking stories and managing your team.
+          </p>
+          <button
+            onClick={() => setShowNewSprintModal(true)}
+            style={{
+              padding: "12px 24px",
+              background: theme.accent,
+              border: "none",
+              borderRadius: 8,
+              color: "white",
+              cursor: "pointer",
+            }}
+          >
+            🚀 Create First Sprint
+          </button>
+        </div>
+      )}
+
+      {/* Burndown Chart Preview */}
+      {metrics && activeSprint && activeSprint.dailyProgress.length > 0 && (
+        <BurndownChart sprint={activeSprint} metrics={metrics} theme={theme} />
+      )}
+
+      {/* Modals */}
+      {showNewSprintModal && (
+        <NewSprintModal
+          onClose={() => setShowNewSprintModal(false)}
+          onCreate={createSprint}
+          theme={theme}
+        />
+      )}
+      {showNewStoryModal && activeSprint && (
+        <NewStoryModal
+          onClose={() => setShowNewStoryModal(false)}
+          onCreate={createStory}
+          theme={theme}
+        />
+      )}
+    </div>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  unit,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  unit: string;
+  color: string;
+}) {
+  return (
+    <div
+      className="card"
+      style={{
+        flex: 1,
+        textAlign: "center",
+        padding: 12,
+        background: `${color}10`,
+        border: `1px solid ${color}30`,
+      }}
+    >
+      <div style={{ fontSize: 24, fontWeight: "bold", color }}>{value}</div>
+      <div style={{ fontSize: 10, color: "var(--muted)" }}>
+        {label} {unit && <span style={{ opacity: 0.7 }}>{unit}</span>}
+      </div>
+    </div>
+  );
+}
+
+function KanbanColumn({
+  column,
+  stories,
+  theme,
+  onStatusChange,
+  onAssignCrew,
+}: {
+  column: { status: StoryStatus; label: string; icon: string };
+  stories: Story[];
+  theme: { accent: string };
+  onStatusChange: (storyId: string, status: StoryStatus) => void;
+  onAssignCrew: (storyId: string) => void;
+}) {
+  const totalPoints = stories.reduce((sum, s) => sum + s.storyPoints, 0);
+
+  return (
+    <div
+      style={{
+        background: "var(--surface)",
+        borderRadius: 8,
+        padding: 12,
+        border: `1px solid ${getStoryStatusColor(column.status)}30`,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 12,
+          paddingBottom: 8,
+          borderBottom: `2px solid ${getStoryStatusColor(column.status)}`,
+        }}
+      >
+        <span style={{ fontWeight: 600, fontSize: 13 }}>
+          {column.icon} {column.label}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            padding: "2px 8px",
+            background: `${getStoryStatusColor(column.status)}20`,
+            borderRadius: 10,
+            color: getStoryStatusColor(column.status),
+          }}
+        >
+          {stories.length} ({totalPoints} pts)
+        </span>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {stories.map((story) => (
+          <StoryCard
+            key={story.id}
+            story={story}
+            theme={theme}
+            onStatusChange={onStatusChange}
+            onAssignCrew={onAssignCrew}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StoryCard({
+  story,
+  theme,
+  onStatusChange,
+  onAssignCrew,
+}: {
+  story: Story;
+  theme: { accent: string };
+  onStatusChange: (storyId: string, status: StoryStatus) => void;
+  onAssignCrew: (storyId: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div
+      className="card"
+      style={{
+        padding: 10,
+        cursor: "pointer",
+        borderLeft: `3px solid ${getPriorityColor(story.priority)}`,
+        fontSize: 12,
+      }}
+      onClick={() => setExpanded(!expanded)}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 6,
+        }}
+      >
+        <span style={{ fontWeight: 600 }}>
+          {getStoryTypeIcon(story.type)} {story.title}
+        </span>
+        <span
+          style={{
+            padding: "2px 6px",
+            background: theme.accent,
+            borderRadius: 4,
+            fontSize: 10,
+            color: "white",
+          }}
+        >
+          {story.storyPoints} pts
+        </span>
+      </div>
+
+      {/* Tags */}
+      <div
+        style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}
+      >
+        <span
+          style={{
+            padding: "1px 6px",
+            background: `${getPriorityColor(story.priority)}20`,
+            borderRadius: 4,
+            fontSize: 9,
+            color: getPriorityColor(story.priority),
+          }}
+        >
+          {story.priority}
+        </span>
+        {story.estimatedCost > 0 && (
+          <span
+            style={{
+              padding: "1px 6px",
+              background: "#f59e0b20",
+              borderRadius: 4,
+              fontSize: 9,
+              color: "#f59e0b",
+            }}
+          >
+            ${story.estimatedCost}
+          </span>
+        )}
+      </div>
+
+      {/* Crew */}
+      {story.assignedCrew.length > 0 ? (
+        <div style={{ display: "flex", gap: 4 }}>
+          {story.assignedCrew.slice(0, 3).map((crew, i) => (
+            <span
+              key={i}
+              style={{
+                padding: "2px 6px",
+                background: "var(--surface)",
+                borderRadius: 4,
+                fontSize: 9,
+              }}
+            >
+              {crew.memberId?.split("_").pop() || "Crew"}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAssignCrew(story.id);
+          }}
+          style={{
+            padding: "4px 8px",
+            background: "var(--surface)",
+            border: `1px dashed ${theme.accent}`,
+            borderRadius: 4,
+            color: theme.accent,
+            cursor: "pointer",
+            fontSize: 10,
+          }}
+        >
+          ⚡ Assign Crew (Riker)
+        </button>
+      )}
+
+      {/* Progress */}
+      {story.tasks.length > 0 && (
+        <div style={{ marginTop: 8 }}>
+          <div
+            style={{
+              height: 3,
+              background: "var(--surface)",
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${story.progress}%`,
+                height: "100%",
+                background: theme.accent,
+              }}
+            />
+          </div>
+          <div
+            style={{
+              fontSize: 9,
+              color: "var(--muted)",
+              marginTop: 2,
+              textAlign: "right",
+            }}
+          >
+            {story.tasks.filter((t) => t.status === "completed").length}/
+            {story.tasks.length} tasks
+          </div>
+        </div>
+      )}
+
+      {/* Expanded Actions */}
+      {expanded && (
+        <div
+          style={{
+            marginTop: 8,
+            paddingTop: 8,
+            borderTop: "1px solid var(--border)",
+            display: "flex",
+            gap: 4,
+          }}
+        >
+          {statusColumns.map((col) => (
+            <button
+              key={col.status}
+              onClick={(e) => {
+                e.stopPropagation();
+                onStatusChange(story.id, col.status);
+              }}
+              disabled={col.status === story.status}
+              style={{
+                flex: 1,
+                padding: "4px",
+                background:
+                  col.status === story.status
+                    ? getStoryStatusColor(col.status)
+                    : "var(--surface)",
+                border: `1px solid ${getStoryStatusColor(col.status)}40`,
+                borderRadius: 4,
+                color: col.status === story.status ? "white" : "var(--muted)",
+                cursor: col.status === story.status ? "default" : "pointer",
+                fontSize: 10,
+              }}
+            >
+              {col.icon}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BurndownChart({
+  sprint,
+  metrics,
+  theme,
+}: {
+  sprint: Sprint;
+  metrics: SprintMetrics;
+  theme: { accent: string };
+}) {
+  const maxPoints = Math.max(
+    ...metrics.idealBurndown,
+    ...metrics.actualBurndown,
+    1
+  );
+
+  return (
+    <div className="card">
+      <h3 style={{ margin: "0 0 16px", color: theme.accent }}>
+        📊 Burndown Chart
+      </h3>
+      <svg viewBox="0 0 400 200" style={{ width: "100%", height: 200 }}>
+        {/* Grid */}
+        <line x1="40" y1="20" x2="40" y2="170" stroke="var(--border)" />
+        <line x1="40" y1="170" x2="380" y2="170" stroke="var(--border)" />
+
+        {/* Ideal line */}
+        <polyline
+          points={metrics.idealBurndown
+            .map(
+              (p, i) =>
+                `${40 + (i * 340) / (metrics.idealBurndown.length - 1)},${
+                  20 + (1 - p / maxPoints) * 150
+                }`
+            )
+            .join(" ")}
+          fill="none"
+          stroke="var(--muted)"
+          strokeWidth="2"
+          strokeDasharray="5,5"
+        />
+
+        {/* Actual line */}
+        {metrics.actualBurndown.length > 0 && (
+          <polyline
+            points={metrics.actualBurndown
+              .map(
+                (p, i) =>
+                  `${40 + (i * 340) / (metrics.idealBurndown.length - 1)},${
+                    20 + (1 - p / maxPoints) * 150
+                  }`
+              )
+              .join(" ")}
+            fill="none"
+            stroke={theme.accent}
+            strokeWidth="2"
+          />
+        )}
+
+        {/* Labels */}
+        <text x="20" y="30" fontSize="10" fill="var(--muted)">
+          {maxPoints}
+        </text>
+        <text x="20" y="175" fontSize="10" fill="var(--muted)">
+          0
+        </text>
+        <text x="40" y="190" fontSize="10" fill="var(--muted)">
+          Day 1
+        </text>
+        <text x="360" y="190" fontSize="10" fill="var(--muted)">
+          Day {sprint.duration}
+        </text>
+      </svg>
+      <div
+        style={{
+          display: "flex",
+          gap: 16,
+          justifyContent: "center",
+          fontSize: 11,
+          color: "var(--muted)",
+        }}
+      >
+        <span>--- Ideal</span>
+        <span style={{ color: theme.accent }}>━ Actual</span>
+      </div>
+    </div>
+  );
+}
+
+function NewSprintModal({
+  onClose,
+  onCreate,
+  theme,
+}: {
+  onClose: () => void;
+  onCreate: (name: string, goal: string, duration: number) => void;
+  theme: { accent: string };
+}) {
+  const [name, setName] = useState("");
+  const [goal, setGoal] = useState("");
+  const [duration, setDuration] = useState(14);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.7)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="card"
+        style={{ width: 400, maxWidth: "90vw" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ margin: "0 0 16px", color: theme.accent }}>
+          🆕 Create New Sprint
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <input
+            type="text"
+            placeholder="Sprint name (e.g., Sprint 1)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{
+              padding: 12,
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              color: "var(--text)",
+            }}
+          />
+          <textarea
+            placeholder="Sprint goal..."
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+            rows={3}
+            style={{
+              padding: 12,
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              color: "var(--text)",
+              resize: "none",
+            }}
+          />
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <label style={{ color: "var(--muted)", fontSize: 13 }}>
+              Duration:
+            </label>
+            <select
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              style={{
+                padding: 8,
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+                color: "var(--text)",
+              }}
+            >
+              <option value={7}>1 week</option>
+              <option value={14}>2 weeks</option>
+              <option value={21}>3 weeks</option>
+              <option value={28}>4 weeks</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <button
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: 12,
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+                color: "var(--text)",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onCreate(name || "New Sprint", goal, duration)}
+              style={{
+                flex: 1,
+                padding: 12,
+                background: theme.accent,
+                border: "none",
+                borderRadius: 8,
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Create Sprint
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NewStoryModal({
+  onClose,
+  onCreate,
+  theme,
+}: {
+  onClose: () => void;
+  onCreate: (story: Partial<Story>) => void;
+  theme: { accent: string };
+}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [storyPoints, setStoryPoints] = useState(3);
+  const [type, setType] = useState<Story["type"]>("feature");
+  const [priority, setPriority] = useState<Story["priority"]>("medium");
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.7)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="card"
+        style={{ width: 450, maxWidth: "90vw" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ margin: "0 0 16px", color: theme.accent }}>
+          ➕ Add Story
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <input
+            type="text"
+            placeholder="Story title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{
+              padding: 12,
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              color: "var(--text)",
+            }}
+          />
+          <textarea
+            placeholder="Description / acceptance criteria..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            style={{
+              padding: 12,
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              color: "var(--text)",
+              resize: "none",
+            }}
+          />
+          <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: 11, color: "var(--muted)" }}>
+                Points
+              </label>
+              <select
+                value={storyPoints}
+                onChange={(e) => setStoryPoints(Number(e.target.value))}
+                style={{
+                  width: "100%",
+                  padding: 8,
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  color: "var(--text)",
+                }}
+              >
+                {[1, 2, 3, 5, 8, 13, 21].map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: 11, color: "var(--muted)" }}>
+                Type
+              </label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value as Story["type"])}
+                style={{
+                  width: "100%",
+                  padding: 8,
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  color: "var(--text)",
+                }}
+              >
+                <option value="feature">✨ Feature</option>
+                <option value="bug">🐛 Bug</option>
+                <option value="tech_debt">🔧 Tech Debt</option>
+                <option value="spike">🔬 Spike</option>
+                <option value="documentation">📚 Docs</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: 11, color: "var(--muted)" }}>
+                Priority
+              </label>
+              <select
+                value={priority}
+                onChange={(e) =>
+                  setPriority(e.target.value as Story["priority"])
+                }
+                style={{
+                  width: "100%",
+                  padding: 8,
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  color: "var(--text)",
+                }}
+              >
+                <option value="critical">🔴 Critical</option>
+                <option value="high">🟠 High</option>
+                <option value="medium">🟡 Medium</option>
+                <option value="low">⚪ Low</option>
+              </select>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <button
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: 12,
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+                color: "var(--text)",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() =>
+                onCreate({
+                  title: title || "New Story",
+                  description,
+                  storyPoints: storyPoints as Story["storyPoints"],
+                  type,
+                  priority,
+                  estimatedHours: storyPoints * 4,
+                })
+              }
+              style={{
+                flex: 1,
+                padding: 12,
+                background: theme.accent,
+                border: "none",
+                borderRadius: 8,
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Add Story
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
