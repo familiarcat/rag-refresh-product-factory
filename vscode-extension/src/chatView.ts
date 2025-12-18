@@ -95,6 +95,12 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       case "optimize":
         prompt = `Analyze and suggest optimizations for this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\``;
         break;
+      case "refactor":
+        prompt = `Suggest refactoring improvements for this ${language} code. Focus on readability, maintainability, and clean code principles:\n\n\`\`\`${language}\n${code}\n\`\`\``;
+        break;
+      case "fix":
+        prompt = `Help fix issues in this ${language} code. Provide working solutions:\n\n\`\`\`${language}\n${code}\n\`\`\``;
+        break;
       default:
         prompt = `Analyze this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\``;
     }

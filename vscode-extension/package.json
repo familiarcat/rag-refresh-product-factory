@@ -117,6 +117,22 @@
         "command": "alexAi.openNativeChat",
         "title": "Alex AI: Open in VS Code Chat",
         "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "alexAi.refactorCode",
+        "title": "Alex AI: Suggest Refactoring (Troi)"
+      },
+      {
+        "command": "alexAi.fixCode",
+        "title": "Alex AI: Help Fix Issue (O'Brien)"
+      },
+      {
+        "command": "alexAi.analyzeFile",
+        "title": "Alex AI: Review Current File (Worf)"
+      },
+      {
+        "command": "alexAi.clearDiagnostics",
+        "title": "Alex AI: Clear Code Review Suggestions"
       }
     ],
     "viewsContainers": {
@@ -239,6 +255,24 @@
           "default": true,
           "markdownDescription": "Set Alex AI as the preferred chat agent (pre-selects @alex in chat)",
           "order": 5
+        },
+        "alexAi.enableInlineCompletions": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Enable AI-powered code completions (like GitHub Copilot)",
+          "order": 6
+        },
+        "alexAi.enableHoverExplanations": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Show AI explanations when hovering over code symbols",
+          "order": 7
+        },
+        "alexAi.enableCodeReview": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Automatically review code and show suggestions in Problems panel (on save)",
+          "order": 8
         },
         "alexAi.baseUrl": {
           "type": "string",

@@ -4,6 +4,10 @@ import { CrewTreeProvider } from "./crewTree";
 import { SprintTreeProvider } from "./sprintTree";
 import { AlexAiService } from "./alexAiService";
 import { registerChatParticipant } from "./chatParticipant";
+import { registerInlineCompletionProvider } from "./inlineCompletion";
+import { registerCodeActionProvider } from "./codeActions";
+import { registerHoverProvider } from "./hoverProvider";
+import { registerDiagnosticProvider } from "./diagnosticProvider";
 
 let alexAiService: AlexAiService;
 
@@ -35,6 +39,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register as VS Code Chat Participant (@alex in Chat panel)
   registerChatParticipant(context, alexAiService);
+
+  // Register AI-powered providers (Copilot-like features)
+  registerInlineCompletionProvider(context, alexAiService);
+  registerCodeActionProvider(context);
+  registerHoverProvider(context, alexAiService);
+  registerDiagnosticProvider(context, alexAiService);
 
   // Register Commands
   context.subscriptions.push(
@@ -171,6 +181,56 @@ export function activate(context: vscode.ExtensionContext) {
         "optimize"
       );
     })
+  );
+
+  // Refactor Code command (Troi - UX/readability focused)
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.refactorCode", async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) return;
+
+      const selection = editor.document.getText(editor.selection);
+      if (!selection) {
+        vscode.window.showWarningMessage("No text selected");
+        return;
+      }
+
+      chatViewProvider.askCrewAboutCode(
+        "troi",
+        selection,
+        editor.document.languageId,
+        "refactor"
+      );
+    })
+  );
+
+  // Fix Code command (O'Brien - practical fixes)
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "alexAi.fixCode",
+      async (diagnostics?: vscode.Diagnostic[]) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const selection = editor.document.getText(editor.selection);
+        let prompt = selection || editor.document.getText();
+
+        // Include diagnostic info if available
+        if (diagnostics && diagnostics.length > 0) {
+          const issues = diagnostics
+            .map((d) => `- Line ${d.range.start.line + 1}: ${d.message}`)
+            .join("\n");
+          prompt = `Fix these issues:\n${issues}\n\nCode:\n${prompt}`;
+        }
+
+        chatViewProvider.askCrewAboutCode(
+          "obrien",
+          prompt,
+          editor.document.languageId,
+          "fix"
+        );
+      }
+    )
   );
 
   context.subscriptions.push(
