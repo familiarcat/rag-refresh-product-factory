@@ -214,10 +214,10 @@
         },
         "alexAi.defaultCrewMember": {
           "type": "string",
-          "default": "data",
+          "default": "riker",
           "enum": [
-            "picard",
             "riker",
+            "picard",
             "data",
             "geordi",
             "troi",
@@ -226,16 +226,16 @@
             "quark"
           ],
           "enumDescriptions": [
+            "⚡ Commander Riker - Crew coordinator (RECOMMENDED - routes to optimal crew)",
             "🎖️ Captain Picard - Strategic leadership and architecture",
-            "⚡ Commander Riker - Tactical coordination and execution",
             "🤖 Commander Data - Technical analysis and algorithms",
             "🔧 Lt. Cmdr. La Forge - Infrastructure and DevOps",
             "💭 Counselor Troi - UX design and user experience",
             "⚔️ Lt. Worf - Security reviews and testing",
             "🛠️ Chief O'Brien - Debugging and implementation",
-            "💰 Quark - Business analysis and optimization"
+            "💰 Quark - Cost optimization and efficiency"
           ],
-          "markdownDescription": "Default crew member for quick queries and code analysis",
+          "markdownDescription": "Default crew member. **Riker recommended** - he coordinates the crew and routes queries to optimal specialists while optimizing costs with Quark.",
           "order": 2
         },
         "alexAi.autoLoadContext": {

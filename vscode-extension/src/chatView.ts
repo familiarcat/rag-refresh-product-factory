@@ -5,7 +5,7 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private context: vscode.ExtensionContext;
   private alexAiService: AlexAiService;
-  private currentCrew: string = "data";
+  private currentCrew: string = "riker";
 
   constructor(context: vscode.ExtensionContext, alexAiService: AlexAiService) {
     this.context = context;
@@ -323,9 +323,9 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
   <div class="header">
     <span class="header-title">🖖 Alex AI</span>
     <select class="crew-selector" id="crewSelect">
-      <option value="data">🤖 Data</option>
+      <option value="riker">⚡ Riker (Coordinator)</option>
       <option value="picard">🎖️ Picard</option>
-      <option value="riker">⚡ Riker</option>
+      <option value="data">🤖 Data</option>
       <option value="geordi">🔧 Geordi</option>
       <option value="troi">💭 Troi</option>
       <option value="worf">⚔️ Worf</option>

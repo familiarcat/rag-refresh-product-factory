@@ -29,7 +29,7 @@ export function registerChatParticipant(
       token: vscode.CancellationToken
     ) => {
       // Determine which crew member to use based on command or default
-      let crewMember = "data"; // Default
+      let crewMember = "riker"; // Default - Riker coordinates the crew
 
       // Check for crew-specific commands like /picard, /worf, etc.
       if (request.command) {
@@ -118,6 +118,11 @@ export function registerChatParticipant(
     ) {
       return [
         {
+          prompt: "Coordinate crew response",
+          command: "riker",
+          label: "⚡ Riker (Coordinator)",
+        },
+        {
           prompt: "Ask Picard for strategic advice",
           command: "picard",
           label: "🎖️ Ask Picard",
@@ -133,9 +138,9 @@ export function registerChatParticipant(
           label: "⚔️ Ask Worf",
         },
         {
-          prompt: "Get Troi's UX perspective",
-          command: "troi",
-          label: "💭 Ask Troi",
+          prompt: "Get Quark's cost analysis",
+          command: "quark",
+          label: "💰 Ask Quark",
         },
       ];
     },

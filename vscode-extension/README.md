@@ -28,10 +28,10 @@ Type `@alex` in VS Code's Chat panel (Cmd+Shift+I) to use Alex AI:
 
 | Command         | Crew Member              | Specialty              |
 | --------------- | ------------------------ | ---------------------- |
-| `@alex`         | Commander Data (default) | Technical analysis     |
+| `@alex`         | Commander Riker (default)| **Crew Coordinator** - routes to optimal specialists |
 | `@alex /picard` | Captain Picard           | Strategic advice       |
-| `@alex /riker`  | Commander Riker          | Tactical guidance      |
 | `@alex /data`   | Commander Data           | Technical analysis     |
+| `@alex /quark`  | Quark                    | Cost optimization      |
 | `@alex /geordi` | Lt. Cmdr. La Forge       | Engineering            |
 | `@alex /troi`   | Counselor Troi           | UX perspective         |
 | `@alex /worf`   | Lt. Worf                 | Security review        |
