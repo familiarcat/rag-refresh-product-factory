@@ -10,18 +10,529 @@
       "endDate": "2026-01-01T08:09:37.841Z",
       "duration": 14,
       "teamCapacity": 40,
-      "committedPoints": 0,
+      "committedPoints": 49,
       "completedPoints": 0,
-      "budgetedCost": 0,
+      "budgetedCost": 14044,
       "actualCost": 0,
       "projectedROI": 0,
       "velocity": 0,
       "status": "planning",
-      "stories": [],
-      "activeCrewMembers": [],
+      "stories": [
+        {
+          "id": "story_1766045984400_3l1a",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Define strategic architecture for Organize a system to act as an executive editor of...",
+          "description": "Establish the high-level architecture and strategic direction for Organize a system to act as an executive editor of a writing project across novel, screenplay, and both an episodic and serial representation of a core story",
+          "acceptanceCriteria": [
+            "Architecture diagram created",
+            "Key decisions documented",
+            "Team alignment achieved"
+          ],
+          "type": "spike",
+          "priority": "high",
+          "tags": [
+            "captain_picard",
+            "captain-picard",
+            "architecture",
+            "strategy"
+          ],
+          "storyPoints": 5,
+          "estimatedCost": 1463,
+          "estimatedHours": 20,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "captain_picard",
+              "role": "strategy",
+              "assignment": "Define strategic architecture for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Define strategic architecture for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "quark",
+              "role": "business",
+              "assignment": "Define strategic architecture for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "captain_picard",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.379Z",
+          "updatedAt": "2025-12-18T08:19:44.379Z"
+        },
+        {
+          "id": "story_1766045984402_hf3y",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Coordinate team workflow for Organize a system to act as an executive editor of...",
+          "description": "Establish efficient team coordination and delivery pipeline",
+          "acceptanceCriteria": [
+            "Workflow documented",
+            "Team assignments clear",
+            "Communication channels established"
+          ],
+          "type": "feature",
+          "priority": "high",
+          "tags": [
+            "commander_riker",
+            "commander-riker",
+            "coordination",
+            "workflow"
+          ],
+          "storyPoints": 5,
+          "estimatedCost": 1463,
+          "estimatedHours": 20,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "commander_riker",
+              "role": "execution",
+              "assignment": "Coordinate team workflow for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Coordinate team workflow for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "quark",
+              "role": "business",
+              "assignment": "Coordinate team workflow for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "commander_riker",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.402Z",
+          "updatedAt": "2025-12-18T08:19:44.402Z"
+        },
+        {
+          "id": "story_1766045984405_5mah",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Implement core system logic",
+          "description": "Build the primary technical implementation for Organize a system to act as an executive editor of a writing project across novel, screenplay, and both an episodic and serial representation of a core story",
+          "acceptanceCriteria": [
+            "Core functionality implemented",
+            "Unit tests passing",
+            "Performance benchmarks met"
+          ],
+          "type": "feature",
+          "priority": "critical",
+          "tags": [
+            "commander_data",
+            "commander-data",
+            "implementation",
+            "core"
+          ],
+          "storyPoints": 5,
+          "estimatedCost": 1463,
+          "estimatedHours": 20,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Implement core system logic"
+            },
+            {
+              "memberId": "lieutenant_uhura",
+              "role": "communication",
+              "assignment": "Implement core system logic"
+            },
+            {
+              "memberId": "quark",
+              "role": "business",
+              "assignment": "Implement core system logic"
+            }
+          ],
+          "leadCrew": "commander_data",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.405Z",
+          "updatedAt": "2025-12-18T08:19:44.405Z"
+        },
+        {
+          "id": "story_1766045984409_9xxt",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Set up infrastructure for Organize a system to act as an executive editor of...",
+          "description": "Configure deployment and infrastructure requirements",
+          "acceptanceCriteria": [
+            "Infrastructure provisioned",
+            "CI/CD pipeline configured",
+            "Deployment tested"
+          ],
+          "type": "feature",
+          "priority": "high",
+          "tags": [
+            "geordi_la_forge",
+            "geordi-la_forge",
+            "infrastructure",
+            "devops"
+          ],
+          "storyPoints": 5,
+          "estimatedCost": 1463,
+          "estimatedHours": 20,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "geordi_la_forge",
+              "role": "engineering",
+              "assignment": "Set up infrastructure for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Set up infrastructure for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "quark",
+              "role": "business",
+              "assignment": "Set up infrastructure for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "geordi_la_forge",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.409Z",
+          "updatedAt": "2025-12-18T08:19:44.409Z"
+        },
+        {
+          "id": "story_1766045984409_qd0s",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Implement security measures for Organize a system to act as an executive editor of...",
+          "description": "Add authentication, authorization, and security validation",
+          "acceptanceCriteria": [
+            "Security controls implemented",
+            "Vulnerability scan passed",
+            "Access controls tested"
+          ],
+          "type": "feature",
+          "priority": "high",
+          "tags": [
+            "lieutenant_worf",
+            "lieutenant-worf",
+            "security",
+            "auth"
+          ],
+          "storyPoints": 5,
+          "estimatedCost": 1463,
+          "estimatedHours": 20,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "lieutenant_worf",
+              "role": "security",
+              "assignment": "Implement security measures for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "geordi_la_forge",
+              "role": "engineering",
+              "assignment": "Implement security measures for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "counselor_troi",
+              "role": "ux",
+              "assignment": "Implement security measures for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "lieutenant_worf",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.409Z",
+          "updatedAt": "2025-12-18T08:19:44.409Z"
+        },
+        {
+          "id": "story_1766045984409_tyfn",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Design user experience for Organize a system to act as an executive editor of...",
+          "description": "Create intuitive and accessible user interface",
+          "acceptanceCriteria": [
+            "UI mockups approved",
+            "Accessibility standards met",
+            "User flow documented"
+          ],
+          "type": "feature",
+          "priority": "high",
+          "tags": [
+            "counselor_troi",
+            "counselor-troi",
+            "ux",
+            "design"
+          ],
+          "storyPoints": 5,
+          "estimatedCost": 1463,
+          "estimatedHours": 20,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "counselor_troi",
+              "role": "ux",
+              "assignment": "Design user experience for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Design user experience for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "quark",
+              "role": "business",
+              "assignment": "Design user experience for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "counselor_troi",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.409Z",
+          "updatedAt": "2025-12-18T08:19:44.409Z"
+        },
+        {
+          "id": "story_1766045984409_lfga",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Implement Organize functionality",
+          "description": "Build the practical working implementation",
+          "acceptanceCriteria": [
+            "Feature fully functional",
+            "Edge cases handled",
+            "Integration tested"
+          ],
+          "type": "feature",
+          "priority": "high",
+          "tags": [
+            "chief_obrien",
+            "chief-obrien",
+            "implementation",
+            "practical"
+          ],
+          "storyPoints": 8,
+          "estimatedCost": 2340,
+          "estimatedHours": 32,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "lieutenant_uhura",
+              "role": "communication",
+              "assignment": "Implement Organize functionality"
+            },
+            {
+              "memberId": "geordi_la_forge",
+              "role": "engineering",
+              "assignment": "Implement Organize functionality"
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Implement Organize functionality"
+            }
+          ],
+          "leadCrew": "lieutenant_uhura",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.409Z",
+          "updatedAt": "2025-12-18T08:19:44.409Z"
+        },
+        {
+          "id": "story_1766045984409_7s1c",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Define monetization strategy for Organize a system to act as an executive editor of...",
+          "description": "Establish revenue model and cost optimization",
+          "acceptanceCriteria": [
+            "Revenue model documented",
+            "Cost projections complete",
+            "ROI targets defined"
+          ],
+          "type": "spike",
+          "priority": "high",
+          "tags": [
+            "quark",
+            "quark",
+            "business",
+            "monetization"
+          ],
+          "storyPoints": 3,
+          "estimatedCost": 878,
+          "estimatedHours": 12,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "quark",
+              "role": "business",
+              "assignment": "Define monetization strategy for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Define monetization strategy for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "captain_picard",
+              "role": "strategy",
+              "assignment": "Define monetization strategy for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "quark",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.409Z",
+          "updatedAt": "2025-12-18T08:19:44.409Z"
+        },
+        {
+          "id": "story_1766045984409_ckqe",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Create documentation for Organize a system to act as an executive editor of...",
+          "description": "Write comprehensive technical and user documentation",
+          "acceptanceCriteria": [
+            "Technical docs complete",
+            "User guide written",
+            "API documented"
+          ],
+          "type": "documentation",
+          "priority": "medium",
+          "tags": [
+            "dr_crusher",
+            "dr-crusher",
+            "documentation",
+            "quality"
+          ],
+          "storyPoints": 3,
+          "estimatedCost": 585,
+          "estimatedHours": 12,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "lieutenant_uhura",
+              "role": "communication",
+              "assignment": "Create documentation for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "dr_crusher",
+              "role": "health-checks",
+              "assignment": "Create documentation for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Create documentation for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "lieutenant_uhura",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.409Z",
+          "updatedAt": "2025-12-18T08:19:44.409Z"
+        },
+        {
+          "id": "story_1766045984417_ivbg",
+          "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+          "projectId": "proj_1765948227414_iw68yf",
+          "title": "Design API for Organize a system to act as an executive editor of...",
+          "description": "Create RESTful API and integration points",
+          "acceptanceCriteria": [
+            "API spec documented",
+            "Endpoints implemented",
+            "Integration tests passing"
+          ],
+          "type": "feature",
+          "priority": "high",
+          "tags": [
+            "lieutenant_uhura",
+            "lieutenant-uhura",
+            "api",
+            "integration"
+          ],
+          "storyPoints": 5,
+          "estimatedCost": 1463,
+          "estimatedHours": 20,
+          "actualHours": 0,
+          "assignedCrew": [
+            {
+              "memberId": "lieutenant_uhura",
+              "role": "communication",
+              "assignment": "Design API for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "commander_data",
+              "role": "ai",
+              "assignment": "Design API for Organize a system to act as an executive editor of..."
+            },
+            {
+              "memberId": "geordi_la_forge",
+              "role": "engineering",
+              "assignment": "Design API for Organize a system to act as an executive editor of..."
+            }
+          ],
+          "leadCrew": "lieutenant_uhura",
+          "status": "backlog",
+          "tasks": [],
+          "dependsOn": [],
+          "blocks": [],
+          "progress": 0,
+          "relatedMemories": [],
+          "createdAt": "2025-12-18T08:19:44.415Z",
+          "updatedAt": "2025-12-18T08:19:44.415Z"
+        }
+      ],
+      "activeCrewMembers": [
+        "captain_picard",
+        "commander_data",
+        "quark",
+        "commander_riker",
+        "lieutenant_uhura",
+        "geordi_la_forge",
+        "lieutenant_worf",
+        "counselor_troi",
+        "dr_crusher"
+      ],
       "dailyProgress": [],
       "createdAt": "2025-12-18T08:09:37.841Z",
-      "updatedAt": "2025-12-18T08:09:37.841Z"
+      "updatedAt": "2025-12-18T08:19:44.676Z"
     }
   ],
   "meta": {

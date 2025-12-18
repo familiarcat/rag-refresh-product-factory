@@ -28,7 +28,11 @@ const statusColumns: { status: StoryStatus; label: string; icon: string }[] = [
 
 interface PlanningSession {
   summary: string;
-  crewAnalysis: Array<{ crewMember: string; perspective: string; storiesSuggested: number }>;
+  crewAnalysis: Array<{
+    crewMember: string;
+    perspective: string;
+    storiesSuggested: number;
+  }>;
   deliberation: { consensus: string; adjustmentsMade: number };
   totalStories: number;
   totalPoints: number;
@@ -45,10 +49,14 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
   const [metrics, setMetrics] = useState<SprintMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [planning, setPlanning] = useState(false);
-  const [planningResult, setPlanningResult] = useState<PlanningSession | null>(null);
+  const [planningResult, setPlanningResult] = useState<PlanningSession | null>(
+    null
+  );
   const [showNewSprintModal, setShowNewSprintModal] = useState(false);
   const [showNewStoryModal, setShowNewStoryModal] = useState(false);
   const [showPlanningModal, setShowPlanningModal] = useState(false);
+  const [executing, setExecuting] = useState(false);
+  const [executionLog, setExecutionLog] = useState<string[]>([]);
 
   useEffect(() => {
     loadSprints();
@@ -189,7 +197,10 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
         setPlanningResult({
           summary: data.planningSession?.summary || "",
           crewAnalysis: data.crewAnalysis || [],
-          deliberation: data.deliberation || { consensus: "", adjustmentsMade: 0 },
+          deliberation: data.deliberation || {
+            consensus: "",
+            adjustmentsMade: 0,
+          },
           totalStories: data.summary?.totalStories || 0,
           totalPoints: data.summary?.totalPoints || 0,
           totalBudget: data.summary?.totalBudget || 0,
@@ -205,6 +216,79 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
       console.error("Failed to convene crew:", error);
     } finally {
       setPlanning(false);
+    }
+  }
+
+  async function startSprint() {
+    if (!activeSprint) return;
+
+    setExecuting(true);
+    setExecutionLog(["🚀 Starting sprint..."]);
+
+    try {
+      const res = await fetch("/api/sprints/auto-execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "start-sprint",
+          sprintId: activeSprint.id,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setExecutionLog((prev) => [
+          ...prev,
+          `✅ Sprint activated! ${data.storiesActivated} stories moved to TODO`,
+        ]);
+        await loadSprints();
+      }
+    } catch (error) {
+      setExecutionLog((prev) => [...prev, `❌ Error: ${error}`]);
+    } finally {
+      setExecuting(false);
+    }
+  }
+
+  async function runAutomationCycle() {
+    if (!activeSprint) return;
+
+    setExecuting(true);
+    setExecutionLog((prev) => [...prev, "🔄 Running automation cycle..."]);
+
+    try {
+      const res = await fetch("/api/sprints/auto-execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "run-cycle",
+          sprintId: activeSprint.id,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        // Log each story's progress
+        for (const result of data.cycleResults || []) {
+          setExecutionLog((prev) => [
+            ...prev,
+            `${result.newStatus === "done" ? "✅" : "🔄"} ${result.title}: ${result.action}`,
+          ]);
+        }
+        setExecutionLog((prev) => [
+          ...prev,
+          `📊 Cycle complete: ${data.summary.done}/${data.summary.total} done`,
+        ]);
+        if (data.sprintComplete) {
+          setExecutionLog((prev) => [
+            ...prev,
+            "🎉 SPRINT COMPLETE! All stories done.",
+          ]);
+        }
+        await loadSprints();
+      }
+    } catch (error) {
+      setExecutionLog((prev) => [...prev, `❌ Error: ${error}`]);
+    } finally {
+      setExecuting(false);
     }
   }
 
@@ -276,7 +360,9 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
                 disabled={planning}
                 style={{
                   padding: "8px 16px",
-                  background: planning ? "var(--surface)" : "linear-gradient(135deg, #f59e0b, #ef4444)",
+                  background: planning
+                    ? "var(--surface)"
+                    : "linear-gradient(135deg, #f59e0b, #ef4444)",
                   border: "none",
                   borderRadius: 8,
                   color: "white",
@@ -302,6 +388,42 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
                 }}
               >
                 📋 View Plan
+              </button>
+            )}
+            {activeSprint && activeSprint.status === "planning" && activeSprint.stories.length > 0 && (
+              <button
+                onClick={startSprint}
+                disabled={executing}
+                style={{
+                  padding: "8px 16px",
+                  background: executing ? "var(--surface)" : "linear-gradient(135deg, #10b981, #059669)",
+                  border: "none",
+                  borderRadius: 8,
+                  color: "white",
+                  cursor: executing ? "wait" : "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                {executing ? "🔄 Starting..." : "▶️ Start Sprint"}
+              </button>
+            )}
+            {activeSprint && activeSprint.status === "active" && (
+              <button
+                onClick={runAutomationCycle}
+                disabled={executing}
+                style={{
+                  padding: "8px 16px",
+                  background: executing ? "var(--surface)" : "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                  border: "none",
+                  borderRadius: 8,
+                  color: "white",
+                  cursor: executing ? "wait" : "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                {executing ? "🔄 Running..." : "⚡ Run Cycle"}
               </button>
             )}
             {activeSprint && (
@@ -405,6 +527,42 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
               color="#8b5cf6"
             />
           )}
+        </div>
+      )}
+
+      {/* Execution Log */}
+      {executionLog.length > 0 && (
+        <div
+          className="card"
+          style={{
+            background: "#0d1117",
+            border: "1px solid #30363d",
+            fontFamily: "monospace",
+            fontSize: 12,
+            maxHeight: 200,
+            overflow: "auto",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <span style={{ color: "#8b949e" }}>🤖 Crew Activity Log</span>
+            <button
+              onClick={() => setExecutionLog([])}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#8b949e",
+                cursor: "pointer",
+                fontSize: 10,
+              }}
+            >
+              Clear
+            </button>
+          </div>
+          {executionLog.map((log, i) => (
+            <div key={i} style={{ color: "#c9d1d9", padding: "2px 0" }}>
+              {log}
+            </div>
+          ))}
         </div>
       )}
 
@@ -1209,7 +1367,14 @@ function PlanningSessionModal({
             borderBottom: `2px solid ${theme.accent}`,
           }}
         >
-          <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: 12 }}>
+          <h2
+            style={{
+              margin: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
             🖖 Crew Planning Session
           </h2>
           <button
@@ -1331,16 +1496,29 @@ function PlanningSessionModal({
             </div>
 
             {/* Quark & Riker Analysis */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}
+            >
               {planningResult.quarkAnalysis && (
                 <div
                   className="card"
                   style={{
-                    background: "linear-gradient(135deg, #f59e0b10 0%, transparent 100%)",
+                    background:
+                      "linear-gradient(135deg, #f59e0b10 0%, transparent 100%)",
                     border: "1px solid #f59e0b40",
                   }}
                 >
-                  <h4 style={{ margin: "0 0 8px", fontSize: 13, color: "#f59e0b" }}>
+                  <h4
+                    style={{
+                      margin: "0 0 8px",
+                      fontSize: 13,
+                      color: "#f59e0b",
+                    }}
+                  >
                     💰 Quark&apos;s Analysis
                   </h4>
                   <pre
@@ -1360,11 +1538,18 @@ function PlanningSessionModal({
                 <div
                   className="card"
                   style={{
-                    background: "linear-gradient(135deg, #3b82f610 0%, transparent 100%)",
+                    background:
+                      "linear-gradient(135deg, #3b82f610 0%, transparent 100%)",
                     border: "1px solid #3b82f640",
                   }}
                 >
-                  <h4 style={{ margin: "0 0 8px", fontSize: 13, color: "#3b82f6" }}>
+                  <h4
+                    style={{
+                      margin: "0 0 8px",
+                      fontSize: 13,
+                      color: "#3b82f6",
+                    }}
+                  >
                     ⚡ Riker&apos;s Plan
                   </h4>
                   <pre
@@ -1399,8 +1584,8 @@ function PlanningSessionModal({
         ) : sprint ? (
           <div style={{ textAlign: "center", padding: 32 }}>
             <p style={{ color: "var(--muted)" }}>
-              Sprint &quot;{sprint.name}&quot; has {sprint.stories.length} stories
-              committed.
+              Sprint &quot;{sprint.name}&quot; has {sprint.stories.length}{" "}
+              stories committed.
             </p>
             <p style={{ color: "var(--muted)", fontSize: 12 }}>
               Total: {sprint.committedPoints} points | Budget: $

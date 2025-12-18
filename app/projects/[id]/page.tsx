@@ -828,7 +828,7 @@ export default function ProjectDashboard() {
                     </div>
                   </div>
                   <div style={{ fontSize: 11, color: "var(--muted)" }}>
-                    {member.contributions.length} contributions
+                    {member.contributions?.length || 0} contributions
                   </div>
                 </div>
               ))}

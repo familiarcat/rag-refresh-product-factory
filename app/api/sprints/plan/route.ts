@@ -49,12 +49,15 @@ interface Project {
 }
 
 // Crew member perspectives for sprint planning
-const crewPerspectives: Record<string, {
-  focus: string;
-  storyTypes: StoryType[];
-  keywords: string[];
-  questionPrompt: string;
-}> = {
+const crewPerspectives: Record<
+  string,
+  {
+    focus: string;
+    storyTypes: StoryType[];
+    keywords: string[];
+    questionPrompt: string;
+  }
+> = {
   captain_picard: {
     focus: "Strategic vision and architecture",
     storyTypes: ["feature", "spike"],
@@ -70,13 +73,29 @@ const crewPerspectives: Record<string, {
   commander_data: {
     focus: "Technical analysis and AI/ML systems",
     storyTypes: ["feature", "spike", "tech_debt"],
-    keywords: ["ai", "algorithm", "analysis", "data", "optimization", "rag", "llm"],
+    keywords: [
+      "ai",
+      "algorithm",
+      "analysis",
+      "data",
+      "optimization",
+      "rag",
+      "llm",
+    ],
     questionPrompt: "What technical implementations are needed?",
   },
   geordi_la_forge: {
     focus: "Infrastructure and DevOps",
     storyTypes: ["feature", "tech_debt", "bug"],
-    keywords: ["infrastructure", "deploy", "docker", "ci", "cd", "aws", "performance"],
+    keywords: [
+      "infrastructure",
+      "deploy",
+      "docker",
+      "ci",
+      "cd",
+      "aws",
+      "performance",
+    ],
     questionPrompt: "What infrastructure work is required?",
   },
   lieutenant_worf: {
@@ -124,7 +143,11 @@ async function loadSprints(): Promise<SprintsData> {
   } catch {
     return {
       sprints: [],
-      meta: { version: "1.0", createdAt: new Date().toISOString(), description: "" },
+      meta: {
+        version: "1.0",
+        createdAt: new Date().toISOString(),
+        description: "",
+      },
     };
   }
 }
@@ -154,7 +177,7 @@ async function loadProject(projectId: string): Promise<Project | null> {
 
 /**
  * POST /api/sprints/plan
- * 
+ *
  * Convene the crew for sprint planning:
  * - analyze-goal: Crew analyzes sprint goal and suggests stories
  * - deliberate: Crew deliberates on story priorities and estimates
@@ -180,11 +203,14 @@ export async function POST(req: Request) {
     case "analyze-goal": {
       // Each crew member analyzes the sprint goal
       const crewAnalysis = analyzeSprintGoal(sprint.goal, project, memories);
-      
+
       return NextResponse.json({
         ok: true,
         analysis: crewAnalysis,
-        suggestedStoryCount: crewAnalysis.reduce((sum, a) => sum + a.suggestedStories.length, 0),
+        suggestedStoryCount: crewAnalysis.reduce(
+          (sum, a) => sum + a.suggestedStories.length,
+          0
+        ),
       });
     }
 
@@ -207,7 +233,10 @@ export async function POST(req: Request) {
           });
 
           // Find and assign optimal crew
-          const { team } = findOptimalTeamForStory(story, suggestion.requiredSkills);
+          const { team } = findOptimalTeamForStory(
+            story,
+            suggestion.requiredSkills
+          );
           story.assignedCrew = team.map((m) => ({
             memberId: m.id,
             role: m.specializations[0] || "contributor",
@@ -219,7 +248,9 @@ export async function POST(req: Request) {
           story.estimatedCost = estimateStoryCost(
             story.storyPoints,
             team.map((m) => m.id),
-            story.priority === "critical" || story.priority === "high" ? "high" : "medium"
+            story.priority === "critical" || story.priority === "high"
+              ? "high"
+              : "medium"
           );
 
           generatedStories.push(story);
@@ -228,18 +259,32 @@ export async function POST(req: Request) {
 
       // Add stories to sprint
       sprint.stories.push(...generatedStories);
-      sprint.committedPoints = sprint.stories.reduce((sum, s) => sum + s.storyPoints, 0);
-      sprint.budgetedCost = sprint.stories.reduce((sum, s) => sum + s.estimatedCost, 0);
-      sprint.activeCrewMembers = [...new Set(
-        sprint.stories.flatMap((s) => s.assignedCrew.map((c) => c.memberId || ""))
-      )].filter(Boolean);
+      sprint.committedPoints = sprint.stories.reduce(
+        (sum, s) => sum + s.storyPoints,
+        0
+      );
+      sprint.budgetedCost = sprint.stories.reduce(
+        (sum, s) => sum + s.estimatedCost,
+        0
+      );
+      sprint.activeCrewMembers = [
+        ...new Set(
+          sprint.stories.flatMap((s) =>
+            s.assignedCrew.map((c) => c.memberId || "")
+          )
+        ),
+      ].filter(Boolean);
       sprint.updatedAt = new Date().toISOString();
 
       sprintsData.sprints[sprintIndex] = sprint;
       await saveSprints(sprintsData);
 
       // Generate planning summary
-      const summary = generatePlanningSession(sprint, generatedStories, memories);
+      const summary = generatePlanningSession(
+        sprint,
+        generatedStories,
+        memories
+      );
 
       return NextResponse.json({
         ok: true,
@@ -263,8 +308,14 @@ export async function POST(req: Request) {
 
     case "assign-all": {
       // Riker assigns optimal crews to all unassigned stories
-      const unassigned = sprint.stories.filter((s) => s.assignedCrew.length === 0);
-      const assignments: { storyId: string; team: string[]; synergy: number }[] = [];
+      const unassigned = sprint.stories.filter(
+        (s) => s.assignedCrew.length === 0
+      );
+      const assignments: {
+        storyId: string;
+        team: string[];
+        synergy: number;
+      }[] = [];
 
       for (const story of unassigned) {
         const skills = inferSkillsFromStory(story);
@@ -285,15 +336,27 @@ export async function POST(req: Request) {
         assignments.push({
           storyId: story.id,
           team: team.map((m) => m.name),
-          synergy: pairs.length > 0 ? Math.round(pairs.reduce((sum, p) => sum + p.synergy, 0) / pairs.length) : 75,
+          synergy:
+            pairs.length > 0
+              ? Math.round(
+                  pairs.reduce((sum, p) => sum + p.synergy, 0) / pairs.length
+                )
+              : 75,
         });
       }
 
       // Update sprint metrics
-      sprint.activeCrewMembers = [...new Set(
-        sprint.stories.flatMap((s) => s.assignedCrew.map((c) => c.memberId || ""))
-      )].filter(Boolean);
-      sprint.budgetedCost = sprint.stories.reduce((sum, s) => sum + s.estimatedCost, 0);
+      sprint.activeCrewMembers = [
+        ...new Set(
+          sprint.stories.flatMap((s) =>
+            s.assignedCrew.map((c) => c.memberId || "")
+          )
+        ),
+      ].filter(Boolean);
+      sprint.budgetedCost = sprint.stories.reduce(
+        (sum, s) => sum + s.estimatedCost,
+        0
+      );
       sprint.updatedAt = new Date().toISOString();
 
       sprintsData.sprints[sprintIndex] = sprint;
@@ -326,7 +389,10 @@ export async function POST(req: Request) {
             estimatedHours: suggestion.points * 4,
           });
 
-          const { team } = findOptimalTeamForStory(story, suggestion.requiredSkills);
+          const { team } = findOptimalTeamForStory(
+            story,
+            suggestion.requiredSkills
+          );
           story.assignedCrew = team.map((m) => ({
             memberId: m.id,
             role: m.specializations[0] || "contributor",
@@ -336,7 +402,9 @@ export async function POST(req: Request) {
           story.estimatedCost = estimateStoryCost(
             story.storyPoints,
             team.map((m) => m.id),
-            story.priority === "critical" || story.priority === "high" ? "high" : "medium"
+            story.priority === "critical" || story.priority === "high"
+              ? "high"
+              : "medium"
           );
 
           generatedStories.push(story);
@@ -348,7 +416,9 @@ export async function POST(req: Request) {
 
       // Apply deliberation adjustments
       for (const story of generatedStories) {
-        const adjustment = deliberation.adjustments.find((a) => a.storyId === story.id);
+        const adjustment = deliberation.adjustments.find(
+          (a) => a.storyId === story.id
+        );
         if (adjustment) {
           if (adjustment.newPriority) story.priority = adjustment.newPriority;
           if (adjustment.newPoints) {
@@ -365,18 +435,32 @@ export async function POST(req: Request) {
 
       // Update sprint
       sprint.stories = generatedStories;
-      sprint.committedPoints = sprint.stories.reduce((sum, s) => sum + s.storyPoints, 0);
-      sprint.budgetedCost = sprint.stories.reduce((sum, s) => sum + s.estimatedCost, 0);
-      sprint.activeCrewMembers = [...new Set(
-        sprint.stories.flatMap((s) => s.assignedCrew.map((c) => c.memberId || ""))
-      )].filter(Boolean);
+      sprint.committedPoints = sprint.stories.reduce(
+        (sum, s) => sum + s.storyPoints,
+        0
+      );
+      sprint.budgetedCost = sprint.stories.reduce(
+        (sum, s) => sum + s.estimatedCost,
+        0
+      );
+      sprint.activeCrewMembers = [
+        ...new Set(
+          sprint.stories.flatMap((s) =>
+            s.assignedCrew.map((c) => c.memberId || "")
+          )
+        ),
+      ].filter(Boolean);
       sprint.updatedAt = new Date().toISOString();
 
       sprintsData.sprints[sprintIndex] = sprint;
       await saveSprints(sprintsData);
 
       // Generate comprehensive planning summary
-      const planningSession = generatePlanningSession(sprint, generatedStories, memories);
+      const planningSession = generatePlanningSession(
+        sprint,
+        generatedStories,
+        memories
+      );
 
       return NextResponse.json({
         ok: true,
@@ -437,13 +521,21 @@ function analyzeSprintGoal(
     if (!crewMember) continue;
 
     // Check relevance of this crew member to the goal
-    const relevanceScore = perspective.keywords.filter((k) => goalLower.includes(k)).length;
+    const relevanceScore = perspective.keywords.filter((k) =>
+      goalLower.includes(k)
+    ).length;
     const domainRelevance = projectDomains.some((d) =>
-      perspective.keywords.some((k) => d.name.toLowerCase().includes(k) || d.description.toLowerCase().includes(k))
+      perspective.keywords.some(
+        (k) =>
+          d.name.toLowerCase().includes(k) ||
+          d.description.toLowerCase().includes(k)
+      )
     );
 
     // Get crew memories for context
-    const crewMemories = memories.filter((m) => m.crewId === crewId).slice(0, 3);
+    const crewMemories = memories
+      .filter((m) => m.crewId === crewId)
+      .slice(0, 3);
 
     // Generate stories based on crew expertise and goal analysis
     const suggestedStories = generateCrewStories(
@@ -475,7 +567,7 @@ function analyzeSprintGoal(
 function generateCrewStories(
   crewId: string,
   crewName: string,
-  perspective: typeof crewPerspectives[string],
+  perspective: (typeof crewPerspectives)[string],
   goal: string,
   domains: Project["domains"],
   memories: Memory[],
@@ -532,7 +624,10 @@ function getStoryTemplates(
   // Extract key concepts from goal
   const concepts = extractConcepts(goal);
 
-  const templatesByCrewId: Record<string, ReturnType<typeof getStoryTemplates>> = {
+  const templatesByCrewId: Record<
+    string,
+    ReturnType<typeof getStoryTemplates>
+  > = {
     captain_picard: [
       {
         title: `Define strategic architecture for ${concepts.primary}`,
@@ -555,7 +650,10 @@ function getStoryTemplates(
         priority: "medium",
         points: 3,
         tags: ["documentation", "vision"],
-        acceptanceCriteria: ["Vision document complete", "Stakeholder review done"],
+        acceptanceCriteria: [
+          "Vision document complete",
+          "Stakeholder review done",
+        ],
         requiredSkills: ["documentation", "strategy"],
       },
     ],
@@ -639,7 +737,10 @@ function getStoryTemplates(
         priority: "medium",
         points: 3,
         tags: ["testing", "quality"],
-        acceptanceCriteria: ["Test coverage > 80%", "All critical paths tested"],
+        acceptanceCriteria: [
+          "Test coverage > 80%",
+          "All critical paths tested",
+        ],
         requiredSkills: ["testing", "quality-assurance"],
       },
     ],
@@ -751,19 +852,42 @@ function getStoryTemplates(
 /**
  * Extract key concepts from goal text
  */
-function extractConcepts(goal: string): { primary: string; technical: string; action: string } {
+function extractConcepts(goal: string): {
+  primary: string;
+  technical: string;
+  action: string;
+} {
   const words = goal.split(/\s+/);
-  
+
   // Find key nouns and verbs
-  const actionWords = ["organize", "create", "build", "implement", "design", "develop", "establish"];
-  const action = words.find((w) => actionWords.some((a) => w.toLowerCase().includes(a))) || "implement";
-  
+  const actionWords = [
+    "organize",
+    "create",
+    "build",
+    "implement",
+    "design",
+    "develop",
+    "establish",
+  ];
+  const action =
+    words.find((w) => actionWords.some((a) => w.toLowerCase().includes(a))) ||
+    "implement";
+
   // Extract primary concept (longest meaningful phrase)
   const primary = goal.length > 50 ? goal.substring(0, 50) + "..." : goal;
-  
+
   // Technical concept
-  const techWords = ["system", "editor", "platform", "service", "api", "integration"];
-  const technical = words.find((w) => techWords.some((t) => w.toLowerCase().includes(t))) || "system";
+  const techWords = [
+    "system",
+    "editor",
+    "platform",
+    "service",
+    "api",
+    "integration",
+  ];
+  const technical =
+    words.find((w) => techWords.some((t) => w.toLowerCase().includes(t))) ||
+    "system";
 
   return { primary, technical, action };
 }
@@ -774,7 +898,15 @@ function extractConcepts(goal: string): { primary: string; technical: string; ac
 function findOptimalTeamForStory(
   story: Story,
   requiredSkills: string[]
-): { team: typeof crewRoster; pairs: Array<{ leadId: string; supportId: string; synergy: number; reasoning: string }> } {
+): {
+  team: typeof crewRoster;
+  pairs: Array<{
+    leadId: string;
+    supportId: string;
+    synergy: number;
+    reasoning: string;
+  }>;
+} {
   const task = {
     id: story.id,
     projectId: story.projectId,
@@ -794,7 +926,9 @@ function findOptimalTeamForStory(
  * Infer skills from story content
  */
 function inferSkillsFromStory(story: Story): string[] {
-  const text = `${story.title} ${story.description} ${story.tags.join(" ")}`.toLowerCase();
+  const text = `${story.title} ${story.description} ${story.tags.join(
+    " "
+  )}`.toLowerCase();
   const skills: string[] = [];
 
   const skillMap: Record<string, string[]> = {
@@ -804,7 +938,7 @@ function inferSkillsFromStory(story: Story): string[] {
     "security|auth": ["security", "auth-systems"],
     "database|data": ["database-ops"],
     "deploy|docker|ci": ["ci-cd", "infrastructure"],
-    "test": ["testing", "quality-assurance"],
+    test: ["testing", "quality-assurance"],
   };
 
   for (const [pattern, mappedSkills] of Object.entries(skillMap)) {
@@ -842,9 +976,12 @@ function deliberateOnStories(
   const expensiveStories = stories.filter((s) => s.estimatedCost > 1000);
 
   if (expensiveStories.length > 0) {
-    crewFeedback["quark"] = `I've identified ${expensiveStories.length} high-cost stories totaling $${totalCost}. ` +
+    crewFeedback["quark"] =
+      `I've identified ${expensiveStories.length} high-cost stories totaling $${totalCost}. ` +
       `Rule of Acquisition #3: "Never spend more for an acquisition than you have to." ` +
-      `Consider reducing scope on: ${expensiveStories.map((s) => s.title).join(", ")}`;
+      `Consider reducing scope on: ${expensiveStories
+        .map((s) => s.title)
+        .join(", ")}`;
   }
 
   // Worf reviews security
@@ -852,7 +989,8 @@ function deliberateOnStories(
     s.tags.some((t) => ["security", "auth", "worf"].includes(t.toLowerCase()))
   );
   if (securityStories.length === 0 && stories.length > 3) {
-    crewFeedback["lieutenant_worf"] = "I note a lack of security-focused stories. " +
+    crewFeedback["lieutenant_worf"] =
+      "I note a lack of security-focused stories. " +
       "Every sprint should include security validation. Recommend adding security review.";
   }
 
@@ -864,31 +1002,42 @@ function deliberateOnStories(
         storyId: story.id,
         storyTitle: story.title,
         newPoints: Math.max(5, story.storyPoints - 3) as number,
-        reason: "Story can be decomposed into smaller units for better velocity",
+        reason:
+          "Story can be decomposed into smaller units for better velocity",
         crewMember: "Commander Data",
       });
     }
   }
 
   // Troi reviews user impact
-  const uxStories = stories.filter((s) => s.tags.some((t) => ["ux", "ui", "design"].includes(t)));
+  const uxStories = stories.filter((s) =>
+    s.tags.some((t) => ["ux", "ui", "design"].includes(t))
+  );
   if (uxStories.length > 0) {
-    crewFeedback["counselor_troi"] = `I sense ${uxStories.length} stories with user experience impact. ` +
+    crewFeedback["counselor_troi"] =
+      `I sense ${uxStories.length} stories with user experience impact. ` +
       `Users will appreciate the attention to their needs. Prioritize user-facing features.`;
   }
 
   // Riker's tactical assessment
   const criticalStories = stories.filter((s) => s.priority === "critical");
-  crewFeedback["commander_riker"] = criticalStories.length > 2
-    ? `We have ${criticalStories.length} critical stories - may need to reassess priorities for realistic delivery.`
-    : `Team is well-positioned for this sprint. All hands ready.`;
+  crewFeedback["commander_riker"] =
+    criticalStories.length > 2
+      ? `We have ${criticalStories.length} critical stories - may need to reassess priorities for realistic delivery.`
+      : `Team is well-positioned for this sprint. All hands ready.`;
 
   // Generate consensus
-  const consensus = stories.length > 0
-    ? `Sprint planning complete with ${stories.length} stories totaling ${stories.reduce((sum, s) => sum + s.storyPoints, 0)} points. ` +
-      `The crew has reviewed and deliberated. ${adjustments.length} adjustments recommended. ` +
-      `Budget projection: $${totalCost.toLocaleString()}. Ready to proceed.`
-    : "No stories to deliberate. Generate stories first.";
+  const consensus =
+    stories.length > 0
+      ? `Sprint planning complete with ${
+          stories.length
+        } stories totaling ${stories.reduce(
+          (sum, s) => sum + s.storyPoints,
+          0
+        )} points. ` +
+        `The crew has reviewed and deliberated. ${adjustments.length} adjustments recommended. ` +
+        `Budget projection: $${totalCost.toLocaleString()}. Ready to proceed.`
+      : "No stories to deliberate. Generate stories first.";
 
   return { consensus, adjustments, crewFeedback };
 }
@@ -899,16 +1048,21 @@ function deliberateOnStories(
 function generateRikerAssignmentBriefing(
   assignments: Array<{ storyId: string; team: string[]; synergy: number }>
 ): string {
-  let briefing = `Commander Riker's Team Assignment Briefing\n${"━".repeat(45)}\n\n`;
+  let briefing = `Commander Riker's Team Assignment Briefing\n${"━".repeat(
+    45
+  )}\n\n`;
 
   briefing += `**Assignments Made:** ${assignments.length} stories\n`;
   briefing += `**Average Team Synergy:** ${Math.round(
-    assignments.reduce((sum, a) => sum + a.synergy, 0) / Math.max(assignments.length, 1)
+    assignments.reduce((sum, a) => sum + a.synergy, 0) /
+      Math.max(assignments.length, 1)
   )}%\n\n`;
 
   briefing += `**Team Compositions:**\n`;
   for (const assignment of assignments.slice(0, 5)) {
-    briefing += `• ${assignment.team.join(" + ")} (${assignment.synergy}% synergy)\n`;
+    briefing += `• ${assignment.team.join(" + ")} (${
+      assignment.synergy
+    }% synergy)\n`;
   }
 
   if (assignments.length > 5) {
@@ -936,21 +1090,28 @@ function generatePlanningSession(
   quarkAnalysis: string;
   rikerPlan: string;
 } {
-  const attendees = [...new Set(stories.flatMap((s) => s.assignedCrew.map((c) => c.memberId)))].filter(Boolean);
+  const attendees = [
+    ...new Set(stories.flatMap((s) => s.assignedCrew.map((c) => c.memberId))),
+  ].filter(Boolean);
   const totalPoints = stories.reduce((sum, s) => sum + s.storyPoints, 0);
   const totalCost = stories.reduce((sum, s) => sum + s.estimatedCost, 0);
 
   const decisions = [
     `Sprint goal: "${sprint.goal}"`,
     `${stories.length} stories committed with ${totalPoints} total points`,
-    `Team capacity: ${sprint.teamCapacity} points - Commitment ratio: ${Math.round((totalPoints / sprint.teamCapacity) * 100)}%`,
+    `Team capacity: ${
+      sprint.teamCapacity
+    } points - Commitment ratio: ${Math.round(
+      (totalPoints / sprint.teamCapacity) * 100
+    )}%`,
     `Budget allocation: $${totalCost.toLocaleString()}`,
     `${attendees.length} crew members assigned`,
   ];
 
   // Quark's analysis
   const costPerPoint = totalCost / Math.max(totalPoints, 1);
-  const quarkAnalysis = `💰 Financial Assessment:\n` +
+  const quarkAnalysis =
+    `💰 Financial Assessment:\n` +
     `Cost per point: $${costPerPoint.toFixed(0)}\n` +
     `Total investment: $${totalCost.toLocaleString()}\n` +
     (costPerPoint < 150
@@ -960,9 +1121,12 @@ function generatePlanningSession(
       : `Rule #3 warning: Consider reducing scope to improve ROI.`);
 
   // Riker's plan
-  const rikerPlan = `⚡ Execution Plan:\n` +
+  const rikerPlan =
+    `⚡ Execution Plan:\n` +
     `Sprint Duration: ${sprint.duration} days\n` +
-    `Velocity Target: ${Math.round(totalPoints / (sprint.duration / 7))} points/week\n` +
+    `Velocity Target: ${Math.round(
+      totalPoints / (sprint.duration / 7)
+    )} points/week\n` +
     `Team ready for sprint start.\n` +
     `"Number One, make it so." - Picard`;
 
@@ -970,7 +1134,11 @@ function generatePlanningSession(
     sessionId: `plan_${sprint.id}_${Date.now()}`,
     timestamp: new Date().toISOString(),
     attendees: attendees.map((id) => getCrewMember(id)?.name || id),
-    summary: `Sprint planning session for "${sprint.name}" complete. ${stories.length} stories planned, ${attendees.length} crew assigned, $${totalCost.toLocaleString()} budgeted.`,
+    summary: `Sprint planning session for "${sprint.name}" complete. ${
+      stories.length
+    } stories planned, ${
+      attendees.length
+    } crew assigned, $${totalCost.toLocaleString()} budgeted.`,
     decisions,
     quarkAnalysis,
     rikerPlan,
