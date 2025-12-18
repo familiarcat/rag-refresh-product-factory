@@ -1,7 +1,5 @@
 import * as vscode from "vscode";
 import { CrewChatViewProvider } from "./chatView";
-import { CrewTreeProvider } from "./crewTree";
-import { SprintTreeProvider } from "./sprintTree";
 import { AlexAiService } from "./alexAiService";
 import { registerChatParticipant } from "./chatParticipant";
 import { registerInlineCompletionProvider } from "./inlineCompletion";
@@ -18,24 +16,14 @@ export function activate(context: vscode.ExtensionContext) {
   // Initialize service
   alexAiService = new AlexAiService(context);
 
-  // Register Chat View
+  // Register comprehensive sidebar webview (Chat, Files, Projects, Lounge all-in-one)
   const chatViewProvider = new CrewChatViewProvider(context, alexAiService);
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       "alexAi.chatView",
-      chatViewProvider
+      chatViewProvider,
+      { webviewOptions: { retainContextWhenHidden: true } }
     )
-  );
-
-  // Register Crew Tree View
-  const crewTreeProvider = new CrewTreeProvider();
-  vscode.window.registerTreeDataProvider("alexAi.crewView", crewTreeProvider);
-
-  // Register Sprint Tree View
-  const sprintTreeProvider = new SprintTreeProvider(alexAiService);
-  vscode.window.registerTreeDataProvider(
-    "alexAi.sprintView",
-    sprintTreeProvider
   );
 
   // Register as VS Code Chat Participant (@alex in Chat panel)
@@ -245,7 +233,7 @@ export function activate(context: vscode.ExtensionContext) {
           `${status.name}: ${status.completedPoints}/${status.committedPoints} pts (${status.status})`
         );
       }
-      sprintTreeProvider.refresh();
+      // Sprint status is now shown in the sidebar webview
     })
   );
 
@@ -434,7 +422,8 @@ export function activate(context: vscode.ExtensionContext) {
     100
   );
   statusBarItem.text = "$(comment-discussion) Alex AI";
-  statusBarItem.tooltip = "Open Alex AI Chat (Cmd+Option+A) or use @alex in Chat";
+  statusBarItem.tooltip =
+    "Open Alex AI Chat (Cmd+Option+A) or use @alex in Chat";
   statusBarItem.command = "alexAi.openChat";
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);

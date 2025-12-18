@@ -140,7 +140,10 @@ export class AlexAiPanel {
       relativePath: vscode.workspace.asRelativePath(f),
     }));
 
-    this._panel.webview.postMessage({ type: "workspaceFiles", files: fileTree });
+    this._panel.webview.postMessage({
+      type: "workspaceFiles",
+      files: fileTree,
+    });
   }
 
   private async _sendFileContent(path: string) {

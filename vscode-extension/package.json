@@ -154,15 +154,8 @@
         {
           "type": "webview",
           "id": "alexAi.chatView",
-          "name": "Crew Chat"
-        },
-        {
-          "id": "alexAi.crewView",
-          "name": "Crew Members"
-        },
-        {
-          "id": "alexAi.sprintView",
-          "name": "Sprint Status"
+          "name": "Alex AI",
+          "visibility": "visible"
         }
       ]
     },
