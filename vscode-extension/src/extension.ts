@@ -8,6 +8,7 @@ import { registerInlineCompletionProvider } from "./inlineCompletion";
 import { registerCodeActionProvider } from "./codeActions";
 import { registerHoverProvider } from "./hoverProvider";
 import { registerDiagnosticProvider } from "./diagnosticProvider";
+import { registerAlexPanel } from "./alexPanel";
 
 let alexAiService: AlexAiService;
 
@@ -45,6 +46,9 @@ export function activate(context: vscode.ExtensionContext) {
   registerCodeActionProvider(context);
   registerHoverProvider(context, alexAiService);
   registerDiagnosticProvider(context, alexAiService);
+
+  // Register comprehensive Alex AI Panel
+  registerAlexPanel(context, alexAiService);
 
   // Register Commands
   context.subscriptions.push(

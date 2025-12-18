@@ -133,6 +133,11 @@
       {
         "command": "alexAi.clearDiagnostics",
         "title": "Alex AI: Clear Code Review Suggestions"
+      },
+      {
+        "command": "alexAi.openPanel",
+        "title": "Alex AI: Open Full Panel",
+        "icon": "$(window)"
       }
     ],
     "viewsContainers": {
@@ -201,6 +206,11 @@
         "command": "alexAi.openNativeChat",
         "key": "ctrl+alt+c",
         "mac": "cmd+option+c"
+      },
+      {
+        "command": "alexAi.openPanel",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+option+p"
       }
     ],
     "configuration": {
