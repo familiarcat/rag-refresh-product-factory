@@ -136,7 +136,9 @@ export class AlexAiClient {
         throw new Error(`API error: ${error}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
       return data.choices?.[0]?.message?.content || "No response received";
     } catch (error) {
       return `❌ Error: ${
@@ -151,7 +153,9 @@ export class AlexAiClient {
       const response = await fetch(
         `${config.baseUrl}/api/crew/collaborate?action=memories`
       );
-      const data = await response.json();
+      const data = (await response.json()) as {
+        memories?: Array<{ crewId?: string; content?: string }>;
+      };
       const memories = data.memories || [];
 
       if (crewMember) {
@@ -174,7 +178,16 @@ export class AlexAiClient {
       const response = await fetch(
         `${config.baseUrl}/api/sprints?projectId=proj_1765948227414_iw68yf`
       );
-      const data = await response.json();
+      const data = (await response.json()) as {
+        sprints?: Array<{
+          id: string;
+          name: string;
+          status: string;
+          committedPoints: number;
+          completedPoints: number;
+          stories: Array<{ id: string; title: string; status: string }>;
+        }>;
+      };
       const sprint = data.sprints?.[0];
 
       if (!sprint) return null;
@@ -245,7 +258,9 @@ export class AlexAiClient {
           }
         );
 
-        const data = await response.json();
+        const data = (await response.json()) as {
+          choices?: Array<{ message?: { content?: string } }>;
+        };
         responses.push({
           name: crew.name,
           emoji: crew.emoji,

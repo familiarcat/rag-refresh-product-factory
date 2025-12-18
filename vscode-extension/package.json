@@ -4,7 +4,11 @@
   "description": "AI-powered code assistant with Star Trek crew personas. Chat with Picard, Data, and the crew for code analysis and recommendations.",
   "version": "1.0.0",
   "publisher": "alex-ai",
-  "icon": "media/icon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/familiarcat/rag-refresh-product-factory"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },

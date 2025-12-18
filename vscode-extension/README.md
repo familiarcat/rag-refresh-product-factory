@@ -19,6 +19,7 @@ bash scripts/install-vscode-extension.sh
 ```
 
 This will:
+
 1. Extract your OpenRouter API key from `~/.zshrc`
 2. Build and install the extension
 3. Configure VS Code settings
@@ -34,6 +35,7 @@ code --install-extension alex-ai-assistant-1.0.0.vsix
 ```
 
 Then configure in VS Code Settings:
+
 - `alexAi.openRouterApiKey`: Your OpenRouter API key
 - `alexAi.baseUrl`: Alex AI server URL (default: http://localhost:3001)
 
@@ -41,14 +43,15 @@ Then configure in VS Code Settings:
 
 ### Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Cmd+Shift+A` | Open Alex AI Chat |
+| Shortcut      | Action                       |
+| ------------- | ---------------------------- |
+| `Cmd+Shift+A` | Open Alex AI Chat            |
 | `Cmd+Shift+Q` | Ask crew about selected code |
 
 ### Context Menu
 
 Select code in the editor and right-click:
+
 - **Ask Crew About Selection** - Choose a crew member to analyze
 - **Alex AI: Explain Code** - Data explains the code
 - **Alex AI: Review Code** - Worf reviews for security
@@ -56,6 +59,7 @@ Select code in the editor and right-click:
 ### Sidebar
 
 Click the Starfleet icon in the activity bar to see:
+
 - **Crew Chat** - Interactive chat with AI crew
 - **Crew Members** - List of available crew
 - **Sprint Status** - Current sprint progress
@@ -63,22 +67,23 @@ Click the Starfleet icon in the activity bar to see:
 ### Commands
 
 Press `Cmd+Shift+P` and search for:
+
 - `Alex AI: Open Chat`
 - `Alex AI: Sprint Status`
 - `Alex AI: Convene Observation Lounge`
 
 ## Crew Members
 
-| Crew | Specialty | Best For |
-|------|-----------|----------|
-| 🎖️ Captain Picard | Strategy | Architecture decisions |
-| ⚡ Commander Riker | Coordination | Project planning |
-| 🤖 Commander Data | Technical | Code analysis, algorithms |
-| 🔧 Lt. Cmdr. La Forge | Engineering | Infrastructure, DevOps |
-| 💭 Counselor Troi | UX | User experience, readability |
-| ⚔️ Lt. Worf | Security | Security reviews, testing |
-| 🛠️ Chief O'Brien | Implementation | Debugging, practical fixes |
-| 💰 Quark | Business | Cost analysis, optimization |
+| Crew                  | Specialty      | Best For                     |
+| --------------------- | -------------- | ---------------------------- |
+| 🎖️ Captain Picard     | Strategy       | Architecture decisions       |
+| ⚡ Commander Riker    | Coordination   | Project planning             |
+| 🤖 Commander Data     | Technical      | Code analysis, algorithms    |
+| 🔧 Lt. Cmdr. La Forge | Engineering    | Infrastructure, DevOps       |
+| 💭 Counselor Troi     | UX             | User experience, readability |
+| ⚔️ Lt. Worf           | Security       | Security reviews, testing    |
+| 🛠️ Chief O'Brien      | Implementation | Debugging, practical fixes   |
+| 💰 Quark              | Business       | Cost analysis, optimization  |
 
 ## Requirements
 
@@ -88,12 +93,12 @@ Press `Cmd+Shift+P` and search for:
 
 ## Configuration
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `alexAi.openRouterApiKey` | OpenRouter API key | (required) |
-| `alexAi.baseUrl` | Alex AI server URL | http://localhost:3001 |
-| `alexAi.defaultCrewMember` | Default crew for quick actions | data |
-| `alexAi.autoLoadContext` | Load workspace context | true |
+| Setting                    | Description                    | Default               |
+| -------------------------- | ------------------------------ | --------------------- |
+| `alexAi.openRouterApiKey`  | OpenRouter API key             | (required)            |
+| `alexAi.baseUrl`           | Alex AI server URL             | http://localhost:3001 |
+| `alexAi.defaultCrewMember` | Default crew for quick actions | data                  |
+| `alexAi.autoLoadContext`   | Load workspace context         | true                  |
 
 ## Development
 
@@ -108,6 +113,7 @@ Press F5 in VS Code to launch Extension Development Host.
 ## Cost
 
 Uses OpenRouter for AI responses. Typical costs:
+
 - Claude 3.5 Sonnet: ~$0.003/1K input, $0.015/1K output
 - GPT-4 Turbo: ~$0.01/1K input, $0.03/1K output
 

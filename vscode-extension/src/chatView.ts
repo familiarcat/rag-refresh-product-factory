@@ -1,11 +1,11 @@
-import * as vscode from 'vscode';
-import { AlexAiService, ObservationLoungeResult } from './alexAiService';
+import * as vscode from "vscode";
+import { AlexAiService, ObservationLoungeResult } from "./alexAiService";
 
 export class CrewChatViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private context: vscode.ExtensionContext;
   private alexAiService: AlexAiService;
-  private currentCrew: string = 'data';
+  private currentCrew: string = "data";
 
   constructor(context: vscode.ExtensionContext, alexAiService: AlexAiService) {
     this.context = context;
@@ -24,14 +24,14 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(async (message) => {
       switch (message.type) {
-        case 'sendMessage':
+        case "sendMessage":
           await this.handleUserMessage(message.text, message.crew);
           break;
-        case 'selectCrew':
+        case "selectCrew":
           this.currentCrew = message.crew;
           this.updateCrewIndicator();
           break;
-        case 'clearHistory':
+        case "clearHistory":
           this.alexAiService.clearHistory();
           this.clearChat();
           break;
@@ -44,14 +44,14 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
 
     // Show user message
     this._view.webview.postMessage({
-      type: 'addMessage',
-      role: 'user',
+      type: "addMessage",
+      role: "user",
       content: text,
     });
 
     // Show typing indicator
     this._view.webview.postMessage({
-      type: 'showTyping',
+      type: "showTyping",
       crew,
     });
 
@@ -60,34 +60,39 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
 
     // Hide typing and show response
     this._view.webview.postMessage({
-      type: 'hideTyping',
+      type: "hideTyping",
     });
 
     const crewInfo = this.alexAiService.getCrewInfo(crew);
     this._view.webview.postMessage({
-      type: 'addMessage',
-      role: 'assistant',
+      type: "addMessage",
+      role: "assistant",
       content: response,
       crew: crewInfo.name,
       emoji: crewInfo.emoji,
     });
   }
 
-  async askCrewAboutCode(crew: string, code: string, language: string, action?: string) {
+  async askCrewAboutCode(
+    crew: string,
+    code: string,
+    language: string,
+    action?: string
+  ) {
     if (!this._view) {
-      await vscode.commands.executeCommand('alexAi.chatView.focus');
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await vscode.commands.executeCommand("alexAi.chatView.focus");
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     let prompt: string;
     switch (action) {
-      case 'explain':
+      case "explain":
         prompt = `Explain this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\``;
         break;
-      case 'review':
+      case "review":
         prompt = `Review this ${language} code for security issues, bugs, and best practices:\n\n\`\`\`${language}\n${code}\n\`\`\``;
         break;
-      case 'optimize':
+      case "optimize":
         prompt = `Analyze and suggest optimizations for this ${language} code:\n\n\`\`\`${language}\n${code}\n\`\`\``;
         break;
       default:
@@ -101,7 +106,7 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     if (!this._view) return;
 
     this._view.webview.postMessage({
-      type: 'observationLounge',
+      type: "observationLounge",
       topic: result.topic,
       responses: result.responses,
     });
@@ -111,7 +116,7 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     if (!this._view) return;
     const crewInfo = this.alexAiService.getCrewInfo(this.currentCrew);
     this._view.webview.postMessage({
-      type: 'updateCrew',
+      type: "updateCrew",
       crew: this.currentCrew,
       name: crewInfo.name,
       emoji: crewInfo.emoji,
@@ -120,7 +125,7 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
 
   private clearChat() {
     if (!this._view) return;
-    this._view.webview.postMessage({ type: 'clearChat' });
+    this._view.webview.postMessage({ type: "clearChat" });
   }
 
   private getHtmlContent(): string {

@@ -1,20 +1,22 @@
-import * as vscode from 'vscode';
-import { AlexAiService } from './alexAiService';
+import * as vscode from "vscode";
+import { AlexAiService } from "./alexAiService";
 
 const STATUS_ICONS: Record<string, string> = {
-  backlog: '📋',
-  todo: '📝',
-  in_progress: '🚀',
-  review: '👀',
-  done: '✅',
-  blocked: '🚫',
+  backlog: "📋",
+  todo: "📝",
+  in_progress: "🚀",
+  review: "👀",
+  done: "✅",
+  blocked: "🚫",
 };
 
 export class SprintTreeProvider implements vscode.TreeDataProvider<SprintItem> {
-  private _onDidChangeTreeData: vscode.EventEmitter<SprintItem | undefined | null | void> = 
-    new vscode.EventEmitter<SprintItem | undefined | null | void>();
-  readonly onDidChangeTreeData: vscode.Event<SprintItem | undefined | null | void> = 
-    this._onDidChangeTreeData.event;
+  private _onDidChangeTreeData: vscode.EventEmitter<
+    SprintItem | undefined | null | void
+  > = new vscode.EventEmitter<SprintItem | undefined | null | void>();
+  readonly onDidChangeTreeData: vscode.Event<
+    SprintItem | undefined | null | void
+  > = this._onDidChangeTreeData.event;
 
   private alexAiService: AlexAiService;
 
@@ -35,44 +37,58 @@ export class SprintTreeProvider implements vscode.TreeDataProvider<SprintItem> {
       // Root level - show sprint info
       const sprint = await this.alexAiService.getSprintStatus();
       if (!sprint) {
-        return [new SprintItem('No active sprint', '', 'info', vscode.TreeItemCollapsibleState.None)];
+        return [
+          new SprintItem(
+            "No active sprint",
+            "",
+            "info",
+            vscode.TreeItemCollapsibleState.None
+          ),
+        ];
       }
 
-      const progress = sprint.committedPoints > 0 
-        ? Math.round((sprint.completedPoints / sprint.committedPoints) * 100) 
-        : 0;
+      const progress =
+        sprint.committedPoints > 0
+          ? Math.round((sprint.completedPoints / sprint.committedPoints) * 100)
+          : 0;
 
       return [
         new SprintItem(
           `🏃 ${sprint.name}`,
           sprint.status,
-          'sprint',
+          "sprint",
           vscode.TreeItemCollapsibleState.Expanded
         ),
         new SprintItem(
           `📊 Progress: ${progress}%`,
           `${sprint.completedPoints}/${sprint.committedPoints} pts`,
-          'progress',
+          "progress",
           vscode.TreeItemCollapsibleState.None
         ),
         new SprintItem(
-          '📋 Stories',
+          "📋 Stories",
           `${sprint.stories.length} total`,
-          'stories',
+          "stories",
           vscode.TreeItemCollapsibleState.Collapsed,
           sprint.stories
         ),
       ];
     }
 
-    if (element.contextValue === 'stories' && element.stories) {
+    if (element.contextValue === "stories" && element.stories) {
       // Show individual stories
-      return element.stories.map(story => new SprintItem(
-        `${STATUS_ICONS[story.status] || '📄'} ${story.title.slice(0, 40)}...`,
-        story.status,
-        'story',
-        vscode.TreeItemCollapsibleState.None
-      ));
+      return element.stories.map(
+        (story) =>
+          new SprintItem(
+            `${STATUS_ICONS[story.status] || "📄"} ${story.title.slice(
+              0,
+              40
+            )}...`,
+            story.status,
+            "story",
+            vscode.TreeItemCollapsibleState.None
+          )
+      );
     }
 
     return [];
@@ -85,7 +101,11 @@ class SprintItem extends vscode.TreeItem {
     public readonly description: string,
     public readonly contextValue: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    public readonly stories?: Array<{ id: string; title: string; status: string }>
+    public readonly stories?: Array<{
+      id: string;
+      title: string;
+      status: string;
+    }>
   ) {
     super(label, collapsibleState);
     this.tooltip = `${label} - ${description}`;

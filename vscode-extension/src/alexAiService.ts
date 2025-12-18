@@ -1,16 +1,43 @@
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
-const CREW_MODELS: Record<string, { model: string; name: string; emoji: string }> = {
-  picard: { model: 'anthropic/claude-3.5-sonnet', name: 'Captain Picard', emoji: '🎖️' },
-  riker: { model: 'anthropic/claude-3.5-sonnet', name: 'Commander Riker', emoji: '⚡' },
-  data: { model: 'openai/gpt-4-turbo', name: 'Commander Data', emoji: '🤖' },
-  geordi: { model: 'anthropic/claude-3.5-sonnet', name: 'Lt. Cmdr. La Forge', emoji: '🔧' },
-  troi: { model: 'anthropic/claude-3.5-sonnet', name: 'Counselor Troi', emoji: '💭' },
-  worf: { model: 'openai/gpt-4-turbo', name: 'Lt. Worf', emoji: '⚔️' },
-  obrien: { model: 'openai/gpt-4-turbo', name: "Chief O'Brien", emoji: '🛠️' },
-  quark: { model: 'openai/gpt-4-turbo', name: 'Quark', emoji: '💰' },
-  crusher: { model: 'anthropic/claude-3.5-sonnet', name: 'Dr. Crusher', emoji: '💊' },
-  uhura: { model: 'anthropic/claude-3.5-sonnet', name: 'Lt. Uhura', emoji: '📻' },
+const CREW_MODELS: Record<
+  string,
+  { model: string; name: string; emoji: string }
+> = {
+  picard: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Captain Picard",
+    emoji: "🎖️",
+  },
+  riker: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Commander Riker",
+    emoji: "⚡",
+  },
+  data: { model: "openai/gpt-4-turbo", name: "Commander Data", emoji: "🤖" },
+  geordi: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Lt. Cmdr. La Forge",
+    emoji: "🔧",
+  },
+  troi: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Counselor Troi",
+    emoji: "💭",
+  },
+  worf: { model: "openai/gpt-4-turbo", name: "Lt. Worf", emoji: "⚔️" },
+  obrien: { model: "openai/gpt-4-turbo", name: "Chief O'Brien", emoji: "🛠️" },
+  quark: { model: "openai/gpt-4-turbo", name: "Quark", emoji: "💰" },
+  crusher: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Dr. Crusher",
+    emoji: "💊",
+  },
+  uhura: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Lt. Uhura",
+    emoji: "📻",
+  },
 };
 
 const CREW_PERSONAS: Record<string, string> = {
@@ -50,7 +77,7 @@ Consider resource usage, performance optimization, and business value.`,
 };
 
 export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   crewMember?: string;
   timestamp: Date;
@@ -67,7 +94,12 @@ export interface SprintStatus {
 
 export interface ObservationLoungeResult {
   topic: string;
-  responses: Array<{ crewMember: string; name: string; emoji: string; response: string }>;
+  responses: Array<{
+    crewMember: string;
+    name: string;
+    emoji: string;
+    response: string;
+  }>;
 }
 
 export class AlexAiService {
@@ -79,22 +111,29 @@ export class AlexAiService {
   }
 
   private getConfig() {
-    const config = vscode.workspace.getConfiguration('alexAi');
+    const config = vscode.workspace.getConfiguration("alexAi");
     return {
-      apiKey: config.get<string>('openRouterApiKey') || process.env.OPENROUTER_API_KEY || '',
-      baseUrl: config.get<string>('baseUrl') || 'http://localhost:3001',
-      defaultCrew: config.get<string>('defaultCrewMember') || 'data',
-      autoLoadContext: config.get<boolean>('autoLoadContext') ?? true,
+      apiKey:
+        config.get<string>("openRouterApiKey") ||
+        process.env.OPENROUTER_API_KEY ||
+        "",
+      baseUrl: config.get<string>("baseUrl") || "http://localhost:3001",
+      defaultCrew: config.get<string>("defaultCrewMember") || "data",
+      autoLoadContext: config.get<boolean>("autoLoadContext") ?? true,
     };
   }
 
-  async chat(crewMember: string, message: string, codeContext?: string): Promise<string> {
+  async chat(
+    crewMember: string,
+    message: string,
+    codeContext?: string
+  ): Promise<string> {
     const config = this.getConfig();
     const crew = CREW_MODELS[crewMember] || CREW_MODELS.data;
     const persona = CREW_PERSONAS[crewMember] || CREW_PERSONAS.data;
 
     if (!config.apiKey) {
-      return '❌ OpenRouter API key not configured. Go to Settings > Extensions > Alex AI to set it up.';
+      return "❌ OpenRouter API key not configured. Go to Settings > Extensions > Alex AI to set it up.";
     }
 
     // Build context
@@ -112,45 +151,51 @@ export class AlexAiService {
     }
 
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${config.apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://alex-ai.dev',
-          'X-Title': 'Alex AI VS Code Extension',
-        },
-        body: JSON.stringify({
-          model: crew.model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...this.conversationHistory.slice(-10).map(m => ({
-              role: m.role,
-              content: m.content,
-            })),
-            { role: 'user', content: message },
-          ],
-          max_tokens: 2000,
-          temperature: 0.7,
-        }),
-      });
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${config.apiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://alex-ai.dev",
+            "X-Title": "Alex AI VS Code Extension",
+          },
+          body: JSON.stringify({
+            model: crew.model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              ...this.conversationHistory.slice(-10).map((m) => ({
+                role: m.role,
+                content: m.content,
+              })),
+              { role: "user", content: message },
+            ],
+            max_tokens: 2000,
+            temperature: 0.7,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const error = await response.text();
         throw new Error(`API error: ${error}`);
       }
 
-      const data = await response.json();
-      const reply = data.choices?.[0]?.message?.content || 'No response received';
+      const data = (await response.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
+      const reply =
+        data.choices?.[0]?.message?.content || "No response received";
 
       // Store in history
       this.conversationHistory.push({
-        role: 'user',
+        role: "user",
         content: message,
         timestamp: new Date(),
       });
       this.conversationHistory.push({
-        role: 'assistant',
+        role: "assistant",
         content: reply,
         crewMember,
         timestamp: new Date(),
@@ -158,7 +203,8 @@ export class AlexAiService {
 
       return reply;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       return `❌ Error: ${errorMessage}`;
     }
   }
@@ -166,8 +212,19 @@ export class AlexAiService {
   async getSprintStatus(): Promise<SprintStatus | null> {
     const config = this.getConfig();
     try {
-      const response = await fetch(`${config.baseUrl}/api/sprints?projectId=proj_1765948227414_iw68yf`);
-      const data = await response.json();
+      const response = await fetch(
+        `${config.baseUrl}/api/sprints?projectId=proj_1765948227414_iw68yf`
+      );
+      const data = (await response.json()) as {
+        sprints?: Array<{
+          id: string;
+          name: string;
+          status: string;
+          committedPoints: number;
+          completedPoints: number;
+          stories: Array<{ id: string; title: string; status: string }>;
+        }>;
+      };
       const sprint = data.sprints?.[0];
       if (sprint) {
         return {
@@ -184,50 +241,62 @@ export class AlexAiService {
         };
       }
     } catch (error) {
-      console.error('Failed to get sprint status:', error);
+      console.error("Failed to get sprint status:", error);
     }
     return null;
   }
 
-  async conveneObservationLounge(topic: string): Promise<ObservationLoungeResult | null> {
+  async conveneObservationLounge(
+    topic: string
+  ): Promise<ObservationLoungeResult | null> {
     const config = this.getConfig();
     if (!config.apiKey) {
-      vscode.window.showErrorMessage('OpenRouter API key not configured');
+      vscode.window.showErrorMessage("OpenRouter API key not configured");
       return null;
     }
 
-    const seniorStaff = ['picard', 'riker', 'data', 'geordi', 'troi', 'worf'];
-    const responses: ObservationLoungeResult['responses'] = [];
+    const seniorStaff = ["picard", "riker", "data", "geordi", "troi", "worf"];
+    const responses: ObservationLoungeResult["responses"] = [];
 
     for (const crewId of seniorStaff) {
       const crew = CREW_MODELS[crewId];
-      const previousContext = responses.length > 0
-        ? '\n\nPrevious responses:\n' + responses.map(r => `${r.name}: ${r.response}`).join('\n\n')
-        : '';
+      const previousContext =
+        responses.length > 0
+          ? "\n\nPrevious responses:\n" +
+            responses.map((r) => `${r.name}: ${r.response}`).join("\n\n")
+          : "";
 
       try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: crew.model,
-            messages: [
-              {
-                role: 'system',
-                content: `${CREW_PERSONAS[crewId]}\n\nYou are in a senior staff meeting discussing: "${topic}"\n\nKeep your response to 2-3 sentences.${previousContext}`,
-              },
-              { role: 'user', content: `Topic: ${topic}\n\nProvide your perspective.` },
-            ],
-            max_tokens: 300,
-            temperature: 0.7,
-          }),
-        });
+        const response = await fetch(
+          "https://openrouter.ai/api/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${config.apiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: crew.model,
+              messages: [
+                {
+                  role: "system",
+                  content: `${CREW_PERSONAS[crewId]}\n\nYou are in a senior staff meeting discussing: "${topic}"\n\nKeep your response to 2-3 sentences.${previousContext}`,
+                },
+                {
+                  role: "user",
+                  content: `Topic: ${topic}\n\nProvide your perspective.`,
+                },
+              ],
+              max_tokens: 300,
+              temperature: 0.7,
+            }),
+          }
+        );
 
-        const data = await response.json();
-        const reply = data.choices?.[0]?.message?.content || 'No response';
+        const data = (await response.json()) as {
+          choices?: Array<{ message?: { content?: string } }>;
+        };
+        const reply = data.choices?.[0]?.message?.content || "No response";
 
         responses.push({
           crewMember: crewId,
@@ -250,7 +319,7 @@ export class AlexAiService {
     }
 
     const folder = workspaceFolders[0];
-    const packageJsonUri = vscode.Uri.joinPath(folder.uri, 'package.json');
+    const packageJsonUri = vscode.Uri.joinPath(folder.uri, "package.json");
 
     try {
       const content = await vscode.workspace.fs.readFile(packageJsonUri);
