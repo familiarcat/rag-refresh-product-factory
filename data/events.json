@@ -212,5 +212,12 @@
     "updates": [
       "status"
     ]
+  },
+  {
+    "type": "sprint-created",
+    "at": "2025-12-18T08:09:37.857Z",
+    "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+    "projectId": "proj_1765948227414_iw68yf",
+    "sprintNumber": 1
   }
 ]

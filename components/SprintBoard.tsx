@@ -26,13 +26,29 @@ const statusColumns: { status: StoryStatus; label: string; icon: string }[] = [
   { status: "blocked", label: "Blocked", icon: "🚫" },
 ];
 
+interface PlanningSession {
+  summary: string;
+  crewAnalysis: Array<{ crewMember: string; perspective: string; storiesSuggested: number }>;
+  deliberation: { consensus: string; adjustmentsMade: number };
+  totalStories: number;
+  totalPoints: number;
+  totalBudget: number;
+  crewInvolved: number;
+  estimatedROI: number;
+  quarkAnalysis?: string;
+  rikerPlan?: string;
+}
+
 export function SprintBoard({ projectId, theme }: SprintBoardProps) {
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [metrics, setMetrics] = useState<SprintMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [planning, setPlanning] = useState(false);
+  const [planningResult, setPlanningResult] = useState<PlanningSession | null>(null);
   const [showNewSprintModal, setShowNewSprintModal] = useState(false);
   const [showNewStoryModal, setShowNewStoryModal] = useState(false);
+  const [showPlanningModal, setShowPlanningModal] = useState(false);
 
   useEffect(() => {
     loadSprints();
@@ -153,6 +169,45 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
     }
   }
 
+  async function conveneCrew() {
+    if (!activeSprint) return;
+
+    setPlanning(true);
+    setPlanningResult(null);
+
+    try {
+      const res = await fetch("/api/sprints/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "full-planning",
+          sprintId: activeSprint.id,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setPlanningResult({
+          summary: data.planningSession?.summary || "",
+          crewAnalysis: data.crewAnalysis || [],
+          deliberation: data.deliberation || { consensus: "", adjustmentsMade: 0 },
+          totalStories: data.summary?.totalStories || 0,
+          totalPoints: data.summary?.totalPoints || 0,
+          totalBudget: data.summary?.totalBudget || 0,
+          crewInvolved: data.summary?.crewInvolved || 0,
+          estimatedROI: data.summary?.estimatedROI || 0,
+          quarkAnalysis: data.planningSession?.quarkAnalysis,
+          rikerPlan: data.planningSession?.rikerPlan,
+        });
+        setShowPlanningModal(true);
+        await loadSprints();
+      }
+    } catch (error) {
+      console.error("Failed to convene crew:", error);
+    } finally {
+      setPlanning(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="card" style={{ padding: 32, textAlign: "center" }}>
@@ -215,6 +270,40 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
             )}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
+            {activeSprint && activeSprint.stories.length === 0 && (
+              <button
+                onClick={conveneCrew}
+                disabled={planning}
+                style={{
+                  padding: "8px 16px",
+                  background: planning ? "var(--surface)" : "linear-gradient(135deg, #f59e0b, #ef4444)",
+                  border: "none",
+                  borderRadius: 8,
+                  color: "white",
+                  cursor: planning ? "wait" : "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                {planning ? "🔄 Planning..." : "🖖 Convene Crew"}
+              </button>
+            )}
+            {activeSprint && activeSprint.stories.length > 0 && (
+              <button
+                onClick={() => setShowPlanningModal(true)}
+                style={{
+                  padding: "8px 16px",
+                  background: "var(--surface)",
+                  border: `1px solid ${theme.accent}40`,
+                  borderRadius: 8,
+                  color: theme.accent,
+                  cursor: "pointer",
+                  fontSize: 13,
+                }}
+              >
+                📋 View Plan
+              </button>
+            )}
             {activeSprint && (
               <button
                 onClick={() => setShowNewStoryModal(true)}
@@ -382,6 +471,14 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
         <NewStoryModal
           onClose={() => setShowNewStoryModal(false)}
           onCreate={createStory}
+          theme={theme}
+        />
+      )}
+      {showPlanningModal && (
+        <PlanningSessionModal
+          onClose={() => setShowPlanningModal(false)}
+          planningResult={planningResult}
+          sprint={activeSprint}
           theme={theme}
         />
       )}
@@ -1058,6 +1155,305 @@ function NewStoryModal({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PlanningSessionModal({
+  onClose,
+  planningResult,
+  sprint,
+  theme,
+}: {
+  onClose: () => void;
+  planningResult: PlanningSession | null;
+  sprint: Sprint | null;
+  theme: { accent: string };
+}) {
+  if (!planningResult && !sprint) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.8)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+        padding: 20,
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="card"
+        style={{
+          width: 700,
+          maxWidth: "95vw",
+          maxHeight: "90vh",
+          overflow: "auto",
+          background: `linear-gradient(180deg, var(--card) 0%, rgba(13,16,34,.98) 100%)`,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+            paddingBottom: 16,
+            borderBottom: `2px solid ${theme.accent}`,
+          }}
+        >
+          <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: 12 }}>
+            🖖 Crew Planning Session
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: "transparent",
+              border: "none",
+              fontSize: 24,
+              cursor: "pointer",
+              color: "var(--muted)",
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        {planningResult ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Summary Stats */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 12,
+              }}
+            >
+              <StatBox
+                label="Stories"
+                value={planningResult.totalStories}
+                icon="📋"
+                color="#3b82f6"
+              />
+              <StatBox
+                label="Points"
+                value={planningResult.totalPoints}
+                icon="🎯"
+                color="#10b981"
+              />
+              <StatBox
+                label="Budget"
+                value={`$${planningResult.totalBudget.toLocaleString()}`}
+                icon="💰"
+                color="#f59e0b"
+              />
+              <StatBox
+                label="Est. ROI"
+                value={`${planningResult.estimatedROI}%`}
+                icon="📈"
+                color={planningResult.estimatedROI > 50 ? "#10b981" : "#ef4444"}
+              />
+            </div>
+
+            {/* Crew Analysis */}
+            <div className="card" style={{ background: "var(--surface)" }}>
+              <h3 style={{ margin: "0 0 12px", fontSize: 14 }}>
+                👥 Crew Perspectives
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {planningResult.crewAnalysis.map((crew, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: 8,
+                      background: "var(--card)",
+                      borderRadius: 6,
+                    }}
+                  >
+                    <div>
+                      <span style={{ fontWeight: 600 }}>{crew.crewMember}</span>
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          fontSize: 12,
+                          color: "var(--muted)",
+                        }}
+                      >
+                        {crew.perspective}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        padding: "2px 8px",
+                        background: theme.accent,
+                        borderRadius: 4,
+                        fontSize: 11,
+                        color: "white",
+                      }}
+                    >
+                      {crew.storiesSuggested} stories
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Deliberation */}
+            <div className="card" style={{ background: "var(--surface)" }}>
+              <h3 style={{ margin: "0 0 12px", fontSize: 14 }}>
+                ⚖️ Deliberation Results
+              </h3>
+              <p style={{ margin: 0, color: "var(--muted)", fontSize: 13 }}>
+                {planningResult.deliberation.consensus}
+              </p>
+              {planningResult.deliberation.adjustmentsMade > 0 && (
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    fontSize: 12,
+                    color: "#f59e0b",
+                  }}
+                >
+                  📝 {planningResult.deliberation.adjustmentsMade} adjustments
+                  made based on crew feedback
+                </p>
+              )}
+            </div>
+
+            {/* Quark & Riker Analysis */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {planningResult.quarkAnalysis && (
+                <div
+                  className="card"
+                  style={{
+                    background: "linear-gradient(135deg, #f59e0b10 0%, transparent 100%)",
+                    border: "1px solid #f59e0b40",
+                  }}
+                >
+                  <h4 style={{ margin: "0 0 8px", fontSize: 13, color: "#f59e0b" }}>
+                    💰 Quark&apos;s Analysis
+                  </h4>
+                  <pre
+                    style={{
+                      margin: 0,
+                      fontSize: 11,
+                      color: "var(--muted)",
+                      whiteSpace: "pre-wrap",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    {planningResult.quarkAnalysis}
+                  </pre>
+                </div>
+              )}
+              {planningResult.rikerPlan && (
+                <div
+                  className="card"
+                  style={{
+                    background: "linear-gradient(135deg, #3b82f610 0%, transparent 100%)",
+                    border: "1px solid #3b82f640",
+                  }}
+                >
+                  <h4 style={{ margin: "0 0 8px", fontSize: 13, color: "#3b82f6" }}>
+                    ⚡ Riker&apos;s Plan
+                  </h4>
+                  <pre
+                    style={{
+                      margin: 0,
+                      fontSize: 11,
+                      color: "var(--muted)",
+                      whiteSpace: "pre-wrap",
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    {planningResult.rikerPlan}
+                  </pre>
+                </div>
+              )}
+            </div>
+
+            {/* Session Summary */}
+            <div
+              style={{
+                padding: 12,
+                background: `${theme.accent}15`,
+                borderRadius: 8,
+                border: `1px solid ${theme.accent}30`,
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 13 }}>
+                {planningResult.summary}
+              </p>
+            </div>
+          </div>
+        ) : sprint ? (
+          <div style={{ textAlign: "center", padding: 32 }}>
+            <p style={{ color: "var(--muted)" }}>
+              Sprint &quot;{sprint.name}&quot; has {sprint.stories.length} stories
+              committed.
+            </p>
+            <p style={{ color: "var(--muted)", fontSize: 12 }}>
+              Total: {sprint.committedPoints} points | Budget: $
+              {sprint.budgetedCost.toLocaleString()}
+            </p>
+          </div>
+        ) : null}
+
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <button
+            onClick={onClose}
+            style={{
+              padding: "10px 32px",
+              background: theme.accent,
+              border: "none",
+              borderRadius: 8,
+              color: "white",
+              cursor: "pointer",
+              fontSize: 14,
+            }}
+          >
+            Start Sprint →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatBox({
+  label,
+  value,
+  icon,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  icon: string;
+  color: string;
+}) {
+  return (
+    <div
+      style={{
+        textAlign: "center",
+        padding: 12,
+        background: `${color}15`,
+        borderRadius: 8,
+        border: `1px solid ${color}30`,
+      }}
+    >
+      <div style={{ fontSize: 20 }}>{icon}</div>
+      <div style={{ fontSize: 20, fontWeight: "bold", color }}>{value}</div>
+      <div style={{ fontSize: 11, color: "var(--muted)" }}>{label}</div>
     </div>
   );
 }

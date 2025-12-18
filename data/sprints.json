@@ -1,5 +1,29 @@
 {
-  "sprints": [],
+  "sprints": [
+    {
+      "id": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
+      "projectId": "proj_1765948227414_iw68yf",
+      "name": "Sprint 0",
+      "goal": "Organize a system to act as an executive editor of a writing project across novel, screenplay, and both an episodic and serial representation of a core story",
+      "sprintNumber": 1,
+      "startDate": "2025-12-18T08:09:37.841Z",
+      "endDate": "2026-01-01T08:09:37.841Z",
+      "duration": 14,
+      "teamCapacity": 40,
+      "committedPoints": 0,
+      "completedPoints": 0,
+      "budgetedCost": 0,
+      "actualCost": 0,
+      "projectedROI": 0,
+      "velocity": 0,
+      "status": "planning",
+      "stories": [],
+      "activeCrewMembers": [],
+      "dailyProgress": [],
+      "createdAt": "2025-12-18T08:09:37.841Z",
+      "updatedAt": "2025-12-18T08:09:37.841Z"
+    }
+  ],
   "meta": {
     "version": "1.0",
     "createdAt": "2024-12-18T00:00:00.000Z",
