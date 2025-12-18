@@ -26,6 +26,36 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  // Auto-detect text selection and send to sidebar
+  let selectionDebounce: NodeJS.Timeout | undefined;
+  context.subscriptions.push(
+    vscode.window.onDidChangeTextEditorSelection((e) => {
+      const config = vscode.workspace.getConfiguration("alexAi");
+      if (!config.get<boolean>("autoDetectSelection", true)) return;
+
+      // Debounce to avoid too many updates
+      if (selectionDebounce) clearTimeout(selectionDebounce);
+      selectionDebounce = setTimeout(() => {
+        const editor = e.textEditor;
+        const selection = editor.selection;
+        const selectedText = editor.document.getText(selection);
+
+        if (selectedText && selectedText.length > 10 && selectedText.length < 5000) {
+          // Send selection to sidebar
+          chatViewProvider.setSelectionContext({
+            text: selectedText,
+            language: editor.document.languageId,
+            file: vscode.workspace.asRelativePath(editor.document.uri),
+            startLine: selection.start.line + 1,
+            endLine: selection.end.line + 1,
+          });
+        } else if (!selectedText) {
+          chatViewProvider.clearSelectionContext();
+        }
+      }, 300);
+    })
+  );
+
   // Register as VS Code Chat Participant (@alex in Chat panel)
   registerChatParticipant(context, alexAiService);
 

@@ -272,6 +272,31 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     this._view.webview.postMessage({ type: "clearChat" });
   }
 
+  /**
+   * Set selection context from editor (auto-detected)
+   */
+  setSelectionContext(selection: {
+    text: string;
+    language: string;
+    file: string;
+    startLine: number;
+    endLine: number;
+  }) {
+    if (!this._view) return;
+    this._view.webview.postMessage({
+      type: "setSelectionContext",
+      selection,
+    });
+  }
+
+  /**
+   * Clear selection context
+   */
+  clearSelectionContext() {
+    if (!this._view) return;
+    this._view.webview.postMessage({ type: "clearSelectionContext" });
+  }
+
   private getHtmlContent(): string {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -916,6 +941,11 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       to { transform: rotate(360deg); }
     }
     
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
     /* Badge */
     .badge {
       display: inline-block;
@@ -971,6 +1001,10 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
         <span>📄</span>
         <span class="context-file" id="contextFile"></span>
         <span class="context-clear" id="clearContext">✕</span>
+      </div>
+      
+      <div id="selectionIndicator" style="display: none; padding: 6px 10px; margin: 0 10px 8px; background: rgba(124,92,255,.15); border: 1px solid rgba(124,92,255,.3); border-radius: 6px; font-size: 10px; animation: pulse 2s infinite;">
+        📋 Code selected - ask the crew about it!
       </div>
       
       <div class="input-area">
@@ -1224,8 +1258,46 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
         case 'observationLounge':
           showObservationLounge(msg.topic, msg.responses);
           break;
+        case 'setSelectionContext':
+          setSelectionContext(msg.selection);
+          break;
+        case 'clearSelectionContext':
+          clearSelectionContext();
+          break;
       }
     });
+    
+    // Selection context handling
+    let selectionData = null;
+    
+    function setSelectionContext(selection) {
+      selectionData = selection;
+      currentContext = selection.text;
+      
+      // Update context bar
+      const contextBar = document.getElementById('contextBar');
+      const contextFile = document.getElementById('contextFile');
+      contextFile.textContent = selection.file + ' (L' + selection.startLine + '-' + selection.endLine + ')';
+      contextBar.classList.add('visible');
+      
+      // Show selection indicator
+      const indicator = document.getElementById('selectionIndicator');
+      if (indicator) {
+        indicator.innerHTML = '<span style="color: var(--good);">📋 ' + selection.language + ' code selected (' + (selection.endLine - selection.startLine + 1) + ' lines)</span>';
+        indicator.style.display = 'block';
+      }
+      
+      // Switch to chat tab if not already there
+      if (currentPage !== 'chat') {
+        document.querySelector('.nav-tab[data-page="chat"]').click();
+      }
+    }
+    
+    function clearSelectionContext() {
+      selectionData = null;
+      const indicator = document.getElementById('selectionIndicator');
+      if (indicator) indicator.style.display = 'none';
+    }
     
     function renderFileTree(files) {
       const container = document.getElementById('fileTree');

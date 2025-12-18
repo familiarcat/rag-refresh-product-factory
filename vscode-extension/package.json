@@ -277,6 +277,12 @@
           "markdownDescription": "Automatically review code and show suggestions in Problems panel (on save)",
           "order": 8
         },
+        "alexAi.autoDetectSelection": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Automatically detect text selection in editor and prepare it as context for crew chat",
+          "order": 9
+        },
         "alexAi.baseUrl": {
           "type": "string",
           "default": "http://localhost:3001",
