@@ -301,11 +301,17 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
     setShowUnblockModal(true);
   }
 
-  async function unblockStory(resolution: string, moveToStatus: "backlog" | "todo" | "in_progress") {
+  async function unblockStory(
+    resolution: string,
+    moveToStatus: "backlog" | "todo" | "in_progress"
+  ) {
     if (!activeSprint || !blockedStoryId) return;
 
     setExecuting(true);
-    setExecutionLog((prev) => [...prev, `🔓 Unblocking story with human review...`]);
+    setExecutionLog((prev) => [
+      ...prev,
+      `🔓 Unblocking story with human review...`,
+    ]);
 
     try {
       const res = await fetch("/api/sprints/auto-execute", {
@@ -941,13 +947,22 @@ function StoryCard({
             borderRadius: 6,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              marginBottom: 4,
+            }}
+          >
             <span style={{ fontSize: 14 }}>🚫</span>
             <span style={{ fontWeight: 600, color: "#ef4444", fontSize: 11 }}>
               Blocked - Human Review Required
             </span>
           </div>
-          <p style={{ fontSize: 10, color: "var(--muted)", margin: "0 0 8px 0" }}>
+          <p
+            style={{ fontSize: 10, color: "var(--muted)", margin: "0 0 8px 0" }}
+          >
             {(story as Story & { blockedReason?: string }).blockedReason ||
               "Crew unable to reach consensus. Please review and provide resolution."}
           </p>
@@ -1263,11 +1278,16 @@ function UnblockModal({
 }: {
   onClose: () => void;
   story?: Story;
-  onUnblock: (resolution: string, moveToStatus: "backlog" | "todo" | "in_progress") => void;
+  onUnblock: (
+    resolution: string,
+    moveToStatus: "backlog" | "todo" | "in_progress"
+  ) => void;
   executing: boolean;
 }) {
   const [resolution, setResolution] = useState("");
-  const [moveToStatus, setMoveToStatus] = useState<"backlog" | "todo" | "in_progress">("todo");
+  const [moveToStatus, setMoveToStatus] = useState<
+    "backlog" | "todo" | "in_progress"
+  >("todo");
 
   if (!story) return null;
 
@@ -1299,7 +1319,14 @@ function UnblockModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 8,
+            }}
+          >
             <span style={{ fontSize: 24 }}>🔓</span>
             <h2 style={{ margin: 0, fontSize: 18 }}>Human Review Required</h2>
           </div>
@@ -1320,7 +1347,9 @@ function UnblockModal({
           }}
         >
           <div style={{ fontWeight: 600, marginBottom: 4 }}>{story.title}</div>
-          <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 8px 0" }}>
+          <p
+            style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 8px 0" }}
+          >
             {story.description}
           </p>
           <div style={{ fontSize: 11, color: "#ef4444" }}>
@@ -1331,7 +1360,14 @@ function UnblockModal({
 
         {/* Resolution Input */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--muted)" }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 12,
+              marginBottom: 4,
+              color: "var(--muted)",
+            }}
+          >
             Resolution / Guidance for Crew
           </label>
           <textarea
@@ -1354,7 +1390,14 @@ function UnblockModal({
 
         {/* Move To Status */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontSize: 12, marginBottom: 8, color: "var(--muted)" }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 12,
+              marginBottom: 8,
+              color: "var(--muted)",
+            }}
+          >
             Move Story To
           </label>
           <div style={{ display: "flex", gap: 8 }}>
@@ -1365,8 +1408,11 @@ function UnblockModal({
                 style={{
                   flex: 1,
                   padding: "8px 12px",
-                  background: moveToStatus === status ? "#10b981" : "var(--surface)",
-                  border: `1px solid ${moveToStatus === status ? "#10b981" : "var(--border)"}`,
+                  background:
+                    moveToStatus === status ? "#10b981" : "var(--surface)",
+                  border: `1px solid ${
+                    moveToStatus === status ? "#10b981" : "var(--border)"
+                  }`,
                   borderRadius: 6,
                   color: moveToStatus === status ? "white" : "var(--muted)",
                   cursor: "pointer",
@@ -1380,9 +1426,12 @@ function UnblockModal({
             ))}
           </div>
           <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
-            {moveToStatus === "backlog" && "Story needs more planning before work begins."}
-            {moveToStatus === "todo" && "Story is ready for the crew to pick up."}
-            {moveToStatus === "in_progress" && "Story should continue where it left off."}
+            {moveToStatus === "backlog" &&
+              "Story needs more planning before work begins."}
+            {moveToStatus === "todo" &&
+              "Story is ready for the crew to pick up."}
+            {moveToStatus === "in_progress" &&
+              "Story should continue where it left off."}
           </p>
         </div>
 
@@ -1408,13 +1457,15 @@ function UnblockModal({
             style={{
               flex: 1,
               padding: "10px 16px",
-              background: !resolution.trim() || executing
-                ? "var(--surface)"
-                : "linear-gradient(135deg, #10b981, #059669)",
+              background:
+                !resolution.trim() || executing
+                  ? "var(--surface)"
+                  : "linear-gradient(135deg, #10b981, #059669)",
               border: "none",
               borderRadius: 8,
               color: "white",
-              cursor: !resolution.trim() || executing ? "not-allowed" : "pointer",
+              cursor:
+                !resolution.trim() || executing ? "not-allowed" : "pointer",
               fontWeight: 600,
             }}
           >

@@ -438,29 +438,39 @@ export async function POST(req: Request) {
             });
           } else {
             // Track review attempts
-            const reviewAttempts = (story as Story & { reviewAttempts?: number }).reviewAttempts || 0;
-            (story as Story & { reviewAttempts?: number }).reviewAttempts = reviewAttempts + 1;
+            const reviewAttempts =
+              (story as Story & { reviewAttempts?: number }).reviewAttempts ||
+              0;
+            (story as Story & { reviewAttempts?: number }).reviewAttempts =
+              reviewAttempts + 1;
 
             // After 3 failed review attempts, block for human review
             if (reviewAttempts >= 2) {
               story.status = "blocked";
-              (story as Story & { blockedReason?: string }).blockedReason = 
-                `Crew unable to reach consensus after ${reviewAttempts + 1} review cycles. Human review required.`;
-              (story as Story & { blockedAt?: string }).blockedAt = new Date().toISOString();
+              (
+                story as Story & { blockedReason?: string }
+              ).blockedReason = `Crew unable to reach consensus after ${
+                reviewAttempts + 1
+              } review cycles. Human review required.`;
+              (story as Story & { blockedAt?: string }).blockedAt =
+                new Date().toISOString();
 
               cycleResults.push({
                 storyId: story.id,
                 title: story.title,
                 previousStatus,
                 newStatus: "blocked",
-                action: "🚫 BLOCKED - Human review required (crew unable to reach consensus)",
+                action:
+                  "🚫 BLOCKED - Human review required (crew unable to reach consensus)",
               });
 
               // Add blocking memory
               memories.push({
                 id: `mem_blocked_${story.id}_${Date.now()}`,
                 crewId: "captain_picard",
-                content: `Story "${story.title}" blocked after ${reviewAttempts + 1} review attempts. Crew could not reach consensus on Definition of Done. Human intervention needed.`,
+                content: `Story "${story.title}" blocked after ${
+                  reviewAttempts + 1
+                } review attempts. Crew could not reach consensus on Definition of Done. Human intervention needed.`,
                 type: "event",
                 projectContext: sprint.projectId,
                 storyContext: story.id,
@@ -472,7 +482,9 @@ export async function POST(req: Request) {
                 title: story.title,
                 previousStatus,
                 newStatus: "review",
-                action: `Review attempt ${reviewAttempts + 1}/3 - awaiting consensus`,
+                action: `Review attempt ${
+                  reviewAttempts + 1
+                }/3 - awaiting consensus`,
               });
             }
           }
@@ -551,9 +563,12 @@ export async function POST(req: Request) {
       story.status = moveToStatus;
       (story as Story & { reviewAttempts?: number }).reviewAttempts = 0;
       (story as Story & { blockedReason?: string }).blockedReason = undefined;
-      (story as Story & { unblockedAt?: string }).unblockedAt = new Date().toISOString();
-      (story as Story & { unblockedBy?: string }).unblockedBy = "human_reviewer";
-      (story as Story & { unblockResolution?: string }).unblockResolution = resolution;
+      (story as Story & { unblockedAt?: string }).unblockedAt =
+        new Date().toISOString();
+      (story as Story & { unblockedBy?: string }).unblockedBy =
+        "human_reviewer";
+      (story as Story & { unblockResolution?: string }).unblockResolution =
+        resolution;
       story.updatedAt = new Date().toISOString();
 
       // Add memory of human intervention

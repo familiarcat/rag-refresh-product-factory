@@ -185,7 +185,13 @@ export function SprintIndicator({
         </div>
         {showProgress && (
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: statusConfig.color }}>
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                color: statusConfig.color,
+              }}
+            >
               {progress}%
             </div>
             <div style={{ fontSize: 10, color: "var(--muted)" }}>
