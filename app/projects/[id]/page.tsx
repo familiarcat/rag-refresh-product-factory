@@ -20,6 +20,7 @@ import {
   DomainSummaryStrip,
 } from "../../../components/DomainStatusBar";
 import { SprintBoard } from "../../../components/SprintBoard";
+import { SprintIndicator } from "../../../components/SprintIndicator";
 
 export default function ProjectDashboard() {
   const params = useParams();
@@ -380,6 +381,13 @@ export default function ProjectDashboard() {
                 🏷️ {category.name}
               </div>
             )}
+            {/* Active Sprint Indicator */}
+            <div style={{ marginTop: 12 }}>
+              <SprintIndicator
+                projectId={project.id}
+                onClick={() => setActiveTab("sprints")}
+              />
+            </div>
           </div>
 
           {/* Status Controls */}

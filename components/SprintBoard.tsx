@@ -55,6 +55,8 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
   const [showNewSprintModal, setShowNewSprintModal] = useState(false);
   const [showNewStoryModal, setShowNewStoryModal] = useState(false);
   const [showPlanningModal, setShowPlanningModal] = useState(false);
+  const [showUnblockModal, setShowUnblockModal] = useState(false);
+  const [blockedStoryId, setBlockedStoryId] = useState<string | null>(null);
   const [executing, setExecuting] = useState(false);
   const [executionLog, setExecutionLog] = useState<string[]>([]);
 
@@ -286,6 +288,48 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
           ]);
         }
         await loadSprints();
+      }
+    } catch (error) {
+      setExecutionLog((prev) => [...prev, `❌ Error: ${error}`]);
+    } finally {
+      setExecuting(false);
+    }
+  }
+
+  function openUnblockModal(storyId: string) {
+    setBlockedStoryId(storyId);
+    setShowUnblockModal(true);
+  }
+
+  async function unblockStory(resolution: string, moveToStatus: "backlog" | "todo" | "in_progress") {
+    if (!activeSprint || !blockedStoryId) return;
+
+    setExecuting(true);
+    setExecutionLog((prev) => [...prev, `🔓 Unblocking story with human review...`]);
+
+    try {
+      const res = await fetch("/api/sprints/auto-execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "unblock",
+          sprintId: activeSprint.id,
+          storyId: blockedStoryId,
+          resolution,
+          moveToStatus,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setExecutionLog((prev) => [
+          ...prev,
+          `✅ Story unblocked: ${data.message}`,
+        ]);
+        setShowUnblockModal(false);
+        setBlockedStoryId(null);
+        await loadSprints();
+      } else {
+        setExecutionLog((prev) => [...prev, `❌ Failed: ${data.error}`]);
       }
     } catch (error) {
       setExecutionLog((prev) => [...prev, `❌ Error: ${error}`]);
@@ -601,6 +645,7 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
               theme={theme}
               onStatusChange={updateStoryStatus}
               onAssignCrew={assignCrew}
+              onUnblock={openUnblockModal}
             />
           ))}
         </div>
@@ -655,6 +700,17 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
           theme={theme}
         />
       )}
+      {showUnblockModal && blockedStoryId && activeSprint && (
+        <UnblockModal
+          onClose={() => {
+            setShowUnblockModal(false);
+            setBlockedStoryId(null);
+          }}
+          story={activeSprint.stories.find((s) => s.id === blockedStoryId)}
+          onUnblock={unblockStory}
+          executing={executing}
+        />
+      )}
     </div>
   );
 }
@@ -695,12 +751,14 @@ function KanbanColumn({
   theme,
   onStatusChange,
   onAssignCrew,
+  onUnblock,
 }: {
   column: { status: StoryStatus; label: string; icon: string };
   stories: Story[];
   theme: { accent: string };
   onStatusChange: (storyId: string, status: StoryStatus) => void;
   onAssignCrew: (storyId: string) => void;
+  onUnblock: (storyId: string) => void;
 }) {
   const totalPoints = stories.reduce((sum, s) => sum + s.storyPoints, 0);
 
@@ -747,6 +805,7 @@ function KanbanColumn({
             theme={theme}
             onStatusChange={onStatusChange}
             onAssignCrew={onAssignCrew}
+            onUnblock={onUnblock}
           />
         ))}
       </div>
@@ -759,11 +818,13 @@ function StoryCard({
   theme,
   onStatusChange,
   onAssignCrew,
+  onUnblock,
 }: {
   story: Story;
   theme: { accent: string };
   onStatusChange: (storyId: string, status: StoryStatus) => void;
   onAssignCrew: (storyId: string) => void;
+  onUnblock: (storyId: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -867,6 +928,49 @@ function StoryCard({
         >
           ⚡ Assign Crew (Riker)
         </button>
+      )}
+
+      {/* Blocked Indicator */}
+      {story.status === "blocked" && (
+        <div
+          style={{
+            marginTop: 8,
+            padding: 8,
+            background: "#ef444420",
+            border: "1px solid #ef4444",
+            borderRadius: 6,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+            <span style={{ fontSize: 14 }}>🚫</span>
+            <span style={{ fontWeight: 600, color: "#ef4444", fontSize: 11 }}>
+              Blocked - Human Review Required
+            </span>
+          </div>
+          <p style={{ fontSize: 10, color: "var(--muted)", margin: "0 0 8px 0" }}>
+            {(story as Story & { blockedReason?: string }).blockedReason ||
+              "Crew unable to reach consensus. Please review and provide resolution."}
+          </p>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onUnblock(story.id);
+            }}
+            style={{
+              padding: "6px 12px",
+              background: "linear-gradient(135deg, #10b981, #059669)",
+              border: "none",
+              borderRadius: 4,
+              color: "white",
+              cursor: "pointer",
+              fontSize: 11,
+              fontWeight: 600,
+              width: "100%",
+            }}
+          >
+            🔓 Review & Unblock
+          </button>
+        </div>
       )}
 
       {/* Progress */}
@@ -1145,6 +1249,177 @@ function NewSprintModal({
               Create Sprint
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UnblockModal({
+  onClose,
+  story,
+  onUnblock,
+  executing,
+}: {
+  onClose: () => void;
+  story?: Story;
+  onUnblock: (resolution: string, moveToStatus: "backlog" | "todo" | "in_progress") => void;
+  executing: boolean;
+}) {
+  const [resolution, setResolution] = useState("");
+  const [moveToStatus, setMoveToStatus] = useState<"backlog" | "todo" | "in_progress">("todo");
+
+  if (!story) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(0,0,0,0.8)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="card"
+        style={{
+          width: "100%",
+          maxWidth: 500,
+          maxHeight: "80vh",
+          overflow: "auto",
+          background: "var(--bg)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <span style={{ fontSize: 24 }}>🔓</span>
+            <h2 style={{ margin: 0, fontSize: 18 }}>Human Review Required</h2>
+          </div>
+          <p style={{ color: "var(--muted)", fontSize: 13 }}>
+            The crew was unable to reach consensus on this story. Please review
+            and provide your resolution.
+          </p>
+        </div>
+
+        {/* Story Info */}
+        <div
+          style={{
+            padding: 12,
+            background: "#ef444410",
+            border: "1px solid #ef444440",
+            borderRadius: 8,
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>{story.title}</div>
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 8px 0" }}>
+            {story.description}
+          </p>
+          <div style={{ fontSize: 11, color: "#ef4444" }}>
+            {(story as Story & { blockedReason?: string }).blockedReason ||
+              "Crew unable to reach consensus after multiple review attempts."}
+          </div>
+        </div>
+
+        {/* Resolution Input */}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--muted)" }}>
+            Resolution / Guidance for Crew
+          </label>
+          <textarea
+            value={resolution}
+            onChange={(e) => setResolution(e.target.value)}
+            placeholder="Explain how to proceed, clarify requirements, or provide additional context..."
+            style={{
+              width: "100%",
+              padding: 12,
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              color: "inherit",
+              fontSize: 13,
+              minHeight: 100,
+              resize: "vertical",
+            }}
+          />
+        </div>
+
+        {/* Move To Status */}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 12, marginBottom: 8, color: "var(--muted)" }}>
+            Move Story To
+          </label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {(["backlog", "todo", "in_progress"] as const).map((status) => (
+              <button
+                key={status}
+                onClick={() => setMoveToStatus(status)}
+                style={{
+                  flex: 1,
+                  padding: "8px 12px",
+                  background: moveToStatus === status ? "#10b981" : "var(--surface)",
+                  border: `1px solid ${moveToStatus === status ? "#10b981" : "var(--border)"}`,
+                  borderRadius: 6,
+                  color: moveToStatus === status ? "white" : "var(--muted)",
+                  cursor: "pointer",
+                  fontSize: 12,
+                }}
+              >
+                {status === "backlog" && "📋 Backlog"}
+                {status === "todo" && "📝 To Do"}
+                {status === "in_progress" && "🚀 In Progress"}
+              </button>
+            ))}
+          </div>
+          <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
+            {moveToStatus === "backlog" && "Story needs more planning before work begins."}
+            {moveToStatus === "todo" && "Story is ready for the crew to pick up."}
+            {moveToStatus === "in_progress" && "Story should continue where it left off."}
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: "10px 16px",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              color: "inherit",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onUnblock(resolution, moveToStatus)}
+            disabled={!resolution.trim() || executing}
+            style={{
+              flex: 1,
+              padding: "10px 16px",
+              background: !resolution.trim() || executing
+                ? "var(--surface)"
+                : "linear-gradient(135deg, #10b981, #059669)",
+              border: "none",
+              borderRadius: 8,
+              color: "white",
+              cursor: !resolution.trim() || executing ? "not-allowed" : "pointer",
+              fontWeight: 600,
+            }}
+          >
+            {executing ? "Unblocking..." : "✅ Unblock Story"}
+          </button>
         </div>
       </div>
     </div>

@@ -437,13 +437,44 @@ export async function POST(req: Request) {
               createdAt: new Date().toISOString(),
             });
           } else {
-            cycleResults.push({
-              storyId: story.id,
-              title: story.title,
-              previousStatus,
-              newStatus: "review",
-              action: "Review in progress - awaiting consensus",
-            });
+            // Track review attempts
+            const reviewAttempts = (story as Story & { reviewAttempts?: number }).reviewAttempts || 0;
+            (story as Story & { reviewAttempts?: number }).reviewAttempts = reviewAttempts + 1;
+
+            // After 3 failed review attempts, block for human review
+            if (reviewAttempts >= 2) {
+              story.status = "blocked";
+              (story as Story & { blockedReason?: string }).blockedReason = 
+                `Crew unable to reach consensus after ${reviewAttempts + 1} review cycles. Human review required.`;
+              (story as Story & { blockedAt?: string }).blockedAt = new Date().toISOString();
+
+              cycleResults.push({
+                storyId: story.id,
+                title: story.title,
+                previousStatus,
+                newStatus: "blocked",
+                action: "🚫 BLOCKED - Human review required (crew unable to reach consensus)",
+              });
+
+              // Add blocking memory
+              memories.push({
+                id: `mem_blocked_${story.id}_${Date.now()}`,
+                crewId: "captain_picard",
+                content: `Story "${story.title}" blocked after ${reviewAttempts + 1} review attempts. Crew could not reach consensus on Definition of Done. Human intervention needed.`,
+                type: "event",
+                projectContext: sprint.projectId,
+                storyContext: story.id,
+                createdAt: new Date().toISOString(),
+              });
+            } else {
+              cycleResults.push({
+                storyId: story.id,
+                title: story.title,
+                previousStatus,
+                newStatus: "review",
+                action: `Review attempt ${reviewAttempts + 1}/3 - awaiting consensus`,
+              });
+            }
           }
 
           // Add review memories
@@ -492,7 +523,59 @@ export async function POST(req: Request) {
           review: sprint.stories.filter((s) => s.status === "review").length,
           todo: sprint.stories.filter((s) => s.status === "todo").length,
           backlog: sprint.stories.filter((s) => s.status === "backlog").length,
+          blocked: sprint.stories.filter((s) => s.status === "blocked").length,
         },
+      });
+    }
+
+    case "unblock": {
+      // Human intervention to unblock a story
+      const story = sprint.stories.find((s) => s.id === storyId);
+      if (!story) {
+        return NextResponse.json({ error: "Story not found" }, { status: 404 });
+      }
+
+      if (story.status !== "blocked") {
+        return NextResponse.json(
+          { error: "Story is not blocked" },
+          { status: 400 }
+        );
+      }
+
+      const { resolution, moveToStatus = "todo" } = payload as {
+        resolution: string;
+        moveToStatus?: "backlog" | "todo" | "in_progress";
+      };
+
+      // Reset story status
+      story.status = moveToStatus;
+      (story as Story & { reviewAttempts?: number }).reviewAttempts = 0;
+      (story as Story & { blockedReason?: string }).blockedReason = undefined;
+      (story as Story & { unblockedAt?: string }).unblockedAt = new Date().toISOString();
+      (story as Story & { unblockedBy?: string }).unblockedBy = "human_reviewer";
+      (story as Story & { unblockResolution?: string }).unblockResolution = resolution;
+      story.updatedAt = new Date().toISOString();
+
+      // Add memory of human intervention
+      memories.push({
+        id: `mem_unblock_${story.id}_${Date.now()}`,
+        crewId: "captain_picard",
+        content: `Human review resolved blocking issue for "${story.title}". Resolution: ${resolution}. Story moved to ${moveToStatus}.`,
+        type: "event",
+        projectContext: sprint.projectId,
+        storyContext: story.id,
+        createdAt: new Date().toISOString(),
+      });
+
+      sprintsData.sprints[sprintIndex] = sprint;
+      await saveSprints(sprintsData);
+      await saveMemories(memories);
+
+      return NextResponse.json({
+        ok: true,
+        story,
+        message: `Story unblocked and moved to ${moveToStatus}`,
+        resolution,
       });
     }
 

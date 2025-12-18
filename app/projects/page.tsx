@@ -10,6 +10,7 @@ import {
   DomainScores 
 } from '../../lib/projects';
 import { categories } from '../../lib/categories';
+import { SprintBadge } from '../../components/SprintIndicator';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
@@ -107,6 +108,10 @@ export default function ProjectsPage() {
               <p className="small" style={{ margin: '4px 0 0', color: 'var(--muted)' }}>
                 {project.tagline}
               </p>
+              {/* Sprint Badge */}
+              <div style={{ marginTop: 8 }}>
+                <SprintBadge projectId={project.id} />
+              </div>
             </div>
             <span 
               style={{ 

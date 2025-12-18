@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { SprintBadge } from "./SprintIndicator";
 
 interface Domain {
   slug: string;
@@ -180,6 +181,10 @@ function ProjectPreview({
             >
               {project.tagline}
             </p>
+            {/* Sprint Badge */}
+            <div style={{ marginTop: 6 }}>
+              <SprintBadge projectId={project.id} />
+            </div>
           </div>
           <span
             style={{
