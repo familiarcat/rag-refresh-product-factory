@@ -5,6 +5,7 @@ description = "RAG (Retrieval Augmented Generation) implementation for product i
 authors = ["Alex AI Crew <info@example.com>"]
 readme = "README.md"
 license = "MIT"
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
