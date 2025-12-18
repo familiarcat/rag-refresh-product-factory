@@ -4,10 +4,39 @@
 
 ## Features
 
-- **Crew Chat**: Chat with Picard, Data, Worf, and other crew members for code assistance
+- **VS Code Chat Integration**: Use `@alex` in VS Code's native Chat panel to talk to the crew
+- **Crew Chat Sidebar**: Dedicated chat panel with crew member selection
 - **Code Analysis**: Right-click code to get explanations, reviews, and optimizations
 - **Sprint Status**: View current sprint progress from the sidebar
 - **Observation Lounge**: Convene senior staff meetings for architectural decisions
+
+## VS Code Chat Panel
+
+Type `@alex` in VS Code's Chat panel (Cmd+Shift+I) to use Alex AI:
+
+```
+@alex Explain this authentication flow
+
+@alex /worf Review this code for security issues
+
+@alex /data Analyze the time complexity of this algorithm
+
+@alex /troi How can we improve the user experience here?
+```
+
+### Available Crew Commands
+
+| Command | Crew Member | Specialty |
+|---------|-------------|-----------|
+| `@alex` | Commander Data (default) | Technical analysis |
+| `@alex /picard` | Captain Picard | Strategic advice |
+| `@alex /riker` | Commander Riker | Tactical guidance |
+| `@alex /data` | Commander Data | Technical analysis |
+| `@alex /geordi` | Lt. Cmdr. La Forge | Engineering |
+| `@alex /troi` | Counselor Troi | UX perspective |
+| `@alex /worf` | Lt. Worf | Security review |
+| `@alex /obrien` | Chief O'Brien | Debugging |
+| `@alex /quark` | Quark | Cost/business analysis |
 
 ## Installation
 

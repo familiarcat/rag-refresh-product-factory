@@ -30,6 +30,49 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "chatParticipants": [
+      {
+        "id": "alex-ai.crew",
+        "fullName": "Alex AI Crew",
+        "name": "alex",
+        "description": "Chat with the Star Trek crew for code analysis and recommendations",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "picard",
+            "description": "Ask Captain Picard for strategic advice"
+          },
+          {
+            "name": "riker",
+            "description": "Ask Commander Riker for tactical guidance"
+          },
+          {
+            "name": "data",
+            "description": "Ask Commander Data for technical analysis"
+          },
+          {
+            "name": "geordi",
+            "description": "Ask La Forge for engineering solutions"
+          },
+          {
+            "name": "troi",
+            "description": "Ask Counselor Troi for UX perspective"
+          },
+          {
+            "name": "worf",
+            "description": "Ask Lt. Worf for security review"
+          },
+          {
+            "name": "obrien",
+            "description": "Ask Chief O'Brien for debugging help"
+          },
+          {
+            "name": "quark",
+            "description": "Ask Quark for business/cost analysis"
+          }
+        ]
+      }
+    ],
     "commands": [
       {
         "command": "alexAi.openChat",

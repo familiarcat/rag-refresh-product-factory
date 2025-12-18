@@ -3,6 +3,7 @@ import { CrewChatViewProvider } from "./chatView";
 import { CrewTreeProvider } from "./crewTree";
 import { SprintTreeProvider } from "./sprintTree";
 import { AlexAiService } from "./alexAiService";
+import { registerChatParticipant } from "./chatParticipant";
 
 let alexAiService: AlexAiService;
 
@@ -31,6 +32,9 @@ export function activate(context: vscode.ExtensionContext) {
     "alexAi.sprintView",
     sprintTreeProvider
   );
+
+  // Register as VS Code Chat Participant (@alex in Chat panel)
+  registerChatParticipant(context, alexAiService);
 
   // Register Commands
   context.subscriptions.push(
