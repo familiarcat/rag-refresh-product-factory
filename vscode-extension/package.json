@@ -112,6 +112,11 @@
       {
         "command": "alexAi.openSettings",
         "title": "Alex AI: Open Settings"
+      },
+      {
+        "command": "alexAi.openNativeChat",
+        "title": "Alex AI: Open in VS Code Chat",
+        "icon": "$(comment-discussion)"
       }
     ],
     "viewsContainers": {
@@ -175,6 +180,11 @@
         "command": "alexAi.configure",
         "key": "ctrl+alt+k",
         "mac": "cmd+option+k"
+      },
+      {
+        "command": "alexAi.openNativeChat",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+option+c"
       }
     ],
     "configuration": {
@@ -217,6 +227,18 @@
           "default": true,
           "markdownDescription": "Automatically include current file context when chatting with crew members",
           "order": 3
+        },
+        "alexAi.openChatOnStartup": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Automatically open Alex AI chat panel when VS Code starts",
+          "order": 4
+        },
+        "alexAi.setAsDefaultChatAgent": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Set Alex AI as the preferred chat agent (pre-selects @alex in chat)",
+          "order": 5
         },
         "alexAi.baseUrl": {
           "type": "string",

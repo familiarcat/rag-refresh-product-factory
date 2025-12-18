@@ -370,10 +370,42 @@ export function activate(context: vscode.ExtensionContext) {
     100
   );
   statusBarItem.text = "$(comment-discussion) Alex AI";
-  statusBarItem.tooltip = "Open Alex AI Chat";
+  statusBarItem.tooltip = "Open Alex AI Chat (Cmd+Option+A) or use @alex in Chat";
   statusBarItem.command = "alexAi.openChat";
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
+
+  // Auto-open chat on startup if configured
+  if (config.get<boolean>("openChatOnStartup")) {
+    // Small delay to let VS Code fully initialize
+    setTimeout(async () => {
+      // Open the VS Code chat panel with @alex pre-typed
+      try {
+        await vscode.commands.executeCommand("workbench.action.chat.open", {
+          query: "@alex ",
+        });
+      } catch {
+        // Fallback to our sidebar chat if native chat fails
+        vscode.commands.executeCommand("alexAi.chatView.focus");
+      }
+    }, 1500);
+  }
+
+  // Register command to open native chat with @alex
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.openNativeChat", async () => {
+      try {
+        await vscode.commands.executeCommand("workbench.action.chat.open", {
+          query: "@alex ",
+        });
+      } catch {
+        vscode.window.showInformationMessage(
+          "VS Code Chat not available. Using Alex AI sidebar instead."
+        );
+        vscode.commands.executeCommand("alexAi.chatView.focus");
+      }
+    })
+  );
 }
 
 export function deactivate() {
