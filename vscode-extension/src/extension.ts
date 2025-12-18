@@ -206,26 +206,149 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // Show welcome message on first activation
-  const hasShownWelcome = context.globalState.get("alexAi.welcomeShown");
-  if (!hasShownWelcome) {
-    vscode.window
-      .showInformationMessage(
-        "🖖 Alex AI activated! Press Cmd+Shift+A to open chat.",
-        "Open Chat",
-        "Configure"
-      )
-      .then((selection) => {
-        if (selection === "Open Chat") {
-          vscode.commands.executeCommand("alexAi.chatView.focus");
-        } else if (selection === "Configure") {
+  // Configure API Key command - for marketplace users
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.configure", async () => {
+      const config = vscode.workspace.getConfiguration("alexAi");
+      const existingKey = config.get<string>("openRouterApiKey");
+
+      const action = await vscode.window.showQuickPick(
+        [
+          {
+            label: "$(key) Enter API Key",
+            description: "Enter your OpenRouter API key",
+            value: "enter",
+          },
+          {
+            label: "$(link-external) Get API Key",
+            description: "Open OpenRouter website to get a key",
+            value: "get",
+          },
+          {
+            label: "$(gear) Open Settings",
+            description: "Open Alex AI settings",
+            value: "settings",
+          },
+          ...(existingKey
+            ? [
+                {
+                  label: "$(check) Test Current Key",
+                  description: "Verify your API key works",
+                  value: "test",
+                },
+              ]
+            : []),
+        ],
+        { placeHolder: "🔑 Configure Alex AI" }
+      );
+
+      if (!action) return;
+
+      switch (action.value) {
+        case "enter":
+          const apiKey = await vscode.window.showInputBox({
+            prompt: "Enter your OpenRouter API key",
+            placeHolder: "sk-or-v1-...",
+            password: true,
+            ignoreFocusOut: true,
+            validateInput: (value) => {
+              if (!value) return "API key is required";
+              if (!value.startsWith("sk-or-"))
+                return "OpenRouter keys start with 'sk-or-'";
+              if (value.length < 20) return "API key seems too short";
+              return null;
+            },
+          });
+          if (apiKey) {
+            await config.update(
+              "openRouterApiKey",
+              apiKey,
+              vscode.ConfigurationTarget.Global
+            );
+            vscode.window.showInformationMessage(
+              "🖖 API key saved! You're ready to chat with the crew."
+            );
+          }
+          break;
+
+        case "get":
+          vscode.env.openExternal(
+            vscode.Uri.parse("https://openrouter.ai/keys")
+          );
+          vscode.window.showInformationMessage(
+            "Opening OpenRouter... After getting your key, run 'Alex AI: Configure API Key' again."
+          );
+          break;
+
+        case "settings":
           vscode.commands.executeCommand(
             "workbench.action.openSettings",
             "alexAi"
           );
-        }
-      });
-    context.globalState.update("alexAi.welcomeShown", true);
+          break;
+
+        case "test":
+          vscode.window.withProgress(
+            {
+              location: vscode.ProgressLocation.Notification,
+              title: "Testing API key...",
+            },
+            async () => {
+              const response = await alexAiService.chat(
+                "data",
+                "Say 'API key verified' in one sentence."
+              );
+              if (response.includes("Error") || response.includes("❌")) {
+                vscode.window.showErrorMessage(`API key test failed: ${response}`);
+              } else {
+                vscode.window.showInformationMessage(
+                  "✅ API key is working! " + response.slice(0, 50) + "..."
+                );
+              }
+            }
+          );
+          break;
+      }
+    })
+  );
+
+  // Open Settings command
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.openSettings", () => {
+      vscode.commands.executeCommand("workbench.action.openSettings", "alexAi");
+    })
+  );
+
+  // Check for API key on activation
+  const config = vscode.workspace.getConfiguration("alexAi");
+  const apiKey = config.get<string>("openRouterApiKey");
+
+  // Show welcome message on first activation or if no API key
+  const hasShownWelcome = context.globalState.get("alexAi.welcomeShown");
+  const needsSetup = !apiKey || apiKey.trim() === "";
+
+  if (!hasShownWelcome || needsSetup) {
+    const message = needsSetup
+      ? "🖖 Welcome to Alex AI! Configure your API key to get started."
+      : "🖖 Alex AI activated! Press Cmd+Shift+A to open chat.";
+
+    const buttons = needsSetup
+      ? ["Configure API Key", "Get API Key"]
+      : ["Open Chat", "Configure"];
+
+    vscode.window.showInformationMessage(message, ...buttons).then((selection) => {
+      if (selection === "Open Chat") {
+        vscode.commands.executeCommand("alexAi.chatView.focus");
+      } else if (selection === "Configure" || selection === "Configure API Key") {
+        vscode.commands.executeCommand("alexAi.configure");
+      } else if (selection === "Get API Key") {
+        vscode.env.openExternal(vscode.Uri.parse("https://openrouter.ai/keys"));
+      }
+    });
+
+    if (!hasShownWelcome) {
+      context.globalState.update("alexAi.welcomeShown", true);
+    }
   }
 
   // Status bar item

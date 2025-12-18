@@ -37,7 +37,8 @@
     "vscode:quick": "bash scripts/vscode-extension/dev.sh quick",
     "vscode:test": "bash scripts/vscode-extension/dev.sh test",
     "vscode:watch": "bash scripts/vscode-extension/dev.sh watch",
-    "vscode:clean": "bash scripts/vscode-extension/dev.sh clean"
+    "vscode:clean": "bash scripts/vscode-extension/dev.sh clean",
+    "vscode:audit": "bash scripts/vscode-extension/security-audit.sh"
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.952.0",

@@ -60,6 +60,15 @@
       {
         "command": "alexAi.observationLounge",
         "title": "Alex AI: Convene Observation Lounge"
+      },
+      {
+        "command": "alexAi.configure",
+        "title": "Alex AI: Configure API Key",
+        "icon": "$(key)"
+      },
+      {
+        "command": "alexAi.openSettings",
+        "title": "Alex AI: Open Settings"
       }
     ],
     "viewsContainers": {
@@ -126,12 +135,8 @@
         "alexAi.openRouterApiKey": {
           "type": "string",
           "default": "",
-          "description": "OpenRouter API key for AI responses"
-        },
-        "alexAi.baseUrl": {
-          "type": "string",
-          "default": "http://localhost:3001",
-          "description": "Base URL for Alex AI server"
+          "markdownDescription": "**Required**: Your OpenRouter API key for AI responses.\n\nGet your API key at [openrouter.ai](https://openrouter.ai/keys)\n\n⚠️ This key is stored in VS Code settings. Never share it publicly.",
+          "order": 1
         },
         "alexAi.defaultCrewMember": {
           "type": "string",
@@ -146,12 +151,30 @@
             "obrien",
             "quark"
           ],
-          "description": "Default crew member for quick queries"
+          "enumDescriptions": [
+            "🎖️ Captain Picard - Strategic leadership and architecture",
+            "⚡ Commander Riker - Tactical coordination and execution",
+            "🤖 Commander Data - Technical analysis and algorithms",
+            "🔧 Lt. Cmdr. La Forge - Infrastructure and DevOps",
+            "💭 Counselor Troi - UX design and user experience",
+            "⚔️ Lt. Worf - Security reviews and testing",
+            "🛠️ Chief O'Brien - Debugging and implementation",
+            "💰 Quark - Business analysis and optimization"
+          ],
+          "markdownDescription": "Default crew member for quick queries and code analysis",
+          "order": 2
         },
         "alexAi.autoLoadContext": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically load file context when chatting"
+          "markdownDescription": "Automatically include current file context when chatting with crew members",
+          "order": 3
+        },
+        "alexAi.baseUrl": {
+          "type": "string",
+          "default": "http://localhost:3001",
+          "markdownDescription": "Base URL for Alex AI server (for sprint status and memories). Leave default unless self-hosting.",
+          "order": 4
         }
       }
     }
