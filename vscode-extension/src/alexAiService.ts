@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { CredentialManager } from "./credentials";
 
 const CREW_MODELS: Record<
   string,
@@ -129,20 +130,67 @@ export interface ObservationLoungeResult {
 export class AlexAiService {
   private context: vscode.ExtensionContext;
   private conversationHistory: ChatMessage[] = [];
+  private credentialManager: CredentialManager;
+  private apiKeyInitialized: boolean = false;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
+    this.credentialManager = new CredentialManager();
+    
+    // Auto-initialize API key from ~/.zshrc on startup
+    this.initializeApiKey();
   }
 
-  private getConfig() {
+  /**
+   * Initialize API key from local shell config (~/.zshrc)
+   * This runs automatically on extension activation
+   */
+  private async initializeApiKey(): Promise<void> {
+    if (this.apiKeyInitialized) return;
+    
     const config = vscode.workspace.getConfiguration("alexAi");
+    const existingKey = config.get<string>("openRouterApiKey");
+    
+    // Only extract if no key configured in VS Code settings
+    if (!existingKey || existingKey.trim() === "") {
+      console.log("🔑 Alex AI: Checking ~/.zshrc for OpenRouter API key...");
+      
+      const extractedKey = await this.credentialManager.getOpenRouterApiKey();
+      
+      if (extractedKey && this.credentialManager.isValidApiKey(extractedKey)) {
+        console.log("✅ Alex AI: Found valid API key in shell config");
+        // Store in VS Code settings for persistence
+        await config.update(
+          "openRouterApiKey",
+          extractedKey,
+          vscode.ConfigurationTarget.Global
+        );
+        console.log("🖖 Alex AI: API key auto-configured from ~/.zshrc");
+      } else {
+        console.log("⚠️ Alex AI: No valid API key found in shell config");
+      }
+    }
+    
+    this.apiKeyInitialized = true;
+  }
+
+  /**
+   * Get API key using CredentialManager (checks settings, env, ~/.zshrc)
+   */
+  async getApiKey(): Promise<string | null> {
+    return await this.credentialManager.getOpenRouterApiKey();
+  }
+
+  private async getConfig() {
+    const config = vscode.workspace.getConfiguration("alexAi");
+    
+    // Use credential manager for secure key retrieval
+    const apiKey = await this.credentialManager.getOpenRouterApiKey();
+    
     return {
-      apiKey:
-        config.get<string>("openRouterApiKey") ||
-        process.env.OPENROUTER_API_KEY ||
-        "",
+      apiKey: apiKey || "",
       baseUrl: config.get<string>("baseUrl") || "http://localhost:3001",
-      defaultCrew: config.get<string>("defaultCrewMember") || "data",
+      defaultCrew: config.get<string>("defaultCrewMember") || "riker",
       autoLoadContext: config.get<boolean>("autoLoadContext") ?? true,
     };
   }
@@ -152,7 +200,7 @@ export class AlexAiService {
     message: string,
     codeContext?: string
   ): Promise<string> {
-    const config = this.getConfig();
+    const config = await this.getConfig();
     const crew = CREW_MODELS[crewMember] || CREW_MODELS.data;
     const persona = CREW_PERSONAS[crewMember] || CREW_PERSONAS.data;
 
@@ -234,7 +282,7 @@ export class AlexAiService {
   }
 
   async getSprintStatus(): Promise<SprintStatus | null> {
-    const config = this.getConfig();
+    const config = await this.getConfig();
     try {
       const response = await fetch(
         `${config.baseUrl}/api/sprints?projectId=proj_1765948227414_iw68yf`
@@ -273,7 +321,7 @@ export class AlexAiService {
   async conveneObservationLounge(
     topic: string
   ): Promise<ObservationLoungeResult | null> {
-    const config = this.getConfig();
+    const config = await this.getConfig();
     if (!config.apiKey) {
       vscode.window.showErrorMessage("OpenRouter API key not configured");
       return null;
