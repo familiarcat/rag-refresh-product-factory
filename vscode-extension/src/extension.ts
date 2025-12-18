@@ -299,7 +299,9 @@ export function activate(context: vscode.ExtensionContext) {
                 "Say 'API key verified' in one sentence."
               );
               if (response.includes("Error") || response.includes("❌")) {
-                vscode.window.showErrorMessage(`API key test failed: ${response}`);
+                vscode.window.showErrorMessage(
+                  `API key test failed: ${response}`
+                );
               } else {
                 vscode.window.showInformationMessage(
                   "✅ API key is working! " + response.slice(0, 50) + "..."
@@ -330,21 +332,28 @@ export function activate(context: vscode.ExtensionContext) {
   if (!hasShownWelcome || needsSetup) {
     const message = needsSetup
       ? "🖖 Welcome to Alex AI! Configure your API key to get started."
-      : "🖖 Alex AI activated! Press Cmd+Shift+A to open chat.";
+      : "🖖 Alex AI activated! Press Cmd+Option+A to open chat.";
 
     const buttons = needsSetup
       ? ["Configure API Key", "Get API Key"]
       : ["Open Chat", "Configure"];
 
-    vscode.window.showInformationMessage(message, ...buttons).then((selection) => {
-      if (selection === "Open Chat") {
-        vscode.commands.executeCommand("alexAi.chatView.focus");
-      } else if (selection === "Configure" || selection === "Configure API Key") {
-        vscode.commands.executeCommand("alexAi.configure");
-      } else if (selection === "Get API Key") {
-        vscode.env.openExternal(vscode.Uri.parse("https://openrouter.ai/keys"));
-      }
-    });
+    vscode.window
+      .showInformationMessage(message, ...buttons)
+      .then((selection) => {
+        if (selection === "Open Chat") {
+          vscode.commands.executeCommand("alexAi.chatView.focus");
+        } else if (
+          selection === "Configure" ||
+          selection === "Configure API Key"
+        ) {
+          vscode.commands.executeCommand("alexAi.configure");
+        } else if (selection === "Get API Key") {
+          vscode.env.openExternal(
+            vscode.Uri.parse("https://openrouter.ai/keys")
+          );
+        }
+      });
 
     if (!hasShownWelcome) {
       context.globalState.update("alexAi.welcomeShown", true);

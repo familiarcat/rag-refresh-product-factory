@@ -43,10 +43,11 @@ Then configure in VS Code Settings:
 
 ### Keyboard Shortcuts
 
-| Shortcut      | Action                       |
-| ------------- | ---------------------------- |
-| `Cmd+Shift+A` | Open Alex AI Chat            |
-| `Cmd+Shift+Q` | Ask crew about selected code |
+| Shortcut       | Action                       |
+| -------------- | ---------------------------- |
+| `Cmd+Option+A` | Open Alex AI Chat            |
+| `Cmd+Option+Q` | Ask crew about selected code |
+| `Cmd+Option+K` | Configure API Key            |
 
 ### Context Menu
 

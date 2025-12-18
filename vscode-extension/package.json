@@ -119,14 +119,19 @@
     "keybindings": [
       {
         "command": "alexAi.openChat",
-        "key": "ctrl+shift+a",
-        "mac": "cmd+shift+a"
+        "key": "ctrl+alt+a",
+        "mac": "cmd+option+a"
       },
       {
         "command": "alexAi.askCrew",
-        "key": "ctrl+shift+q",
-        "mac": "cmd+shift+q",
+        "key": "ctrl+alt+q",
+        "mac": "cmd+option+q",
         "when": "editorHasSelection"
+      },
+      {
+        "command": "alexAi.configure",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+option+k"
       }
     ],
     "configuration": {

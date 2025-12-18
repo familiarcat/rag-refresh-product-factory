@@ -244,9 +244,10 @@ SAMPLE
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     echo "   1. Look for the Starfleet icon in the Activity Bar (left)"
-    echo "   2. Press Cmd+Shift+A to open chat"
-    echo "   3. Select code and press Cmd+Shift+Q"
-    echo "   4. Open Command Palette (Cmd+Shift+P) and type 'Alex AI'"
+    echo "   2. Press Cmd+Option+A to open chat"
+    echo "   3. Select code and press Cmd+Option+Q"
+    echo "   4. Press Cmd+Option+K to configure API key"
+    echo "   5. Open Command Palette (Cmd+Shift+P) and type 'Alex AI'"
     echo ""
   fi
 }
