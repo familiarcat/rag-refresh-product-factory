@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * CLI for chatting with Alex AI crew members
- * 
+ *
  * Usage:
  *   npm run crew:chat -- "picard" "What should our strategy be?"
  *   npm run crew:chat -- "data" "Analyze the architecture"
@@ -9,19 +9,43 @@
  */
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const BASE_URL = process.env.ALEX_AI_URL || 'http://localhost:3001';
+const BASE_URL = process.env.ALEX_AI_URL || "http://localhost:3001";
 
 const CREW_MODELS = {
-  picard: { model: 'anthropic/claude-3.5-sonnet', name: 'Captain Picard', emoji: '🎖️' },
-  riker: { model: 'anthropic/claude-3.5-sonnet', name: 'Commander Riker', emoji: '⚡' },
-  data: { model: 'openai/gpt-4-turbo', name: 'Commander Data', emoji: '🤖' },
-  geordi: { model: 'anthropic/claude-3.5-sonnet', name: 'Lt. Cmdr. La Forge', emoji: '🔧' },
-  troi: { model: 'anthropic/claude-3.5-sonnet', name: 'Counselor Troi', emoji: '💭' },
-  worf: { model: 'openai/gpt-4-turbo', name: 'Lt. Worf', emoji: '⚔️' },
-  obrien: { model: 'openai/gpt-4-turbo', name: 'Chief O\'Brien', emoji: '🛠️' },
-  quark: { model: 'openai/gpt-4-turbo', name: 'Quark', emoji: '💰' },
-  crusher: { model: 'anthropic/claude-3.5-sonnet', name: 'Dr. Crusher', emoji: '💊' },
-  uhura: { model: 'anthropic/claude-3.5-sonnet', name: 'Lt. Uhura', emoji: '📻' },
+  picard: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Captain Picard",
+    emoji: "🎖️",
+  },
+  riker: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Commander Riker",
+    emoji: "⚡",
+  },
+  data: { model: "openai/gpt-4-turbo", name: "Commander Data", emoji: "🤖" },
+  geordi: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Lt. Cmdr. La Forge",
+    emoji: "🔧",
+  },
+  troi: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Counselor Troi",
+    emoji: "💭",
+  },
+  worf: { model: "openai/gpt-4-turbo", name: "Lt. Worf", emoji: "⚔️" },
+  obrien: { model: "openai/gpt-4-turbo", name: "Chief O'Brien", emoji: "🛠️" },
+  quark: { model: "openai/gpt-4-turbo", name: "Quark", emoji: "💰" },
+  crusher: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Dr. Crusher",
+    emoji: "💊",
+  },
+  uhura: {
+    model: "anthropic/claude-3.5-sonnet",
+    name: "Lt. Uhura",
+    emoji: "📻",
+  },
 };
 
 const CREW_PERSONAS = {
@@ -79,16 +103,20 @@ Focus on API design, communication protocols, and integrations.`,
 async function loadContext() {
   try {
     // Load recent memories
-    const memoriesRes = await fetch(`${BASE_URL}/api/crew/collaborate?action=memories`);
+    const memoriesRes = await fetch(
+      `${BASE_URL}/api/crew/collaborate?action=memories`
+    );
     const memories = await memoriesRes.json();
-    
+
     // Load projects
     const projectsRes = await fetch(`${BASE_URL}/api/projects`);
     const projects = await projectsRes.json();
-    
+
     return {
       recentMemories: (memories.memories || []).slice(0, 5),
-      activeProjects: (projects.projects || []).filter(p => p.status === 'active').slice(0, 3),
+      activeProjects: (projects.projects || [])
+        .filter((p) => p.status === "active")
+        .slice(0, 3),
     };
   } catch (error) {
     return { recentMemories: [], activeProjects: [] };
@@ -99,13 +127,13 @@ async function chat(crewMember, message) {
   const crew = CREW_MODELS[crewMember.toLowerCase()];
   if (!crew) {
     console.error(`❌ Unknown crew member: ${crewMember}`);
-    console.log('Available:', Object.keys(CREW_MODELS).join(', '));
+    console.log("Available:", Object.keys(CREW_MODELS).join(", "));
     process.exit(1);
   }
 
   if (!OPENROUTER_API_KEY) {
-    console.error('❌ OPENROUTER_API_KEY not set');
-    console.log('Get one at: https://openrouter.ai');
+    console.error("❌ OPENROUTER_API_KEY not set");
+    console.log("Get one at: https://openrouter.ai");
     process.exit(1);
   }
 
@@ -113,35 +141,52 @@ async function chat(crewMember, message) {
 
   // Load context
   const context = await loadContext();
-  
+
   const contextPrompt = `
 CURRENT CONTEXT:
-- Active Projects: ${context.activeProjects.map(p => p.name).join(', ') || 'None loaded'}
+- Active Projects: ${
+    context.activeProjects.map((p) => p.name).join(", ") || "None loaded"
+  }
 - Recent Crew Memories: ${context.recentMemories.length} available
 
-${context.recentMemories.length > 0 ? 
-  'Recent lessons:\n' + context.recentMemories.map(m => `- ${m.content.slice(0, 100)}...`).join('\n') : ''}
+${
+  context.recentMemories.length > 0
+    ? "Recent lessons:\n" +
+      context.recentMemories
+        .map((m) => `- ${m.content.slice(0, 100)}...`)
+        .join("\n")
+    : ""
+}
 `;
 
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://alex-ai.dev',
-        'X-Title': 'Alex AI Crew Chat',
-      },
-      body: JSON.stringify({
-        model: crew.model,
-        messages: [
-          { role: 'system', content: CREW_PERSONAS[crewMember.toLowerCase()] + '\n\n' + contextPrompt },
-          { role: 'user', content: message },
-        ],
-        max_tokens: 1000,
-        temperature: 0.7,
-      }),
-    });
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://alex-ai.dev",
+          "X-Title": "Alex AI Crew Chat",
+        },
+        body: JSON.stringify({
+          model: crew.model,
+          messages: [
+            {
+              role: "system",
+              content:
+                CREW_PERSONAS[crewMember.toLowerCase()] +
+                "\n\n" +
+                contextPrompt,
+            },
+            { role: "user", content: message },
+          ],
+          max_tokens: 1000,
+          temperature: 0.7,
+        }),
+      }
+    );
 
     if (!response.ok) {
       const error = await response.text();
@@ -149,19 +194,22 @@ ${context.recentMemories.length > 0 ?
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || 'No response';
+    const reply = data.choices?.[0]?.message?.content || "No response";
 
     console.log(`${crew.emoji} ${crew.name}:`);
-    console.log('─'.repeat(50));
+    console.log("─".repeat(50));
     console.log(reply);
-    console.log('─'.repeat(50));
-    
+    console.log("─".repeat(50));
+
     // Show usage
     if (data.usage) {
       const cost = estimateCost(crew.model, data.usage);
-      console.log(`\n📊 Tokens: ${data.usage.total_tokens} | Est. cost: $${cost.toFixed(4)}`);
+      console.log(
+        `\n📊 Tokens: ${data.usage.total_tokens} | Est. cost: $${cost.toFixed(
+          4
+        )}`
+      );
     }
-
   } catch (error) {
     console.error(`❌ Error: ${error.message}`);
     process.exit(1);
@@ -170,11 +218,14 @@ ${context.recentMemories.length > 0 ?
 
 function estimateCost(model, usage) {
   const rates = {
-    'anthropic/claude-3.5-sonnet': { input: 0.003, output: 0.015 },
-    'openai/gpt-4-turbo': { input: 0.01, output: 0.03 },
+    "anthropic/claude-3.5-sonnet": { input: 0.003, output: 0.015 },
+    "openai/gpt-4-turbo": { input: 0.01, output: 0.03 },
   };
   const rate = rates[model] || { input: 0.001, output: 0.002 };
-  return (usage.prompt_tokens * rate.input + usage.completion_tokens * rate.output) / 1000;
+  return (
+    (usage.prompt_tokens * rate.input + usage.completion_tokens * rate.output) /
+    1000
+  );
 }
 
 // Main
@@ -206,4 +257,4 @@ Examples:
   process.exit(0);
 }
 
-chat(args[0], args.slice(1).join(' '));
+chat(args[0], args.slice(1).join(" "));

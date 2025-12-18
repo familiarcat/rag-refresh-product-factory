@@ -47,7 +47,7 @@ Create or edit `~/.continue/config.json`:
     },
     {
       "title": "GPT-4 Turbo (OpenRouter)",
-      "provider": "openrouter", 
+      "provider": "openrouter",
       "model": "openai/gpt-4-turbo",
       "apiKey": "YOUR_OPENROUTER_API_KEY"
     }
@@ -64,7 +64,9 @@ Create or edit `~/.continue/config.json`:
         "transport": {
           "type": "stdio",
           "command": "node",
-          "args": ["/Users/bradygeorgen/Documents/workspace/rag-refresh-product-factory/mcp-server/index.mjs"],
+          "args": [
+            "/Users/bradygeorgen/Documents/workspace/rag-refresh-product-factory/mcp-server/index.mjs"
+          ],
           "env": {
             "OPENROUTER_API_KEY": "YOUR_OPENROUTER_API_KEY"
           }
@@ -102,6 +104,7 @@ alias sprint="npm run sprint:status"
 ```
 
 Then reload:
+
 ```bash
 source ~/.zshrc
 ```
@@ -128,7 +131,7 @@ Press `Cmd+L` to open Continue chat, then:
 # Chat with crew
 /crew Ask Picard about our strategic direction
 
-# Check sprint status  
+# Check sprint status
 /sprint
 
 # Use MCP tools directly
@@ -177,13 +180,14 @@ curl -X POST "http://localhost:3001/api/sprints/auto-execute" \
 
 ## Cost Comparison
 
-| Service | Monthly Cost | What You Get |
-|---------|--------------|--------------|
-| **Cursor Pro** | $20/mo | Full IDE AI, unlimited* |
-| **Continue.dev + OpenRouter** | $5-15/mo* | Same functionality, pay-per-use |
-| **GitHub Copilot** | $10-19/mo | Code completion + chat |
+| Service                       | Monthly Cost | What You Get                    |
+| ----------------------------- | ------------ | ------------------------------- |
+| **Cursor Pro**                | $20/mo       | Full IDE AI, unlimited\*        |
+| **Continue.dev + OpenRouter** | $5-15/mo\*   | Same functionality, pay-per-use |
+| **GitHub Copilot**            | $10-19/mo    | Code completion + chat          |
 
-*OpenRouter costs depend on usage. Typical costs:
+\*OpenRouter costs depend on usage. Typical costs:
+
 - Claude 3.5 Sonnet: ~$0.003/1K input tokens, $0.015/1K output
 - GPT-4 Turbo: ~$0.01/1K input, $0.03/1K output
 - Codestral (autocomplete): ~$0.001/1K tokens
@@ -224,15 +228,15 @@ curl https://openrouter.ai/api/v1/models \
 
 ## Full Feature Parity with Cursor
 
-| Feature | Cursor | VS Code + Continue |
-|---------|--------|-------------------|
-| AI Chat | ✅ | ✅ |
-| Code Completion | ✅ | ✅ |
-| Multi-file Editing | ✅ | ✅ (with Continue) |
-| Alex AI Crew | ✅ (MCP) | ✅ (MCP) |
-| Sprint Automation | ✅ (API) | ✅ (API/CLI) |
-| Milestone Push | ✅ | ✅ (CLI) |
-| RAG Memories | ✅ | ✅ |
+| Feature            | Cursor   | VS Code + Continue |
+| ------------------ | -------- | ------------------ |
+| AI Chat            | ✅       | ✅                 |
+| Code Completion    | ✅       | ✅                 |
+| Multi-file Editing | ✅       | ✅ (with Continue) |
+| Alex AI Crew       | ✅ (MCP) | ✅ (MCP)           |
+| Sprint Automation  | ✅ (API) | ✅ (API/CLI)       |
+| Milestone Push     | ✅       | ✅ (CLI)           |
+| RAG Memories       | ✅       | ✅                 |
 
 ---
 

@@ -30,7 +30,9 @@
     "sprint:status": "node scripts/cli/sprint-status.mjs",
     "sprint:start": "node scripts/cli/sprint-start.mjs",
     "sprint:cycle": "node scripts/cli/sprint-cycle.mjs",
-    "sprint:run": "node scripts/cli/sprint-run.mjs"
+    "sprint:run": "node scripts/cli/sprint-run.mjs",
+    "vscode:install": "bash scripts/install-vscode-extension.sh",
+    "vscode:build": "cd vscode-extension && npm install && npm run compile && npm run package"
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.952.0",

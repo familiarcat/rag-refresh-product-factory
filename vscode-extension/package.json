@@ -1,0 +1,171 @@
+{
+  "name": "alex-ai-assistant",
+  "displayName": "Alex AI - Crew Code Assistant",
+  "description": "AI-powered code assistant with Star Trek crew personas. Chat with Picard, Data, and the crew for code analysis and recommendations.",
+  "version": "1.0.0",
+  "publisher": "alex-ai",
+  "icon": "media/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "assistant",
+    "copilot",
+    "chat",
+    "code-analysis",
+    "star-trek"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "alexAi.openChat",
+        "title": "Open Alex AI Chat",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "alexAi.askCrew",
+        "title": "Ask Crew About Selection",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "alexAi.explainCode",
+        "title": "Alex AI: Explain Code"
+      },
+      {
+        "command": "alexAi.reviewCode",
+        "title": "Alex AI: Review Code (Worf)"
+      },
+      {
+        "command": "alexAi.optimizeCode",
+        "title": "Alex AI: Optimize Code (Data)"
+      },
+      {
+        "command": "alexAi.sprintStatus",
+        "title": "Alex AI: Sprint Status"
+      },
+      {
+        "command": "alexAi.observationLounge",
+        "title": "Alex AI: Convene Observation Lounge"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "alex-ai",
+          "title": "Alex AI",
+          "icon": "media/starfleet.svg"
+        }
+      ]
+    },
+    "views": {
+      "alex-ai": [
+        {
+          "type": "webview",
+          "id": "alexAi.chatView",
+          "name": "Crew Chat"
+        },
+        {
+          "id": "alexAi.crewView",
+          "name": "Crew Members"
+        },
+        {
+          "id": "alexAi.sprintView",
+          "name": "Sprint Status"
+        }
+      ]
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "command": "alexAi.askCrew",
+          "group": "alexAi@1",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "alexAi.explainCode",
+          "group": "alexAi@2",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "alexAi.reviewCode",
+          "group": "alexAi@3",
+          "when": "editorHasSelection"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "alexAi.openChat",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      },
+      {
+        "command": "alexAi.askCrew",
+        "key": "ctrl+shift+q",
+        "mac": "cmd+shift+q",
+        "when": "editorHasSelection"
+      }
+    ],
+    "configuration": {
+      "title": "Alex AI",
+      "properties": {
+        "alexAi.openRouterApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenRouter API key for AI responses"
+        },
+        "alexAi.baseUrl": {
+          "type": "string",
+          "default": "http://localhost:3001",
+          "description": "Base URL for Alex AI server"
+        },
+        "alexAi.defaultCrewMember": {
+          "type": "string",
+          "default": "data",
+          "enum": [
+            "picard",
+            "riker",
+            "data",
+            "geordi",
+            "troi",
+            "worf",
+            "obrien",
+            "quark"
+          ],
+          "description": "Default crew member for quick queries"
+        },
+        "alexAi.autoLoadContext": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically load file context when chatting"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "install-extension": "code --install-extension alex-ai-assistant-1.0.0.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "marked": "^12.0.0"
+  }
+}
