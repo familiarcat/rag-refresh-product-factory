@@ -24,7 +24,13 @@
     "bootstrap:setup": "bash scripts/bootstrap/unify_setup.sh",
     "infra:init": "cd infra && terraform init",
     "infra:apply": "cd infra && terraform apply",
-    "infra:plan": "cd infra && terraform plan"
+    "infra:plan": "cd infra && terraform plan",
+    "crew:chat": "node scripts/cli/crew-chat.mjs",
+    "crew:lounge": "node scripts/cli/observation-lounge.mjs",
+    "sprint:status": "node scripts/cli/sprint-status.mjs",
+    "sprint:start": "node scripts/cli/sprint-start.mjs",
+    "sprint:cycle": "node scripts/cli/sprint-cycle.mjs",
+    "sprint:run": "node scripts/cli/sprint-run.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.952.0",
