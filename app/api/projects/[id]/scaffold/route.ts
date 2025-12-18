@@ -37,7 +37,7 @@ interface ScaffoldConfig {
 
 /**
  * POST /api/projects/[id]/scaffold
- * 
+ *
  * Project isolation and deployment:
  * - create-branch: Create isolated GitHub branch for project
  * - scaffold: Generate standalone Next.js project
@@ -73,10 +73,14 @@ export async function POST(
           ...branchResult,
         });
       } catch (error) {
-        return NextResponse.json({
-          ok: false,
-          error: error instanceof Error ? error.message : "Branch creation failed",
-        }, { status: 500 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              error instanceof Error ? error.message : "Branch creation failed",
+          },
+          { status: 500 }
+        );
       }
     }
 
@@ -89,10 +93,16 @@ export async function POST(
           ...scaffoldResult,
         });
       } catch (error) {
-        return NextResponse.json({
-          ok: false,
-          error: error instanceof Error ? error.message : "Scaffold generation failed",
-        }, { status: 500 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              error instanceof Error
+                ? error.message
+                : "Scaffold generation failed",
+          },
+          { status: 500 }
+        );
       }
     }
 
@@ -105,26 +115,36 @@ export async function POST(
           ...deployResult,
         });
       } catch (error) {
-        return NextResponse.json({
-          ok: false,
-          error: error instanceof Error ? error.message : "Deployment failed",
-        }, { status: 500 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error: error instanceof Error ? error.message : "Deployment failed",
+          },
+          { status: 500 }
+        );
       }
     }
 
     case "eject": {
       // Export project as independent repository
       try {
-        const ejectResult = await ejectProject(project, config, payload.targetRepo);
+        const ejectResult = await ejectProject(
+          project,
+          config,
+          payload.targetRepo
+        );
         return NextResponse.json({
           ok: true,
           ...ejectResult,
         });
       } catch (error) {
-        return NextResponse.json({
-          ok: false,
-          error: error instanceof Error ? error.message : "Eject failed",
-        }, { status: 500 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error: error instanceof Error ? error.message : "Eject failed",
+          },
+          { status: 500 }
+        );
       }
     }
 
@@ -166,10 +186,13 @@ export async function POST(
           ],
         });
       } catch (error) {
-        return NextResponse.json({
-          ok: false,
-          error: error instanceof Error ? error.message : "Setup failed",
-        }, { status: 500 });
+        return NextResponse.json(
+          {
+            ok: false,
+            error: error instanceof Error ? error.message : "Setup failed",
+          },
+          { status: 500 }
+        );
       }
     }
 
@@ -233,13 +256,17 @@ This branch contains the isolated development environment for this project.
 `;
 
     // Create a marker file for this project
-    const markerContent = JSON.stringify({
-      projectId: project.id,
-      projectName: project.name,
-      createdAt: new Date().toISOString(),
-      branch: config.branch,
-      subdomain: config.subdomain,
-    }, null, 2);
+    const markerContent = JSON.stringify(
+      {
+        projectId: project.id,
+        projectName: project.name,
+        createdAt: new Date().toISOString(),
+        branch: config.branch,
+        subdomain: config.subdomain,
+      },
+      null,
+      2
+    );
 
     await fs.mkdir(config.scaffoldPath, { recursive: true });
     await fs.writeFile(
@@ -249,7 +276,9 @@ This branch contains the isolated development environment for this project.
 
     // Stage and commit
     await execAsync(`git add ${config.scaffoldPath}`, { cwd });
-    await execAsync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`, { cwd });
+    await execAsync(`git commit -m "${commitMessage.replace(/"/g, '\\"')}"`, {
+      cwd,
+    });
 
     // Push branch
     await execAsync(`git push -u origin ${config.branch}`, { cwd });
@@ -412,7 +441,9 @@ export default function RootLayout({
           </p>
         </div>
 
-        ${project.domains?.length > 0 ? `
+        ${
+          project.domains?.length > 0
+            ? `
         <div style={{
           background: "rgba(255,255,255,0.05)",
           borderRadius: 12,
@@ -420,7 +451,9 @@ export default function RootLayout({
         }}>
           <h2 style={{ fontSize: 20, marginBottom: 16 }}>Domains</h2>
           <div style={{ display: "grid", gap: 12 }}>
-            ${project.domains.map((d) => `
+            ${project.domains
+              .map(
+                (d) => `
             <div style={{
               padding: 16,
               background: "rgba(255,255,255,0.03)",
@@ -431,9 +464,13 @@ export default function RootLayout({
               <p style={{ margin: "8px 0 0", fontSize: 14, color: "#8b8fa3" }}>
                 ${d.description}
               </p>
-            </div>`).join("")}
+            </div>`
+              )
+              .join("")}
           </div>
-        </div>` : ""}
+        </div>`
+            : ""
+        }
 
         <footer style={{
           marginTop: 48,
@@ -495,9 +532,21 @@ Open [http://localhost:3000](http://localhost:3000) to view the project.
 
 ## Tech Stack
 
-${project.techStack?.frontend?.length ? `- **Frontend:** ${project.techStack.frontend.join(", ")}` : ""}
-${project.techStack?.backend?.length ? `- **Backend:** ${project.techStack.backend.join(", ")}` : ""}
-${project.techStack?.infrastructure?.length ? `- **Infrastructure:** ${project.techStack.infrastructure.join(", ")}` : ""}
+${
+  project.techStack?.frontend?.length
+    ? `- **Frontend:** ${project.techStack.frontend.join(", ")}`
+    : ""
+}
+${
+  project.techStack?.backend?.length
+    ? `- **Backend:** ${project.techStack.backend.join(", ")}`
+    : ""
+}
+${
+  project.techStack?.infrastructure?.length
+    ? `- **Infrastructure:** ${project.techStack.infrastructure.join(", ")}`
+    : ""
+}
 
 ---
 

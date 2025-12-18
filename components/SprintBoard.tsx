@@ -270,7 +270,9 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
         for (const result of data.cycleResults || []) {
           setExecutionLog((prev) => [
             ...prev,
-            `${result.newStatus === "done" ? "✅" : "🔄"} ${result.title}: ${result.action}`,
+            `${result.newStatus === "done" ? "✅" : "🔄"} ${result.title}: ${
+              result.action
+            }`,
           ]);
         }
         setExecutionLog((prev) => [
@@ -390,31 +392,37 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
                 📋 View Plan
               </button>
             )}
-            {activeSprint && activeSprint.status === "planning" && activeSprint.stories.length > 0 && (
-              <button
-                onClick={startSprint}
-                disabled={executing}
-                style={{
-                  padding: "8px 16px",
-                  background: executing ? "var(--surface)" : "linear-gradient(135deg, #10b981, #059669)",
-                  border: "none",
-                  borderRadius: 8,
-                  color: "white",
-                  cursor: executing ? "wait" : "pointer",
-                  fontSize: 13,
-                  fontWeight: 600,
-                }}
-              >
-                {executing ? "🔄 Starting..." : "▶️ Start Sprint"}
-              </button>
-            )}
+            {activeSprint &&
+              activeSprint.status === "planning" &&
+              activeSprint.stories.length > 0 && (
+                <button
+                  onClick={startSprint}
+                  disabled={executing}
+                  style={{
+                    padding: "8px 16px",
+                    background: executing
+                      ? "var(--surface)"
+                      : "linear-gradient(135deg, #10b981, #059669)",
+                    border: "none",
+                    borderRadius: 8,
+                    color: "white",
+                    cursor: executing ? "wait" : "pointer",
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
+                >
+                  {executing ? "🔄 Starting..." : "▶️ Start Sprint"}
+                </button>
+              )}
             {activeSprint && activeSprint.status === "active" && (
               <button
                 onClick={runAutomationCycle}
                 disabled={executing}
                 style={{
                   padding: "8px 16px",
-                  background: executing ? "var(--surface)" : "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                  background: executing
+                    ? "var(--surface)"
+                    : "linear-gradient(135deg, #8b5cf6, #7c3aed)",
                   border: "none",
                   borderRadius: 8,
                   color: "white",
@@ -543,7 +551,14 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
             overflow: "auto",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
             <span style={{ color: "#8b949e" }}>🤖 Crew Activity Log</span>
             <button
               onClick={() => setExecutionLog([])}
