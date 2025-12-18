@@ -1,0 +1,178 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🧪 RAG: Run Tests",
+      "type": "shell",
+      "command": "poetry run pytest tests/ -v",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🚀 RAG: Start API Server",
+      "type": "shell",
+      "command": "poetry run python -m src.rag_factory.server",
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "📦 RAG: Install Dependencies",
+      "type": "shell",
+      "command": "poetry install",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🖖 Alex AI: Activate Crew",
+      "type": "shell",
+      "command": "npm run alex-ai:activate",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "🧠 Alex AI: Load Crew Memories",
+      "type": "shell",
+      "command": "npm run alex-ai:memories",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "⚡ Alex AI: Riker Coordinate",
+      "type": "shell",
+      "command": "npm run alex-ai:coordinate",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "📋 Milestone: Push to RAG",
+      "type": "shell",
+      "command": "./scripts/milestone/run_milestone.sh",
+      "args": ["${input:milestoneTitle}"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🚀 Milestone: Push & Deploy",
+      "type": "shell",
+      "command": "./scripts/milestone/run_milestone.sh",
+      "args": ["${input:milestoneTitle}", "--deploy"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🐳 Deploy: Manual to AWS",
+      "type": "shell",
+      "command": "./scripts/deploy-app.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🔧 Dev: Start Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "🏗️ Dev: Build",
+      "type": "shell",
+      "command": "npm run build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "📊 View: Deploy Metrics",
+      "type": "shell",
+      "command": "open http://localhost:3000/deploy-metrics",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent"
+      },
+      "osx": {
+        "command": "open http://localhost:3000/deploy-metrics"
+      },
+      "linux": {
+        "command": "xdg-open http://localhost:3000/deploy-metrics"
+      },
+      "windows": {
+        "command": "start http://localhost:3000/deploy-metrics"
+      }
+    },
+    {
+      "label": "👥 View: Observation Lounge",
+      "type": "shell",
+      "command": "open http://localhost:3000/observation-lounge",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent"
+      },
+      "osx": {
+        "command": "open http://localhost:3000/observation-lounge"
+      },
+      "linux": {
+        "command": "xdg-open http://localhost:3000/observation-lounge"
+      },
+      "windows": {
+        "command": "start http://localhost:3000/observation-lounge"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "milestoneTitle",
+      "type": "promptString",
+      "description": "Enter milestone title",
+      "default": "Milestone update"
+    }
+  ]
+}
+

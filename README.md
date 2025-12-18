@@ -1,4 +1,16 @@
-# RAG Refresh Product Factory (Next.js)
+# RAG Refresh Product Factory
+
+> A Retrieval Augmented Generation (RAG) system for product information management with crew-based coordination
+
+## 🎯 Overview
+
+This project implements a comprehensive RAG system designed around the Alex AI crew model, featuring:
+
+- **Memory Storage**: Vector-based memory system for storing crew decisions and analysis
+- **Processing Engine**: Flexible RAG processor supporting text and image inputs
+- **Crew Authorization**: Role-based access control for the AI crew members
+- **API Endpoints**: FastAPI-based REST API for system interaction
+- **VSCode Integration**: Seamless integration with VSCode for development (Next.js)
 
 ## What this is
 A Next.js starter that turns the Review Pack into a navigable app **and** includes a minimal RAG endpoint with a feedback loop.

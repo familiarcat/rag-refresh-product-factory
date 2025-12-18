@@ -1,0 +1,65 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+
+  "files.associations": {
+    "*.cursorrules": "markdown"
+  },
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/out": true,
+    "**/.git": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true
+  },
+
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+  "python.formatting.provider": "black",
+  "python.analysis.extraPaths": ["${workspaceFolder}/src"],
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+
+  "terminal.integrated.env.osx": {
+    "ALEX_AI_ENABLED": "true"
+  },
+  "terminal.integrated.env.linux": {
+    "ALEX_AI_ENABLED": "true"
+  },
+
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#1a1f35",
+    "titleBar.activeBackground": "#1a1f35",
+    "titleBar.activeForeground": "#eef1ff"
+  },
+
+  "alexAI": {
+    "enabled": true,
+    "autoActivate": true,
+    "crewMembers": [
+      "captain_picard",
+      "commander_riker",
+      "commander_data",
+      "geordi_la_forge",
+      "counselor_troi",
+      "lieutenant_worf",
+      "dr_crusher",
+      "chief_obrien",
+      "quark",
+      "lieutenant_uhura"
+    ],
+    "features": {
+      "rag": true,
+      "observationLounge": true,
+      "collaboration": true
+    }
+  }
+}
+
