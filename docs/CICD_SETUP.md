@@ -1,21 +1,33 @@
 # CI/CD Setup Guide
 
-This project uses GitHub Actions for automated deployment when app code changes.
+This project uses GitHub Actions as the **only** deployment method. Local deployments are intentionally disabled to ensure:
+
+- ✅ **Audit trail** - Every deploy is tied to a commit in the repository
+- ✅ **No drift** - Cannot deploy uncommitted local changes
+- ✅ **Security** - AWS credentials stay in GitHub Secrets, not local files
+- ✅ **Reproducibility** - Same build environment every time
+- ✅ **Team-ready** - Anyone with repo access can deploy
 
 ## How It Works
 
 1. **On push to `main`**: If app code files changed, GitHub Actions automatically:
+
    - Builds Docker image for `linux/amd64`
    - Pushes to ECR with commit SHA and `latest` tags
    - Deploys to EC2 via SSM (no SSH keys needed!)
 
-2. **Milestone pushes**: The milestone script detects app changes and notifies you that CI/CD will auto-deploy.
+2. **Milestone pushes with deploy**: Use `npm run milestone:deploy -- "title"` to:
 
-3. **Manual deploy**: Run `./scripts/deploy-app.sh` for immediate deployment.
+   - Commit and push changes
+   - Upload milestone to Supabase
+   - Trigger GitHub Actions deployment
+
+3. **Manual deploy trigger**: Run `gh workflow run deploy.yml` to deploy the current `main` branch.
 
 ## Path Filters
 
 CI/CD only triggers when these paths change:
+
 - `app/**` - Next.js routes and pages
 - `components/**` - React components
 - `lib/**` - Utility libraries
@@ -30,9 +42,9 @@ Docs, milestones, and Terraform changes do NOT trigger deploys.
 
 Go to: **Settings → Secrets and variables → Actions**
 
-| Secret | Value | Description |
-|--------|-------|-------------|
-| `AWS_ACCESS_KEY_ID` | `AKIA...` | IAM user access key |
+| Secret                  | Value     | Description         |
+| ----------------------- | --------- | ------------------- |
+| `AWS_ACCESS_KEY_ID`     | `AKIA...` | IAM user access key |
 | `AWS_SECRET_ACCESS_KEY` | `XtLX...` | IAM user secret key |
 
 ### Setting Secrets via CLI
@@ -43,6 +55,7 @@ gh secret set AWS_SECRET_ACCESS_KEY --body "YOUR_SECRET_ACCESS_KEY"
 ```
 
 Or sync from your environment:
+
 ```bash
 gh secret set AWS_ACCESS_KEY_ID --body "$AWS_ACCESS_KEY_ID"
 gh secret set AWS_SECRET_ACCESS_KEY --body "$AWS_SECRET_ACCESS_KEY"
@@ -57,38 +70,39 @@ gh secret set AWS_SECRET_ACCESS_KEY --body "$AWS_SECRET_ACCESS_KEY"
 
 ## Manual Deployment
 
-For immediate deployment without waiting for CI/CD:
+To trigger a deployment of the current `main` branch:
 
 ```bash
-# Set AWS credentials first
-export AWS_ACCESS_KEY_ID=...
-export AWS_SECRET_ACCESS_KEY=...
+# Trigger deploy via GitHub CLI
+gh workflow run deploy.yml
 
-# Run deploy
-./scripts/deploy-app.sh
+# Monitor the deployment
+gh run list --workflow=deploy.yml --limit 1
+gh run watch
 ```
 
-Or with a specific tag:
-```bash
-./scripts/deploy-app.sh v1.0.0
-```
+Or visit: https://github.com/familiarcat/rag-refresh-product-factory/actions
+
+> **Note**: Local deployment scripts (`deploy-app.sh`) are retained for emergency/debugging purposes only. All production deployments should go through GitHub Actions.
 
 ## Troubleshooting
 
 ### "Deployment failed"
+
 - Check SSM permissions on the IAM user
 - Verify EC2 instance is running
 - Check EC2 has the IAM instance profile attached
 
 ### "ECR login failed"
+
 - Verify AWS credentials are set correctly
 - Check ECR repository exists
 
 ### "docker: command not found" on EC2
+
 - SSH to EC2 and install Docker:
   ```bash
   sudo yum install -y docker
   sudo systemctl start docker
   sudo systemctl enable docker
   ```
-

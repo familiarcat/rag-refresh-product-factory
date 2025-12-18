@@ -35,8 +35,9 @@ say(){ printf "%b\n" "$*"; }
 
 ENV_DUMP="$OUT_DIR/_env_dump.txt"
 
-# Source ~/.zshrc in a non-interactive login shell and dump env.
-zsh -lc 'set -a; source ~/.zshrc >/dev/null 2>&1; env' > "$ENV_DUMP" || true
+# Source ~/.zshenv and ~/.zshrc in a non-interactive login shell and dump env.
+# ~/.zshenv contains non-interactive exports (like AWS credentials)
+zsh -lc 'set -a; [[ -f ~/.zshenv ]] && source ~/.zshenv >/dev/null 2>&1; source ~/.zshrc >/dev/null 2>&1; env' > "$ENV_DUMP" || true
 
 LOCAL_ENV="$OUT_DIR/.env.local"
 CICD_ENV="$OUT_DIR/.env.cicd"
@@ -45,7 +46,7 @@ CICD_ENV="$OUT_DIR/.env.cicd"
 : > "$CICD_ENV"
 
 for k in "${ALLOWLIST[@]}"; do
-  v="$(grep -E "^${k}=" "$ENV_DUMP" | tail -n 1 | sed 's/^[^=]*=//')"
+  v="$(grep -E "^${k}=" "$ENV_DUMP" 2>/dev/null | tail -n 1 | sed 's/^[^=]*=//' || true)"
   if [[ -n "${v:-}" ]]; then
     v_escaped="$(printf "%s" "$v" | sed 's/\\/\\\\/g; s/"/\\"/g')"
     echo "${k}=\"${v_escaped}\"" >> "$LOCAL_ENV"

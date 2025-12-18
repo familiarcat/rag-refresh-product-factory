@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TITLE="${1:-}"
-DEPLOY_FLAG="${2:-}"
+# Parse arguments - supports both positional and flag-based
+TITLE=""
+DEPLOY_FLAG=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --deploy) DEPLOY_FLAG="--deploy" ;;
+    *) [[ -z "$TITLE" ]] && TITLE="$arg" ;;
+  esac
+done
 
 [[ -n "$TITLE" ]] || { echo "Usage: scripts/milestone/run_milestone.sh \"Milestone title\" [--deploy]"; exit 1; }
 
-# Load local env if present (server-side only)
+# Load local env if present (for Supabase upload)
 if [[ -f ".env.local" ]]; then
   set -a
   # shellcheck disable=SC1091
@@ -25,19 +33,31 @@ git push
 echo "✅ Milestone pushed to Git + Supabase"
 echo ""
 
-# Manual deploy option
+# Deploy via GitHub Actions (never local - ensures all deploys are from committed code)
 if [[ "$DEPLOY_FLAG" == "--deploy" ]]; then
-  echo "🚀 Running manual deploy to AWS..."
-  bash scripts/deploy-app.sh
+  echo "🚀 Triggering deployment via GitHub Actions..."
+  echo "   (All deployments go through CI/CD for auditability)"
+  echo ""
+  
+  if command -v gh >/dev/null 2>&1; then
+    gh workflow run deploy.yml
+    echo "✅ Deploy workflow triggered!"
+    echo ""
+    echo "Monitor at: https://github.com/familiarcat/rag-refresh-product-factory/actions"
+    echo "Or run: gh run list --workflow=deploy.yml --limit 1"
+  else
+    echo "⚠️  GitHub CLI not installed. Trigger manually:"
+    echo "   gh workflow run deploy.yml"
+    echo "   Or visit: https://github.com/familiarcat/rag-refresh-product-factory/actions"
+  fi
 else
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "📋 Development Mode: Auto-deploy is OFF"
+  echo "📋 Milestone Complete - Deploy when ready"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
-  echo "To deploy when ready:"
-  echo "  Local:   ./scripts/deploy-app.sh"
-  echo "  GitHub:  gh workflow run deploy.yml"
-  echo "  With ms: ./scripts/milestone/run_milestone.sh \"title\" --deploy"
+  echo "To deploy (via GitHub Actions):"
+  echo "  gh workflow run deploy.yml"
+  echo "  Or: npm run milestone:deploy -- \"title\""
   echo ""
 fi
 

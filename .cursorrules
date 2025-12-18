@@ -88,9 +88,25 @@ Access memories via:
 The user may use natural language commands:
 
 - "make a milestone push" - Run milestone script to Git + Supabase
-- "deploy" or "make a milestone push and deploy" - Deploy to AWS
+- "deploy" or "make a milestone push and deploy" - Commit, push, then trigger GitHub Actions deploy
 - "have Riker coordinate" - Use the collaboration system
 - "ask [crew member]" - Get perspective from a specific crew member
+
+### 🔒 CI/CD Philosophy
+
+**All deployments go through GitHub Actions** - never local scripts. This ensures:
+
+- Every deploy is tied to a committed SHA (audit trail)
+- No "works on my machine" drift
+- AWS credentials stay in GitHub Secrets
+- Reproducible builds in consistent environment
+
+Deploy commands:
+
+```bash
+npm run milestone:deploy -- "title"  # Commit + push + trigger deploy
+gh workflow run deploy.yml           # Deploy current main branch
+```
 
 ## ⚡ Quick Actions
 
@@ -111,4 +127,3 @@ The user may use natural language commands:
 ## 🖖 Sign-Off
 
 End significant responses with relevant crew wisdom or Star Trek references when appropriate. The crew is here to help - "Make it so."
-
