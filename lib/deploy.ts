@@ -200,3 +200,5 @@ export function getAWSCredentials(): { accessKeyId: string; secretAccessKey: str
   return { accessKeyId, secretAccessKey };
 }
 
+
+

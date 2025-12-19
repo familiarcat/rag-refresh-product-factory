@@ -445,3 +445,5 @@ export function calculateTreeProgress(node: ProjectTreeNode): number {
   return Math.round(node.project.progress * 0.6 + avgChildProgress * 0.4);
 }
 
+
+

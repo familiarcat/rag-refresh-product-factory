@@ -58,3 +58,5 @@ async function startSprint(sprintId) {
 }
 
 startSprint(process.argv[2]);
+
+

@@ -89,3 +89,5 @@ async function runCycle(sprintId) {
 }
 
 runCycle(process.argv[2]);
+
+

@@ -121,3 +121,5 @@ async function runToCompletion(sprintId) {
 }
 
 runToCompletion(process.argv[2]);
+
+

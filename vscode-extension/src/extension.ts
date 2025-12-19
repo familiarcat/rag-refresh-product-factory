@@ -7,6 +7,7 @@ import { registerCodeActionProvider } from "./codeActions";
 import { registerHoverProvider } from "./hoverProvider";
 import { registerDiagnosticProvider } from "./diagnosticProvider";
 import { registerAlexPanel } from "./alexPanel";
+import { registerExecutionCommands } from "./executionCommands";
 
 let alexAiService: AlexAiService;
 
@@ -40,7 +41,11 @@ export function activate(context: vscode.ExtensionContext) {
         const selection = editor.selection;
         const selectedText = editor.document.getText(selection);
 
-        if (selectedText && selectedText.length > 10 && selectedText.length < 5000) {
+        if (
+          selectedText &&
+          selectedText.length > 10 &&
+          selectedText.length < 5000
+        ) {
           // Send selection to sidebar
           chatViewProvider.setSelectionContext({
             text: selectedText,
@@ -67,6 +72,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Register comprehensive Alex AI Panel
   registerAlexPanel(context, alexAiService);
+
+  // Register file system and execution commands (for saving plans and recommendations)
+  registerExecutionCommands(context, alexAiService);
 
   // Register Commands
   context.subscriptions.push(

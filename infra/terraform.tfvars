@@ -27,3 +27,5 @@ n8n_subdomain = "n8n"
 # Disable alarms until CloudWatch permissions are added
 enable_alarms = false
 
+
+

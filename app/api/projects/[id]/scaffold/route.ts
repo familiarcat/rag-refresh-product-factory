@@ -686,3 +686,5 @@ async function getProjectScaffoldStatus(
     deploymentStatus: scaffoldExists ? "ready" : "not_scaffolded",
   };
 }
+
+

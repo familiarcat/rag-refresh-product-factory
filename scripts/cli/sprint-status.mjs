@@ -116,3 +116,5 @@ ${"═".repeat(50)}
 
 const projectId = process.argv[2] || DEFAULT_PROJECT;
 getSprintStatus(projectId);
+
+

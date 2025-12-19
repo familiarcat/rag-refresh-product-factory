@@ -138,6 +138,34 @@
         "command": "alexAi.openPanel",
         "title": "Alex AI: Open Full Panel",
         "icon": "$(window)"
+      },
+      {
+        "command": "alexAi.saveRecommendation",
+        "title": "Alex AI: Save Recommendation to File"
+      },
+      {
+        "command": "alexAi.savePlan",
+        "title": "Alex AI: Save Execution Plan to File"
+      },
+      {
+        "command": "alexAi.executeRecommendation",
+        "title": "Alex AI: Execute Code Recommendation"
+      },
+      {
+        "command": "alexAi.viewRecommendations",
+        "title": "Alex AI: View Saved Recommendations"
+      },
+      {
+        "command": "alexAi.viewPlans",
+        "title": "Alex AI: View Saved Plans"
+      },
+      {
+        "command": "alexAi.exportRecommendations",
+        "title": "Alex AI: Export Recommendations to Markdown"
+      },
+      {
+        "command": "alexAi.exportPlans",
+        "title": "Alex AI: Export Plans to Markdown"
       }
     ],
     "viewsContainers": {

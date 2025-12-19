@@ -78,7 +78,7 @@ sed -i.bak "s|^alias status='./scripts/alex-ai-detailed-status.sh'|# MIGRATED: u
 sed -i.bak "s|^alias detailed='./scripts/alex-ai-detailed-status.sh'|# MIGRATED: use alex-dash instead|" "$TEMP_ZSHRC"
 
 # 4. Comment out old monorepo functions
-sed -i.bak 's/^alex_monorepo_status()/# MIGRATED: alex_monorepo_status() - replaced by alex_ai_prompt_status\nalex_monorepo_status_disabled()/' "$TEMP_ZSHRC"
+# sed -i.bak 's/^alex_monorepo_status()/# MIGRATED: alex_monorepo_status() - replaced by alex_ai_prompt_status\nalex_monorepo_status_disabled()/' "$TEMP_ZSHRC"
 
 # 5. Check if new init is already sourced
 if ! grep -q "alex-ai-shell-init.sh" "$TEMP_ZSHRC"; then

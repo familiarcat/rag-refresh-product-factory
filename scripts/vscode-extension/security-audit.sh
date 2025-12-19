@@ -202,3 +202,5 @@ echo "   1. Users must configure API key via VS Code Settings"
 echo "   2. Local shell config extraction is for YOUR testing only"
 echo "   3. Run 'npm run vscode:audit' before every publish"
 echo ""
+
+

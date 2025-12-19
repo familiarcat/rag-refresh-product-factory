@@ -572,3 +572,5 @@ export function getStoryTypeIcon(type: StoryType): string {
   };
   return icons[type];
 }
+
+

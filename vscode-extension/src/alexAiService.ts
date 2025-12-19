@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { CredentialManager } from "./credentials";
+import { FileSystemManager } from "./fileSystemManager";
 
 const CREW_MODELS: Record<
   string,
@@ -131,14 +132,23 @@ export class AlexAiService {
   private context: vscode.ExtensionContext;
   private conversationHistory: ChatMessage[] = [];
   private credentialManager: CredentialManager;
+  private fileSystemManager: FileSystemManager;
   private apiKeyInitialized: boolean = false;
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
     this.credentialManager = new CredentialManager();
-    
+    this.fileSystemManager = new FileSystemManager();
+
     // Auto-initialize API key from ~/.zshrc on startup
     this.initializeApiKey();
+
+    // Initialize file system directories
+    this.fileSystemManager
+      .initialize()
+      .catch((err) =>
+        console.error("Failed to initialize FileSystemManager:", err)
+      );
   }
 
   /**
@@ -147,16 +157,16 @@ export class AlexAiService {
    */
   private async initializeApiKey(): Promise<void> {
     if (this.apiKeyInitialized) return;
-    
+
     const config = vscode.workspace.getConfiguration("alexAi");
     const existingKey = config.get<string>("openRouterApiKey");
-    
+
     // Only extract if no key configured in VS Code settings
     if (!existingKey || existingKey.trim() === "") {
       console.log("🔑 Alex AI: Checking ~/.zshrc for OpenRouter API key...");
-      
+
       const extractedKey = await this.credentialManager.getOpenRouterApiKey();
-      
+
       if (extractedKey && this.credentialManager.isValidApiKey(extractedKey)) {
         console.log("✅ Alex AI: Found valid API key in shell config");
         // Store in VS Code settings for persistence
@@ -170,7 +180,7 @@ export class AlexAiService {
         console.log("⚠️ Alex AI: No valid API key found in shell config");
       }
     }
-    
+
     this.apiKeyInitialized = true;
   }
 
@@ -183,10 +193,10 @@ export class AlexAiService {
 
   private async getConfig() {
     const config = vscode.workspace.getConfiguration("alexAi");
-    
+
     // Use credential manager for secure key retrieval
     const apiKey = await this.credentialManager.getOpenRouterApiKey();
-    
+
     return {
       apiKey: apiKey || "",
       baseUrl: config.get<string>("baseUrl") || "http://localhost:3001",
@@ -408,5 +418,97 @@ export class AlexAiService {
 
   getCrewInfo(crewMember: string) {
     return CREW_MODELS[crewMember] || CREW_MODELS.data;
+  }
+
+  /**
+   * Get file system manager for file operations
+   */
+  getFileSystemManager(): FileSystemManager {
+    return this.fileSystemManager;
+  }
+
+  /**
+   * Save a crew recommendation to the file system
+   */
+  async saveRecommendation(
+    crewMember: string,
+    recommendation: {
+      title: string;
+      content: string;
+      context?: string;
+      action?: string;
+      priority?: "high" | "medium" | "low";
+      file?: string;
+      lineStart?: number;
+      lineEnd?: number;
+    }
+  ): Promise<string> {
+    return await this.fileSystemManager.saveRecommendation(
+      crewMember,
+      recommendation
+    );
+  }
+
+  /**
+   * Save an execution plan
+   */
+  async savePlan(plan: {
+    name: string;
+    description: string;
+    objectives: string[];
+    steps: Array<{
+      step: number;
+      task: string;
+      assignedTo?: string;
+      priority?: "high" | "medium" | "low";
+    }>;
+    estimatedTime?: string;
+    files?: string[];
+    metadata?: Record<string, any>;
+  }): Promise<string> {
+    return await this.fileSystemManager.savePlan(plan);
+  }
+
+  /**
+   * Get recent recommendations
+   */
+  async getRecentRecommendations(limit: number = 5) {
+    return await this.fileSystemManager.getRecentRecommendations(limit);
+  }
+
+  /**
+   * Get recent plans
+   */
+  async getRecentPlans(limit: number = 5) {
+    return await this.fileSystemManager.getRecentPlans(limit);
+  }
+
+  /**
+   * Execute a code recommendation
+   */
+  async executeCodeRecommendation(
+    file: string,
+    oldCode: string,
+    newCode: string
+  ): Promise<boolean> {
+    return await this.fileSystemManager.executeCodeRecommendation(
+      file,
+      oldCode,
+      newCode
+    );
+  }
+
+  /**
+   * Load crew memories
+   */
+  async loadCrewMemories(): Promise<Record<string, any>> {
+    return await this.fileSystemManager.loadCrewMemories();
+  }
+
+  /**
+   * Update crew memories
+   */
+  async updateCrewMemories(memories: Record<string, any>): Promise<void> {
+    return await this.fileSystemManager.updateCrewMemories(memories);
   }
 }

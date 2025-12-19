@@ -185,3 +185,5 @@ aws ec2 describe-instances \
 *Analysis by Quark, Business Consultant*
 *"Greed is eternal." — Rule of Acquisition #10*
 
+
+

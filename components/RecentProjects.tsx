@@ -507,3 +507,5 @@ export function ProjectStats({ theme }: { theme: { accent: string } }) {
     </div>
   );
 }
+
+

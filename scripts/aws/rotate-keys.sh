@@ -98,3 +98,5 @@ echo "  export RAG_REFRESH_AWS_ACCESS_KEY_ID=\"$NEW_ACCESS_KEY_ID\""
 echo "  export RAG_REFRESH_AWS_SECRET_ACCESS_KEY=\"$NEW_SECRET_ACCESS_KEY\""
 echo ""
 
+
+

@@ -955,3 +955,5 @@ function checkDefinitionOfDone(story: Story): boolean {
 
   return Object.values(criteria).every(Boolean);
 }
+
+
