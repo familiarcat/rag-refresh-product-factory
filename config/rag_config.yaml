@@ -3,16 +3,16 @@ rag_factory:
     vector_store: "faiss"
     embedding_model: "sentence-transformers/all-mpnet-base-v2"
     dimension: 768
-    
+
   processing:
     chunk_size: 500
     chunk_overlap: 50
-    
+
   api:
     host: "0.0.0.0"
     port: 8000
     reload: true
-    
+
   security:
     enable_audit_logging: true
     require_authorization: true

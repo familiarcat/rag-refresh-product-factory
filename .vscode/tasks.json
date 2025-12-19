@@ -76,7 +76,9 @@
       "label": "📋 Milestone: Push to RAG",
       "type": "shell",
       "command": "./scripts/milestone/run_milestone.sh",
-      "args": ["${input:milestoneTitle}"],
+      "args": [
+        "${input:milestoneTitle}"
+      ],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -87,7 +89,10 @@
       "label": "🚀 Milestone: Push & Deploy",
       "type": "shell",
       "command": "./scripts/milestone/run_milestone.sh",
-      "args": ["${input:milestoneTitle}", "--deploy"],
+      "args": [
+        "${input:milestoneTitle}",
+        "--deploy"
+      ],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -175,4 +180,3 @@
     }
   ]
 }
-

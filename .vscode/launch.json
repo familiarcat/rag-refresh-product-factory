@@ -24,7 +24,10 @@
             "type": "python",
             "request": "launch",
             "module": "pytest",
-            "args": ["tests/", "-v"],
+            "args": [
+                "tests/",
+                "-v"
+            ],
             "console": "integratedTerminal"
         }
     ]

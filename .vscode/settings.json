@@ -3,11 +3,9 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
-
   "files.associations": {
     "*.cursorrules": "markdown"
   },
-
   "search.exclude": {
     "**/node_modules": true,
     "**/.next": true,
@@ -17,29 +15,29 @@
     "**/.pytest_cache": true,
     "**/.venv": true
   },
-
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestArgs": ["tests"],
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
   "python.formatting.provider": "black",
-  "python.analysis.extraPaths": ["${workspaceFolder}/src"],
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/src"
+  ],
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
-
   "terminal.integrated.env.osx": {
     "ALEX_AI_ENABLED": "true"
   },
   "terminal.integrated.env.linux": {
     "ALEX_AI_ENABLED": "true"
   },
-
   "workbench.colorCustomizations": {
     "activityBar.background": "#1a1f35",
     "titleBar.activeBackground": "#1a1f35",
     "titleBar.activeForeground": "#eef1ff"
   },
-
   "alexAI": {
     "enabled": true,
     "autoActivate": true,
@@ -62,4 +60,3 @@
     }
   }
 }
-
