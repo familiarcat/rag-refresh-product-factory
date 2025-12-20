@@ -323,9 +323,13 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
+    "compile:watch": "tsc -watch -p ./",
     "watch": "tsc -watch -p ./",
     "package": "vsce package",
-    "install-extension": "code --install-extension alex-ai-assistant-1.0.0.vsix"
+    "package:install": "vsce package && code --install-extension alex-ai-assistant-1.0.0.vsix",
+    "install-extension": "code --install-extension alex-ai-assistant-1.0.0.vsix",
+    "dev:reload": "npm run compile && npm run package && npm run install-extension && echo '\n✅ Extension reloaded! Press Cmd+R in VS Code to activate.'",
+    "dev:watch": "npm run compile:watch"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
