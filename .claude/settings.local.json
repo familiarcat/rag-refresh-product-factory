@@ -15,7 +15,15 @@
       "WebFetch(domain:openrouter.ai)",
       "Bash(python:*)",
       "Bash(python3:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(supabase link:*)",
+      "Bash(pip3 install:*)",
+      "Bash(bash -c '\nSUPABASE_URL=\"\"https://rpkkkbufdwxmjaerbhbn.supabase.co\"\"\nSUPABASE_SERVICE_ROLE_KEY=\"\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwa2trYnVmZHd4bWphZXJiaGJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDA4Njc5MywiZXhwIjoyMDY5NjYyNzkzfQ.tkpxFpJUTG_sfkmauc_E8XmFKp_gnAT4gBhnBaUZTMY\"\"\n\necho \"\"🔍 Verifying if drill tables exist in production...\"\"\necho \"\"\"\"\n\nfor table in drill_scenarios drill_runs drill_executions drill_evaluations; do\n  response=$\\(curl -s \"\"${SUPABASE_URL}/rest/v1/${table}?select=id&limit=0\"\" \\\\\n    -H \"\"apikey: ${SUPABASE_SERVICE_ROLE_KEY}\"\" \\\\\n    -H \"\"Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}\"\" \\\\\n    -H \"\"Prefer: count=exact\"\" 2>&1\\)\n  \n  if echo \"\"$response\"\" | grep -q \"\"does not exist\"\"; then\n    echo \"\"✗ $table: does not exist\"\"\n  elif echo \"\"$response\"\" | grep -q \"\"\\\\[\"\"; then\n    count=$\\(echo \"\"$response\"\" | grep -o \"\"count\\\\\"\":[0-9]*\"\" | grep -o \"\"[0-9]*\"\" || echo \"\"0\"\"\\)\n    echo \"\"✓ $table: exists\"\"\n  else\n    echo \"\"⚠️  $table: status unclear - ${response:0:60}\"\"\n  fi\ndone\n')",
+      "Bash(node scripts/apply-migration.mjs:*)",
+      "Bash(./scripts/apply-migration.sh:*)",
+      "Bash(cat:*)",
+      "Bash(supabase:*)",
+      "Bash(bash -c 'if command -v pbcopy &> /dev/null; then cat supabase/migrations/20251220_create_drill_system.sql | pbcopy && echo \"\"✅ Migration SQL copied to clipboard!\"\" && echo \"\"   You can now paste it directly into the Supabase SQL Editor\"\"; else echo \"\"ℹ️  Please manually copy: supabase/migrations/20251220_create_drill_system.sql\"\"; fi')"
     ]
   }
 }
