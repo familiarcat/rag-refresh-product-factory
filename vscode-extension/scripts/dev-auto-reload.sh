@@ -14,7 +14,7 @@ npm run compile && npm run package && npm run install-extension
 echo ""
 echo "✅ Initial setup complete!"
 echo "💡 Edit files in src/ and they'll auto-reload"
-echo "🔄 After changes, press Cmd+R in VS Code to reload the window"
+echo "🔄 After changes, reload window: Cmd+Shift+P → 'Developer: Reload Window'"
 echo ""
 
 # Watch for changes using fswatch (macOS)
@@ -23,7 +23,7 @@ if command -v fswatch &> /dev/null; then
         echo ""
         echo "🔄 Changes detected! Rebuilding..."
         npm run compile && npm run package && npm run install-extension
-        echo "✅ Extension updated! Press Cmd+R in VS Code to reload"
+        echo "✅ Extension updated! Reload window: Cmd+Shift+P → 'Developer: Reload Window'"
         echo ""
     done
 else

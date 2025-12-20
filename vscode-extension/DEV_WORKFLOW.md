@@ -37,7 +37,7 @@ For testing in your actual VS Code installation:
 3. **Make changes** to files in `src/`
    - Script automatically detects changes
    - Recompiles TypeScript → Packages VSIX → Reinstalls extension
-   - Press **Cmd+R** in VS Code to reload the window
+   - Reload VS Code window: **Cmd+Shift+P** → "Developer: Reload Window"
 
 ### Method 3: Manual Reload
 
@@ -47,7 +47,7 @@ Quick one-off reload after making changes:
 npm run dev:reload
 ```
 
-Then press **Cmd+R** in VS Code.
+Then reload VS Code: **Cmd+Shift+P** → "Developer: Reload Window" (or restart VS Code).
 
 ## 📋 Available Scripts
 
@@ -162,7 +162,7 @@ When ready for marketplace:
 
 ### Changes not appearing?
 - **In Debug Mode:** Press Cmd+R to reload Extension Development Host
-- **In Production:** Reinstall extension + reload window (Cmd+R)
+- **In Production:** Reinstall extension + reload window (Cmd+Shift+P → "Developer: Reload Window")
 - Check TypeScript compiled without errors
 
 ### fswatch not working?
