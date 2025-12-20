@@ -239,7 +239,7 @@ export class AlexAiClient {
         throw new Error(`RAG API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { actions?: any[] };
       return data.actions || [];
     } catch (error) {
       console.error("Failed to query Claude history:", error);
