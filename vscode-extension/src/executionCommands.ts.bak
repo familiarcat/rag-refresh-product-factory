@@ -12,7 +12,6 @@ export function registerExecutionCommands(
    * Command: Save a crew recommendation
    * Usage: alexAi.saveRecommendation
    */
-  
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "alexAi.saveRecommendation",

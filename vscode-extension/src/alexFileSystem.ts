@@ -1,0 +1,89 @@
+import * as vscode from 'vscode';
+import * as fs from 'fs';
+import { join, dirname } from 'path';
+
+export interface FileSystemOperationResult {
+    success: boolean;
+    message: string;
+    error?: Error;
+}
+
+export class AlexFileSystemService {
+    private workspacePath: string;
+    private configPath: string;
+    private cachePath: string;
+
+    constructor(workspacePath: string) {
+        this.workspacePath = workspacePath;
+        this.configPath = join(workspacePath, '.alex-ai-config');
+        this.cachePath = join(workspacePath, '.alex-ai', 'cache');
+    }
+
+    async initialize(): Promise<FileSystemOperationResult> {
+        try {
+            await fs.promises.mkdir(this.cachePath, { recursive: true });
+            return {
+                success: true,
+                message: 'File system initialized successfully'
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to initialize file system',
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async writeConfig(config: Record<string, unknown>): Promise<FileSystemOperationResult> {
+        try {
+            await fs.promises.writeFile(
+                this.configPath,
+                JSON.stringify(config, null, 2),
+                'utf8'
+            );
+            return {
+                success: true,
+                message: 'Configuration written successfully'
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to write configuration',
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async readConfig(): Promise<FileSystemOperationResult & { config?: Record<string, unknown> }> {
+        try {
+            const data = await fs.promises.readFile(this.configPath, 'utf8');
+            return {
+                success: true,
+                message: 'Configuration read successfully',
+                config: JSON.parse(data)
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to read configuration',
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async writeFile(relativePath: string, content: string): Promise<FileSystemOperationResult> {
+        try {
+            const full = join(this.workspacePath, relativePath);
+            await fs.promises.mkdir(dirname(full), { recursive: true });
+            await fs.promises.writeFile(full, content, 'utf8');
+            return { success: true, message: `Wrote ${relativePath}` };
+        } catch (error) {
+            return {
+                success: false,
+                message: `Failed to write ${relativePath}`,
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+}

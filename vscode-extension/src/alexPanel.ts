@@ -112,7 +112,7 @@ export class AlexAiPanel {
   private async _handleChat(crew: string, text: string, context?: string) {
     this._panel.webview.postMessage({ type: "chatLoading", crew });
 
-    const response = await this._alexAiService.chat(crew, text, context);
+    const response = await this._alexAiService.chat(crew, text);
 
     this._panel.webview.postMessage({
       type: "chatResponse",

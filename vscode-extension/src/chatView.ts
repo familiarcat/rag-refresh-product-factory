@@ -57,6 +57,24 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
         case "observationLounge":
           await this.handleObservationLounge(message.topic);
           break;
+        case "milestonePush":
+  // message.prompt: natural-language prompt from UI
+  try {
+    await vscode.commands.executeCommand("alexAi.milestonePush", message.prompt);
+    // Optionally notify webview of success
+    this._view?.webview.postMessage({
+      type: "milestoneResult",
+      status: "ok",
+      message: `Milestone request queued: ${message.prompt}`,
+    });
+  } catch (err) {
+    this._view?.webview.postMessage({
+      type: "milestoneResult",
+      status: "error",
+      message: String(err),
+    });
+  }
+  break;
       }
     });
 

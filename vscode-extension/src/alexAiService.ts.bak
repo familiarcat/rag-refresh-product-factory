@@ -1,10 +1,8 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
-import { join, dirname } from "path";
-import { AlexAiClient, SprintStatus, ObservationLoungeResult as _ObservationLoungeResult } from "./client";
+import { join } from "path";
+import { AlexAiClient, SprintStatus } from "./client";
 import { AlexFileSystemService } from "./alexFileSystem";
-
-export type ObservationLoungeResult = _ObservationLoungeResult;
 
 interface WorkspaceAnalysis {
   files: {
@@ -26,7 +24,6 @@ interface WorkspaceAnalysis {
     projectType: string;
     mainEntryPoints: string[];
   };
-  
 }
 
 export class AlexAiService {
@@ -119,25 +116,8 @@ export class AlexAiService {
     return await this.client.getMemories(crewMember);
   }
 
-  async conveneObservationLounge(topic: string): Promise<ObservationLoungeResult | null> {
+  async conveneObservationLounge(topic: string) {
     return await this.client.conveneObservationLounge(topic);
-  }
-
-  // Provide crew info (single entry) for callers that expect one crew object
-  getCrewInfo(crewId?: string) {
-    const all = this.client.getCrewInfo();
-    if (!crewId) return all[0] || all;
-    const found = all.find((c: any) => c.id === crewId);
-    return found || all[0] || all;
-  }
-
-  // Clear cached analysis and optionally remove local data cache
-  clearHistory(): void {
-    this.workspaceAnalysis = null;
-    const root = vscode.workspace.workspaceFolders?.[0].uri.fsPath || process.cwd();
-    const dataDir = join(root, "data", "alex-ai");
-    // best-effort async remove (don't await here)
-    fs.promises.rm(dataDir, { recursive: true, force: true }).catch(() => {});
   }
 
   // File system manager accessor
