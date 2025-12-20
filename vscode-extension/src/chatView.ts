@@ -989,7 +989,7 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       <button class="nav-tab active" data-page="chat">💬 Chat</button>
       <button class="nav-tab" data-page="files">📁 Files</button>
       <button class="nav-tab" data-page="projects">📦 Projects</button>
-      <button class="nav-tab" data-page="lounge">🚀 Lounge</button>
+      <button class="nav-tab" data-page="lounge">🚀 Observation Lounge</button>
     </div>
   </div>
   
