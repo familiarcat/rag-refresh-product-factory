@@ -373,7 +373,12 @@ class CrewOrchestrator:
             recommendation=recommendation
         )
 
-    def orchestrate(self, user_request: str, context: Optional[Dict] = None) -> OrchestrationResult:
+    def orchestrate(
+        self,
+        user_request: str,
+        context: Optional[Dict] = None,
+        tier_override: Optional[Dict[str, str]] = None
+    ) -> OrchestrationResult:
         """
         Orchestrate cost-optimized crew activation
 
@@ -385,6 +390,8 @@ class CrewOrchestrator:
         Args:
             user_request: The user's task request
             context: Optional context about the task
+            tier_override: Optional dict mapping crew_id to tier (for drill testing)
+                          If provided, bypasses Quark's ROI analysis
 
         Returns:
             OrchestrationResult with crew activation plan
@@ -394,8 +401,24 @@ class CrewOrchestrator:
         task_analysis = self._picard_analyze_task(user_request, context)
 
         # Step 2: Quark's ROI analysis (coordinated by Riker)
-        logger.info("💰 Riker coordinating with Quark for ROI analysis...")
-        roi_analysis = self._quark_roi_analysis(task_analysis, task_analysis.recommended_crew)
+        if tier_override:
+            # Use tier override (for drill testing)
+            logger.info("💰 Using tier override for drill testing...")
+            llm_assignments = tier_override
+            estimated_cost = self._calculate_cost_from_tiers(tier_override)
+
+            # Create simplified ROI analysis
+            roi_analysis = ROIAnalysis(
+                total_cost_premium=estimated_cost * 1.5,  # Estimate
+                total_cost_optimized=estimated_cost,
+                cost_savings=estimated_cost * 0.5,
+                savings_percentage=33.3,
+                crew_llm_assignments=llm_assignments,
+                recommendation=f"Using tier override for testing: ${estimated_cost:.4f}"
+            )
+        else:
+            logger.info("💰 Riker coordinating with Quark for ROI analysis...")
+            roi_analysis = self._quark_roi_analysis(task_analysis, task_analysis.recommended_crew)
 
         # Step 3: Assemble orchestration result
         result = OrchestrationResult(
@@ -413,6 +436,21 @@ class CrewOrchestrator:
         )
 
         return result
+
+    def _calculate_cost_from_tiers(self, tier_assignments: Dict[str, str]) -> float:
+        """Calculate total cost from tier assignments"""
+        cost_map = {
+            "premium": self.cost_db["cost_calculations"]["cost_per_request"]["premium_mid"]["cost_usd"],
+            "standard": self.cost_db["cost_calculations"]["cost_per_request"]["standard"]["cost_usd"],
+            "budget": self.cost_db["cost_calculations"]["cost_per_request"]["budget"]["cost_usd"],
+            "ultra_budget": self.cost_db["cost_calculations"]["cost_per_request"]["ultra_budget"]["cost_usd"]
+        }
+
+        total_cost = 0.0
+        for crew_id, tier in tier_assignments.items():
+            total_cost += cost_map.get(tier, cost_map["standard"])
+
+        return total_cost
 
     def get_llm_config_for_crew(self, crew_id: str, tier: str) -> Dict:
         """

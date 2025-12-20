@@ -572,6 +572,138 @@ async def get_cost_estimate(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ============================================================================
+# CREW DRILL & OPTIMIZATION ENDPOINTS
+# ============================================================================
+
+class DrillExecuteRequest(BaseModel):
+    run_type: str = "manual"
+    scenario_count: Optional[int] = None
+    complexity_filter: Optional[List[str]] = None
+    dry_run: bool = False
+
+
+@app.post("/crew/drill/execute")
+async def execute_drill(data: DrillExecuteRequest):
+    """
+    Execute crew drill and optimization cycle.
+
+    Runs a complete drill session:
+    1. Generates test scenarios (synthetic + real-world + benchmark)
+    2. Executes scenarios with different LLM tier configurations
+    3. Picard evaluates performance across 4 metrics
+    4. Applies system optimizations automatically
+
+    Request body:
+    - run_type: Type of drill ("manual", "weekly_auto", "on_demand")
+    - scenario_count: Number of scenarios (default: 25)
+    - complexity_filter: Filter scenarios by complexity (optional)
+    - dry_run: If true, don't apply system updates
+
+    Returns:
+    - drill_run_id: Unique ID for this drill run
+    - total_scenarios: Number of scenarios executed
+    - total_cost: Total LLM API cost
+    - evaluation_summary: Picard's assessment summary
+    """
+    try:
+        from ..drills.drill_orchestrator import DrillOrchestrator
+
+        orchestrator = DrillOrchestrator(
+            supabase_client=None,  # TODO: Add Supabase client
+            memory_store=processor.memory_store
+        )
+
+        # Execute drill cycle
+        result = await orchestrator.execute_drill_cycle(
+            run_type=data.run_type,
+            scenario_count=data.scenario_count,
+            complexity_filter=data.complexity_filter,
+            dry_run=data.dry_run
+        )
+
+        return {
+            "status": "success",
+            "drill_run_id": result.drill_run_id,
+            "total_scenarios": result.total_scenarios,
+            "total_cost": result.total_cost,
+            "evaluation_summary": result.evaluation_summary,
+            "drill_status": result.status.value if hasattr(result.status, 'value') else result.status
+        }
+
+    except Exception as e:
+        logger.error(f"Drill execution error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/crew/drill/status/{run_id}")
+async def get_drill_status(run_id: str):
+    """
+    Get status of a drill run.
+
+    Path parameters:
+    - run_id: Drill run ID
+
+    Returns:
+    - Drill run status and progress information
+    """
+    try:
+        from ..drills.drill_orchestrator import DrillOrchestrator
+
+        orchestrator = DrillOrchestrator()
+        status = orchestrator.get_drill_run_status(run_id)
+
+        if not status:
+            raise HTTPException(status_code=404, detail="Drill run not found")
+
+        return {
+            "status": "success",
+            "drill_run": status
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching drill status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/crew/drill/results/{run_id}")
+async def get_drill_results(run_id: str):
+    """
+    Get detailed results of a drill run.
+
+    Path parameters:
+    - run_id: Drill run ID
+
+    Returns:
+    - Complete drill run details including:
+      - Execution summary
+      - Picard's evaluation
+      - Recommendations
+      - Updates applied
+    """
+    try:
+        from ..drills.drill_orchestrator import DrillOrchestrator
+
+        orchestrator = DrillOrchestrator()
+        results = orchestrator.get_drill_run_results(run_id)
+
+        if not results:
+            raise HTTPException(status_code=404, detail="Drill run not found")
+
+        return {
+            "status": "success",
+            "results": results
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching drill results: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -584,6 +716,7 @@ async def health_check():
             "files": "Full CRUD support",
             "crew": "Authorization enabled",
             "claude_integration": "Bidirectional learning enabled",
-            "crew_orchestration": "Cost-optimized activation enabled"
+            "crew_orchestration": "Cost-optimized activation enabled",
+            "crew_drills": "Automated optimization drills enabled"
         }
     }
