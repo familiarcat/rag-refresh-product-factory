@@ -10,7 +10,12 @@
       "Bash(git push:*)",
       "Bash(npm run install-extension:*)",
       "Bash(chmod:*)",
-      "Bash(npm run dev:reload:*)"
+      "Bash(npm run dev:reload:*)",
+      "WebSearch",
+      "WebFetch(domain:openrouter.ai)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(git log:*)"
     ]
   }
 }
