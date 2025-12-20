@@ -531,6 +531,107 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
+        name: "alex_ai_learn_from_claude",
+        description:
+          "Log Claude Code's action to Alex AI's RAG system for crew learning. This enables bidirectional knowledge sharing where the crew learns from Claude's implementations.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            action_type: {
+              type: "string",
+              description: "Type of action",
+              enum: [
+                "code_modification",
+                "decision",
+                "analysis",
+                "bug_fix",
+                "refactoring",
+                "feature_implementation",
+                "debugging",
+                "optimization",
+                "architecture_design",
+                "security_fix"
+              ],
+            },
+            summary: {
+              type: "string",
+              description: "Brief summary of what Claude did",
+            },
+            reasoning: {
+              type: "string",
+              description: "Why Claude chose this approach",
+            },
+            files_affected: {
+              type: "array",
+              description: "List of files modified/created",
+              items: { type: "string" },
+            },
+            outcome: {
+              type: "string",
+              description: "Outcome of the action",
+              enum: ["success", "failure", "partial", "pending"],
+            },
+            user_request: {
+              type: "string",
+              description: "Original user request that triggered this action",
+            },
+            tags: {
+              type: "array",
+              description: "Tags for categorization",
+              items: { type: "string" },
+            },
+          },
+          required: ["action_type", "summary", "reasoning"],
+        },
+      },
+      {
+        name: "alex_ai_query_claude_history",
+        description:
+          "Query Claude Code's past actions from Alex AI's RAG. This allows crew members to learn from Claude's previous solutions and patterns.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Natural language query about Claude's past actions",
+            },
+            action_type: {
+              type: "string",
+              description: "Optional: filter by specific action type",
+            },
+            limit: {
+              type: "number",
+              description: "Maximum number of results",
+            },
+          },
+          required: ["query"],
+        },
+      },
+      {
+        name: "alex_ai_collaborative_solve",
+        description:
+          "Collaborate with Alex AI crew to solve a problem. Claude provides initial analysis, crew members provide their perspectives, creating a unified solution.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            problem: {
+              type: "string",
+              description: "The problem to solve",
+            },
+            claude_analysis: {
+              type: "string",
+              description: "Claude's initial analysis or thoughts",
+            },
+            crew_members: {
+              type: "array",
+              description: "Specific crew members to consult (optional)",
+              items: { type: "string" },
+            },
+          },
+          required: ["problem", "claude_analysis"],
+        },
+      },
+      {
         name: "alex_ai_coordinate",
         description:
           "Have Commander Riker analyze all projects and provide a coordination briefing with collaboration opportunities. Uses OpenRouter for intelligent analysis.",
@@ -648,11 +749,195 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
+// =============================================================================
+// RAG API CLIENT
+// =============================================================================
+
+const RAG_API_BASE_URL = process.env.RAG_API_URL || "http://localhost:8000";
+
+async function callRagAPI(endpoint, method = "GET", body = null) {
+  const url = `${RAG_API_BASE_URL}${endpoint}`;
+  const options = {
+    method,
+    headers: { "Content-Type": "application/json" },
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, options);
+
+  if (!response.ok) {
+    throw new Error(`RAG API error: ${response.status} - ${await response.text()}`);
+  }
+
+  return await response.json();
+}
+
+// =============================================================================
+// TOOL HANDLERS
+// =============================================================================
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   try {
     switch (name) {
+      case "alex_ai_learn_from_claude": {
+        const result = await callRagAPI("/claude/log_action", "POST", {
+          action_type: args.action_type,
+          summary: args.summary,
+          detailed_content: {
+            description: args.summary,
+            files: args.files_affected || [],
+          },
+          reasoning: args.reasoning,
+          outcome: args.outcome || "success",
+          confidence: 1.0,
+          files_affected: args.files_affected || [],
+          tags: args.tags || [],
+          alternatives_considered: [],
+          user_request: args.user_request,
+        });
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `## ✅ Claude Code Action Logged to Alex AI RAG
+
+**Memory ID**: ${result.memory_id}
+**Crew Analog**: ${result.crew_analog}
+**Action**: ${args.summary}
+
+The crew can now reference this solution in future deliberations.`,
+            },
+          ],
+        };
+      }
+
+      case "alex_ai_query_claude_history": {
+        const result = await callRagAPI("/claude/query_history", "POST", {
+          query: args.query,
+          action_type: args.action_type,
+          limit: args.limit || 5,
+        });
+
+        const formattedActions = result.actions
+          .map(
+            (action) => `### ${action.content?.summary || "Unknown Action"}
+
+**Type**: ${action.content?.content_type || "N/A"}
+**Crew Analog**: ${action.content?.crew_analog || "N/A"}
+**Outcome**: ${action.content?.outcome || "N/A"}
+**Reasoning**: ${action.content?.reasoning || "N/A"}
+
+**Timestamp**: ${action.timestamp}`
+          )
+          .join("\n\n---\n\n");
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `## 🔍 Claude Code History Query Results
+
+**Query**: ${args.query}
+**Found**: ${result.count} actions
+
+${formattedActions || "No matching actions found."}`,
+            },
+          ],
+        };
+      }
+
+      case "alex_ai_collaborative_solve": {
+        const crewMembers = args.crew_members || [
+          "captain_picard",
+          "commander_data",
+          "commander_riker",
+        ];
+
+        // First, log Claude's analysis
+        await callRagAPI("/claude/log_action", "POST", {
+          action_type: "analysis",
+          summary: `Collaborative problem solving: ${args.problem}`,
+          detailed_content: { problem: args.problem },
+          reasoning: args.claude_analysis,
+          outcome: "pending",
+          confidence: 0.8,
+          tags: ["collaborative", "analysis"],
+        });
+
+        // Then get crew perspectives
+        const crewResponses = [];
+        for (const crewId of crewMembers) {
+          const crewMap = {
+            captain_picard: "picard",
+            commander_riker: "riker",
+            commander_data: "data",
+            geordi_la_forge: "geordi",
+            counselor_troi: "troi",
+            lieutenant_worf: "worf",
+            chief_obrien: "obrien",
+            quark: "quark",
+          };
+
+          const shortId = crewMap[crewId] || crewId;
+          const crewMember = CREW_MEMBERS[crewId];
+
+          if (!crewMember) continue;
+
+          const response = await generateCrewResponse(
+            crewId,
+            `Claude Code has analyzed this problem and seeks your perspective:
+
+**Problem**: ${args.problem}
+
+**Claude's Analysis**: ${args.claude_analysis}
+
+Please provide your expert perspective based on your specialty in ${crewMember.expertise.join(", ")}.`
+          );
+
+          crewResponses.push({
+            name: crewMember.name,
+            icon: crewMember.icon,
+            response: response.response || response.message,
+          });
+        }
+
+        const formattedSession = `## 🤝 Collaborative Problem Solving
+
+**Problem**: ${args.problem}
+
+### Claude Code's Initial Analysis
+${args.claude_analysis}
+
+---
+
+${crewResponses
+  .map(
+    (r) => `### ${r.icon} ${r.name}
+
+${r.response}`
+  )
+  .join("\n\n---\n\n")}
+
+---
+
+**Synthesis**: This collaborative approach combines Claude's implementation expertise with the crew's specialized perspectives.`;
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: formattedSession,
+            },
+          ],
+        };
+      }
+
       case "alex_ai_chat": {
         const crewMap = {
           picard: "captain_picard",

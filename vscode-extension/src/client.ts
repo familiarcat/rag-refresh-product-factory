@@ -55,6 +55,23 @@ export interface ObservationLoungeResult {
   responses: Array<{ name: string; emoji: string; response: string }>;
 }
 
+export interface ClaudeAction {
+  action_type: string;
+  summary: string;
+  reasoning: string;
+  files_affected?: string[];
+  outcome?: string;
+  user_request?: string;
+  tags?: string[];
+}
+
+export interface ClaudeActionResult {
+  status: string;
+  memory_id: string;
+  crew_analog: string;
+  message: string;
+}
+
 export class AlexAiClient {
   private getConfig() {
     const config = vscode.workspace.getConfiguration("alexAi");
@@ -168,6 +185,64 @@ export class AlexAiClient {
         .slice(0, 5)
         .map((m: any) => m.content?.slice(0, 100) + "...");
     } catch {
+      return [];
+    }
+  }
+
+  async logClaudeAction(action: ClaudeAction): Promise<ClaudeActionResult | null> {
+    const config = this.getConfig();
+    const ragApiUrl = process.env.RAG_API_URL || "http://localhost:8000";
+
+    try {
+      const response = await fetch(`${ragApiUrl}/claude/log_action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action_type: action.action_type,
+          summary: action.summary,
+          detailed_content: {
+            description: action.summary,
+            files: action.files_affected || [],
+          },
+          reasoning: action.reasoning,
+          outcome: action.outcome || "success",
+          confidence: 1.0,
+          files_affected: action.files_affected || [],
+          tags: action.tags || [],
+          alternatives_considered: [],
+          user_request: action.user_request,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`RAG API error: ${response.status}`);
+      }
+
+      return await response.json() as ClaudeActionResult;
+    } catch (error) {
+      console.error("Failed to log Claude action:", error);
+      return null;
+    }
+  }
+
+  async queryClaudeHistory(query: string, limit: number = 5): Promise<any[]> {
+    const ragApiUrl = process.env.RAG_API_URL || "http://localhost:8000";
+
+    try {
+      const response = await fetch(`${ragApiUrl}/claude/query_history`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, limit }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`RAG API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.actions || [];
+    } catch (error) {
+      console.error("Failed to query Claude history:", error);
       return [];
     }
   }

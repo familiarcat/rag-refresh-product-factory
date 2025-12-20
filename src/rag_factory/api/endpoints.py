@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional, List
 from ..processing.enhanced_engine import EnhancedRAGProcessor
 from ..crew.authorization import CrewMember, CrewRank
 from ..crew.system_access import CrewSystemAccess
+from ..integrations.claude_observer import ClaudeCodeObserver, ClaudeCodeAction
 import os
 
 app = FastAPI(
@@ -16,6 +17,7 @@ app = FastAPI(
 
 processor = EnhancedRAGProcessor()
 system_access = CrewSystemAccess()
+claude_observer = ClaudeCodeObserver(memory_store=processor.memory_store)
 
 
 class InputData(BaseModel):
@@ -263,6 +265,211 @@ async def analyze_image_file(file_path: str, crew_member: str = "system"):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# CLAUDE CODE INTEGRATION ENDPOINTS
+
+class ClaudeActionRequest(BaseModel):
+    action_type: str
+    summary: str
+    detailed_content: Dict[str, Any]
+    reasoning: str
+    outcome: str = "success"
+    confidence: float = 1.0
+    files_affected: Optional[List[str]] = None
+    tags: Optional[List[str]] = None
+    alternatives_considered: Optional[List[str]] = None
+    user_request: Optional[str] = None
+
+
+class ClaudeQueryRequest(BaseModel):
+    query: str
+    action_type: Optional[str] = None
+    min_confidence: float = 0.0
+    limit: int = 5
+
+
+@app.post("/claude/log_action")
+async def log_claude_action(data: ClaudeActionRequest):
+    """
+    Log a Claude Code action to Alex AI's RAG system.
+
+    This enables the crew to learn from Claude's decisions and implementations.
+    """
+    try:
+        action = ClaudeCodeAction(
+            action_type=data.action_type,
+            summary=data.summary,
+            detailed_content=data.detailed_content,
+            reasoning=data.reasoning,
+            outcome=data.outcome,
+            confidence=data.confidence,
+            files_affected=data.files_affected,
+            tags=data.tags,
+            alternatives_considered=data.alternatives_considered,
+            user_request=data.user_request
+        )
+
+        memory_id = claude_observer.log_action(action)
+
+        return {
+            "status": "success",
+            "memory_id": memory_id,
+            "crew_analog": claude_observer.crew_mapper.map_action_to_crew(action),
+            "message": "Claude Code action logged to Alex AI RAG"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/claude/log_code_modification")
+async def log_code_modification(
+    files_modified: List[str],
+    summary: str,
+    reasoning: str,
+    diff_summary: Optional[str] = None,
+    outcome: str = "success",
+    user_request: Optional[str] = None,
+    tags: Optional[List[str]] = None
+):
+    """Convenience endpoint for logging code modifications"""
+    try:
+        memory_id = claude_observer.log_code_modification(
+            files_modified=files_modified,
+            summary=summary,
+            reasoning=reasoning,
+            diff_summary=diff_summary,
+            outcome=outcome,
+            user_request=user_request,
+            tags=tags
+        )
+
+        return {
+            "status": "success",
+            "memory_id": memory_id,
+            "message": "Code modification logged"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/claude/log_decision")
+async def log_claude_decision(
+    decision: str,
+    reasoning: str,
+    alternatives: List[str],
+    context: Dict[str, Any],
+    confidence: float = 0.8,
+    user_request: Optional[str] = None,
+    tags: Optional[List[str]] = None
+):
+    """Log an architectural or strategic decision"""
+    try:
+        memory_id = claude_observer.log_decision(
+            decision=decision,
+            reasoning=reasoning,
+            alternatives=alternatives,
+            context=context,
+            confidence=confidence,
+            user_request=user_request,
+            tags=tags
+        )
+
+        return {
+            "status": "success",
+            "memory_id": memory_id,
+            "message": "Decision logged"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/claude/log_bug_fix")
+async def log_bug_fix(
+    bug_description: str,
+    root_cause: str,
+    solution: str,
+    files_affected: List[str],
+    outcome: str = "success",
+    user_request: Optional[str] = None,
+    tags: Optional[List[str]] = None
+):
+    """Log a bug fix"""
+    try:
+        memory_id = claude_observer.log_bug_fix(
+            bug_description=bug_description,
+            root_cause=root_cause,
+            solution=solution,
+            files_affected=files_affected,
+            outcome=outcome,
+            user_request=user_request,
+            tags=tags
+        )
+
+        return {
+            "status": "success",
+            "memory_id": memory_id,
+            "message": "Bug fix logged"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/claude/session_summary")
+async def get_claude_session_summary():
+    """Get a summary of Claude Code's actions in this session"""
+    try:
+        summary = claude_observer.get_session_summary()
+        return {
+            "status": "success",
+            "summary": summary
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/claude/query_history")
+async def query_claude_history(data: ClaudeQueryRequest):
+    """
+    Query Claude Code's past actions using semantic search.
+
+    This endpoint allows the crew to learn from Claude's history.
+    Note: Requires embedding generation for the query.
+    """
+    try:
+        # For now, return recent memories filtered by tags
+        # TODO: Implement proper vector search with query embedding
+        recent = processor.memory_store.list_recent_memories(limit=50)
+
+        # Filter for Claude Code actions
+        claude_actions = [
+            m for m in recent
+            if m.get('content', {}).get('source') == 'claude_code'
+        ]
+
+        # Apply filters
+        if data.action_type:
+            claude_actions = [
+                m for m in claude_actions
+                if m.get('content', {}).get('content_type') == data.action_type
+            ]
+
+        # Apply confidence filter
+        claude_actions = [
+            m for m in claude_actions
+            if m.get('content', {}).get('confidence', 0) >= data.min_confidence
+        ]
+
+        # Limit results
+        claude_actions = claude_actions[:data.limit]
+
+        return {
+            "status": "success",
+            "count": len(claude_actions),
+            "actions": claude_actions
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -273,6 +480,7 @@ async def health_check():
             "memory": "FAISS vector store",
             "processing": "Text and image",
             "files": "Full CRUD support",
-            "crew": "Authorization enabled"
+            "crew": "Authorization enabled",
+            "claude_integration": "Bidirectional learning enabled"
         }
     }
