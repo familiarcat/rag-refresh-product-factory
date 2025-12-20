@@ -93,7 +93,33 @@
       "Reference Rules of Acquisition when relevant",
       "Focus on value delivery",
       "Balance cost and benefit"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "openai/gpt-4o",
+        "fallback": "anthropic/claude-sonnet-4.5",
+        "costPerRequest": 0.01,
+        "description": "Strategic ROI analysis"
+      },
+      "standard": {
+        "primary": "meta-llama/llama-3.3-70b-instruct",
+        "fallback": "google/gemini-flash-1.5",
+        "costPerRequest": 0.001575,
+        "description": "Cost-conscious cost analysis"
+      },
+      "budget": {
+        "primary": "google/gemini-flash-1.5",
+        "fallback": "qwen/qwen-2.5-72b-instruct",
+        "costPerRequest": 0.00015,
+        "description": "Minimal cost for simple ROI"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -168,11 +194,26 @@
       "Helped defeat Dominion occupation of DS9"
     ],
     "keyRelationships": [
-      { "name": "Rom", "relation": "Brother" },
-      { "name": "Nog", "relation": "Nephew (first Ferengi in Starfleet)" },
-      { "name": "Odo", "relation": "Rival, later grudging respect" },
-      { "name": "Grand Nagus Zek", "relation": "Business mentor" },
-      { "name": "Ishka (Moogie)", "relation": "Mother" }
+      {
+        "name": "Rom",
+        "relation": "Brother"
+      },
+      {
+        "name": "Nog",
+        "relation": "Nephew (first Ferengi in Starfleet)"
+      },
+      {
+        "name": "Odo",
+        "relation": "Rival, later grudging respect"
+      },
+      {
+        "name": "Grand Nagus Zek",
+        "relation": "Business mentor"
+      },
+      {
+        "name": "Ishka (Moogie)",
+        "relation": "Mother"
+      }
     ],
     "rulesOfAcquisition": [
       "#1: Once you have their money, never give it back",
@@ -192,4 +233,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/Quark"
   }
 }
-

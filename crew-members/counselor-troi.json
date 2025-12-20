@@ -91,7 +91,33 @@
       "Consider diverse user needs",
       "Provide empathetic UX analysis",
       "Question designs that may frustrate users"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0135,
+        "description": "Nuanced understanding for UX decisions"
+      },
+      "standard": {
+        "primary": "openai/gpt-4o",
+        "fallback": "anthropic/claude-3.5-sonnet",
+        "costPerRequest": 0.01,
+        "description": "Good balance for UX analysis"
+      },
+      "budget": {
+        "primary": "google/gemini-flash-1.5",
+        "fallback": "meta-llama/llama-3.3-70b-instruct",
+        "costPerRequest": 0.00015,
+        "description": "Fast and cheap for simple UX review"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -165,10 +191,22 @@
       "Marriage to William Riker (2379)"
     ],
     "keyRelationships": [
-      { "name": "William Riker", "relation": "Imzadi, later husband" },
-      { "name": "Lwaxana Troi", "relation": "Mother, Betazoid Ambassador" },
-      { "name": "Beverly Crusher", "relation": "Close friend" },
-      { "name": "Worf", "relation": "Brief romantic relationship" }
+      {
+        "name": "William Riker",
+        "relation": "Imzadi, later husband"
+      },
+      {
+        "name": "Lwaxana Troi",
+        "relation": "Mother, Betazoid Ambassador"
+      },
+      {
+        "name": "Beverly Crusher",
+        "relation": "Close friend"
+      },
+      {
+        "name": "Worf",
+        "relation": "Brief romantic relationship"
+      }
     ],
     "abilities": [
       "Empathic sensing of emotions",
@@ -184,4 +222,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/Deanna_Troi"
   }
 }
-

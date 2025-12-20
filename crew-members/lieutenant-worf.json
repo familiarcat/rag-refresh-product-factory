@@ -92,7 +92,33 @@
       "Be direct about security concerns",
       "Don't compromise on safety",
       "Validate and verify thoroughly"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0135,
+        "description": "Thorough analysis for security audits"
+      },
+      "standard": {
+        "primary": "anthropic/claude-3.5-sonnet",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0105,
+        "description": "Strong reasoning for security review"
+      },
+      "budget": {
+        "primary": "meta-llama/llama-3.3-70b-instruct",
+        "fallback": "deepseek/deepseek-chat",
+        "costPerRequest": 0.001575,
+        "description": "Basic security checks"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -168,11 +194,26 @@
       "Marriage to Jadzia Dax (2374)"
     ],
     "keyRelationships": [
-      { "name": "Alexander Rozhenko", "relation": "Son" },
-      { "name": "Jadzia Dax", "relation": "Wife (deceased)" },
-      { "name": "Ezri Dax", "relation": "Complex relationship" },
-      { "name": "K'Ehleyr", "relation": "Former mate, Alexander's mother" },
-      { "name": "Sergey and Helena Rozhenko", "relation": "Adoptive parents" }
+      {
+        "name": "Alexander Rozhenko",
+        "relation": "Son"
+      },
+      {
+        "name": "Jadzia Dax",
+        "relation": "Wife (deceased)"
+      },
+      {
+        "name": "Ezri Dax",
+        "relation": "Complex relationship"
+      },
+      {
+        "name": "K'Ehleyr",
+        "relation": "Former mate, Alexander's mother"
+      },
+      {
+        "name": "Sergey and Helena Rozhenko",
+        "relation": "Adoptive parents"
+      }
     ],
     "klingonHeritage": [
       "House of Mogh",
@@ -184,4 +225,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/Worf"
   }
 }
-

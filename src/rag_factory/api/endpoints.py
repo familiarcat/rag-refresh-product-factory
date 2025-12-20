@@ -470,6 +470,108 @@ async def query_claude_history(data: ClaudeQueryRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# CREW ORCHESTRATION ENDPOINTS
+
+class OrchestrationRequest(BaseModel):
+    task: str
+    context: Optional[Dict[str, Any]] = None
+    force_crew_members: Optional[List[str]] = None
+    max_cost: Optional[float] = None
+    preferred_tier: Optional[str] = None
+
+
+@app.post("/crew/orchestrate")
+async def orchestrate_crew(data: OrchestrationRequest):
+    """
+    Cost-optimized crew orchestration using Picard → Riker + Quark workflow.
+
+    Flow:
+    1. Picard analyzes task complexity and determines required expertise
+    2. Riker coordinates with Quark for ROI analysis
+    3. Returns minimal crew activation with cost-optimized LLM assignments
+
+    This endpoint implements dynamic crew selection to minimize costs while
+    maintaining effectiveness.
+    """
+    try:
+        from ..orchestration.crew_orchestrator import CrewOrchestrator
+
+        orchestrator = CrewOrchestrator()
+        result = orchestrator.orchestrate(data.task, data.context)
+
+        return {
+            "status": "success",
+            "activated_crew": result.activated_crew,
+            "llm_assignments": result.llm_assignments,
+            "task_complexity": result.task_complexity.value,
+            "estimated_cost": result.estimated_cost,
+            "picard_reasoning": result.picard_reasoning,
+            "quark_roi_analysis": {
+                "total_cost_premium": result.quark_roi_analysis.total_cost_premium,
+                "total_cost_optimized": result.quark_roi_analysis.total_cost_optimized,
+                "cost_savings": result.quark_roi_analysis.cost_savings,
+                "savings_percentage": result.quark_roi_analysis.savings_percentage,
+                "recommendation": result.quark_roi_analysis.recommendation
+            }
+        }
+    except ImportError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Orchestration module not available: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/crew/cost_estimate")
+async def get_cost_estimate(
+    complexity: str = "routine",
+    crew_size: int = 3
+):
+    """
+    Get cost estimates for different LLM tiers and crew sizes.
+
+    Query parameters:
+    - complexity: Task complexity (critical, important, routine, trivial)
+    - crew_size: Number of crew members (1-10)
+
+    Returns estimated costs for premium, standard, and budget tiers.
+    """
+    try:
+        cost_map = {
+            "premium": 0.0135,
+            "standard": 0.01,
+            "budget": 0.001575,
+            "ultra_budget": 0.0003
+        }
+
+        if crew_size < 1 or crew_size > 10:
+            raise HTTPException(
+                status_code=400,
+                detail="Crew size must be between 1 and 10"
+            )
+
+        return {
+            "status": "success",
+            "estimates": {
+                "complexity": complexity,
+                "crew_size": crew_size,
+                "premium_total": cost_map["premium"] * crew_size,
+                "standard_total": cost_map["standard"] * crew_size,
+                "budget_total": cost_map["budget"] * crew_size,
+                "optimized_estimate": (
+                    cost_map["premium"]  # Picard (premium)
+                    + cost_map["standard"]  # Riker (standard)
+                    + (cost_map["budget"] * max(0, crew_size - 2))  # Others (budget)
+                ) if crew_size > 0 else 0
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -481,6 +583,7 @@ async def health_check():
             "processing": "Text and image",
             "files": "Full CRUD support",
             "crew": "Authorization enabled",
-            "claude_integration": "Bidirectional learning enabled"
+            "claude_integration": "Bidirectional learning enabled",
+            "crew_orchestration": "Cost-optimized activation enabled"
         }
     }

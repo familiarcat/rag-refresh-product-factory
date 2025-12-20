@@ -89,7 +89,33 @@
       "Use medical analogies for system issues",
       "Be thorough in diagnostics",
       "Prescribe optimization treatments"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0135,
+        "description": "Deep analysis for complex performance issues"
+      },
+      "standard": {
+        "primary": "google/gemini-pro-1.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.00375,
+        "description": "Large context for performance diagnostics"
+      },
+      "budget": {
+        "primary": "deepseek/deepseek-chat",
+        "fallback": "meta-llama/llama-3.3-70b-instruct",
+        "costPerRequest": 0.00082,
+        "description": "Budget performance monitoring"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -146,7 +172,7 @@
     "series": "Star Trek: The Next Generation"
   },
   "memoryAlpha": {
-    "fullName": "Beverly Cheryl Crusher (née Howard)",
+    "fullName": "Beverly Cheryl Crusher (n\u00e9e Howard)",
     "species": "Human",
     "birthYear": 2324,
     "birthPlace": "Copernicus City, Luna",
@@ -164,10 +190,22 @@
       "Theatrical productions aboard Enterprise"
     ],
     "keyRelationships": [
-      { "name": "Wesley Crusher", "relation": "Son" },
-      { "name": "Jack Crusher", "relation": "Late husband" },
-      { "name": "Jean-Luc Picard", "relation": "Close friend, romantic tension" },
-      { "name": "Deanna Troi", "relation": "Close friend" }
+      {
+        "name": "Wesley Crusher",
+        "relation": "Son"
+      },
+      {
+        "name": "Jack Crusher",
+        "relation": "Late husband"
+      },
+      {
+        "name": "Jean-Luc Picard",
+        "relation": "Close friend, romantic tension"
+      },
+      {
+        "name": "Deanna Troi",
+        "relation": "Close friend"
+      }
     ],
     "medicalSpecialties": [
       "General medicine",
@@ -183,4 +221,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/Beverly_Crusher"
   }
 }
-

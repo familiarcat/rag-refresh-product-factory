@@ -1,0 +1,299 @@
+{
+  "lastUpdated": "2025-12-20",
+  "provider": "OpenRouter",
+  "currency": "USD",
+  "unit": "per million tokens",
+  "note": "Pricing sourced from OpenRouter.ai as of December 2025",
+  "tiers": {
+    "premium": {
+      "description": "Highest capability models for strategic decisions",
+      "use_cases": ["strategic_planning", "complex_analysis", "high_stakes_decisions"],
+      "models": [
+        {
+          "id": "anthropic/claude-opus-4.5",
+          "name": "Claude Opus 4.5",
+          "input_cost": 15.0,
+          "output_cost": 75.0,
+          "context_window": 200000,
+          "capabilities": ["reasoning", "coding", "analysis"],
+          "best_for": "Complex strategic decisions"
+        },
+        {
+          "id": "openai/o1-preview",
+          "name": "GPT-o1 Preview",
+          "input_cost": 15.0,
+          "output_cost": 60.0,
+          "context_window": 128000,
+          "capabilities": ["reasoning", "math", "complex_analysis"],
+          "best_for": "Advanced reasoning and analysis"
+        },
+        {
+          "id": "anthropic/claude-sonnet-4.5",
+          "name": "Claude Sonnet 4.5",
+          "input_cost": 3.0,
+          "output_cost": 15.0,
+          "context_window": 200000,
+          "capabilities": ["balanced", "coding", "analysis"],
+          "best_for": "Balanced performance and cost"
+        }
+      ]
+    },
+    "standard": {
+      "description": "Good performance for tactical execution",
+      "use_cases": ["tactical_execution", "implementation", "coordination"],
+      "models": [
+        {
+          "id": "openai/gpt-4o",
+          "name": "GPT-4o",
+          "input_cost": 2.5,
+          "output_cost": 10.0,
+          "context_window": 128000,
+          "capabilities": ["multimodal", "fast", "balanced"],
+          "best_for": "General purpose tasks"
+        },
+        {
+          "id": "anthropic/claude-3.5-sonnet",
+          "name": "Claude 3.5 Sonnet",
+          "input_cost": 3.0,
+          "output_cost": 15.0,
+          "context_window": 200000,
+          "capabilities": ["coding", "analysis", "writing"],
+          "best_for": "Coding and technical tasks"
+        },
+        {
+          "id": "google/gemini-pro-1.5",
+          "name": "Gemini Pro 1.5",
+          "input_cost": 1.25,
+          "output_cost": 5.0,
+          "context_window": 2000000,
+          "capabilities": ["large_context", "multimodal"],
+          "best_for": "Large context analysis"
+        }
+      ]
+    },
+    "budget": {
+      "description": "Cost-efficient models for routine tasks",
+      "use_cases": ["simple_analysis", "routine_tasks", "data_processing"],
+      "models": [
+        {
+          "id": "meta-llama/llama-3.3-70b-instruct",
+          "name": "Llama 3.3 70B",
+          "input_cost": 0.59,
+          "output_cost": 0.79,
+          "context_window": 128000,
+          "capabilities": ["open_source", "fast", "efficient"],
+          "best_for": "Cost-effective general tasks"
+        },
+        {
+          "id": "google/gemini-flash-1.5",
+          "name": "Gemini Flash 1.5",
+          "input_cost": 0.075,
+          "output_cost": 0.3,
+          "context_window": 1000000,
+          "capabilities": ["fast", "large_context", "cheap"],
+          "best_for": "High-volume simple tasks"
+        },
+        {
+          "id": "deepseek/deepseek-chat",
+          "name": "DeepSeek Chat",
+          "input_cost": 0.27,
+          "output_cost": 1.1,
+          "context_window": 64000,
+          "capabilities": ["reasoning", "coding", "budget"],
+          "best_for": "Budget-conscious coding"
+        },
+        {
+          "id": "qwen/qwen-2.5-72b-instruct",
+          "name": "Qwen 2.5 72B",
+          "input_cost": 0.35,
+          "output_cost": 0.35,
+          "context_window": 32768,
+          "capabilities": ["multilingual", "fast", "cheap"],
+          "best_for": "Simple multilingual tasks"
+        }
+      ]
+    },
+    "ultra_budget": {
+      "description": "Minimal cost for very simple tasks",
+      "use_cases": ["simple_queries", "basic_formatting", "data_extraction"],
+      "models": [
+        {
+          "id": "mistralai/mistral-7b-instruct",
+          "name": "Mistral 7B",
+          "input_cost": 0.06,
+          "output_cost": 0.06,
+          "context_window": 32768,
+          "capabilities": ["fast", "efficient", "minimal"],
+          "best_for": "Simple classification tasks"
+        },
+        {
+          "id": "meta-llama/llama-3.2-3b-instruct",
+          "name": "Llama 3.2 3B",
+          "input_cost": 0.04,
+          "output_cost": 0.04,
+          "context_window": 131072,
+          "capabilities": ["tiny", "fast", "ultra_cheap"],
+          "best_for": "Minimal processing tasks"
+        }
+      ]
+    }
+  },
+  "crew_recommendations": {
+    "captain_picard": {
+      "primary_tier": "premium",
+      "rationale": "Strategic decisions require highest capability",
+      "recommended_model": "anthropic/claude-sonnet-4.5",
+      "budget_alternative": "openai/gpt-4o"
+    },
+    "commander_riker": {
+      "primary_tier": "standard",
+      "rationale": "Tactical execution needs good balance",
+      "recommended_model": "openai/gpt-4o",
+      "budget_alternative": "meta-llama/llama-3.3-70b-instruct"
+    },
+    "commander_data": {
+      "primary_tier": "standard",
+      "rationale": "Analysis benefits from reasoning capability",
+      "recommended_model": "google/gemini-pro-1.5",
+      "budget_alternative": "deepseek/deepseek-chat"
+    },
+    "geordi_la_forge": {
+      "primary_tier": "standard",
+      "rationale": "Infrastructure work needs solid capability",
+      "recommended_model": "anthropic/claude-3.5-sonnet",
+      "budget_alternative": "meta-llama/llama-3.3-70b-instruct"
+    },
+    "counselor_troi": {
+      "primary_tier": "standard",
+      "rationale": "UX analysis needs understanding",
+      "recommended_model": "openai/gpt-4o",
+      "budget_alternative": "google/gemini-flash-1.5"
+    },
+    "lieutenant_worf": {
+      "primary_tier": "standard",
+      "rationale": "Security needs thorough analysis",
+      "recommended_model": "anthropic/claude-3.5-sonnet",
+      "budget_alternative": "meta-llama/llama-3.3-70b-instruct"
+    },
+    "chief_obrien": {
+      "primary_tier": "budget",
+      "rationale": "Implementation can use cost-efficient models",
+      "recommended_model": "meta-llama/llama-3.3-70b-instruct",
+      "budget_alternative": "google/gemini-flash-1.5"
+    },
+    "quark": {
+      "primary_tier": "budget",
+      "rationale": "Cost analysis should be cost-efficient",
+      "recommended_model": "meta-llama/llama-3.3-70b-instruct",
+      "budget_alternative": "google/gemini-flash-1.5"
+    },
+    "dr_crusher": {
+      "primary_tier": "standard",
+      "rationale": "Performance diagnosis needs capability",
+      "recommended_model": "google/gemini-pro-1.5",
+      "budget_alternative": "deepseek/deepseek-chat"
+    },
+    "lieutenant_uhura": {
+      "primary_tier": "budget",
+      "rationale": "API documentation can use efficient models",
+      "recommended_model": "meta-llama/llama-3.3-70b-instruct",
+      "budget_alternative": "google/gemini-flash-1.5"
+    }
+  },
+  "cost_calculations": {
+    "typical_request": {
+      "input_tokens": 2000,
+      "output_tokens": 500,
+      "note": "Average tokens for crew consultation"
+    },
+    "cost_per_request": {
+      "premium_high": {
+        "model": "claude-opus-4.5",
+        "calculation": "(2000 * 15 + 500 * 75) / 1000000",
+        "cost_usd": 0.0675,
+        "note": "6.75 cents per request"
+      },
+      "premium_mid": {
+        "model": "claude-sonnet-4.5",
+        "calculation": "(2000 * 3 + 500 * 15) / 1000000",
+        "cost_usd": 0.0135,
+        "note": "1.35 cents per request"
+      },
+      "standard": {
+        "model": "gpt-4o",
+        "calculation": "(2000 * 2.5 + 500 * 10) / 1000000",
+        "cost_usd": 0.01,
+        "note": "1 cent per request"
+      },
+      "budget": {
+        "model": "llama-3.3-70b",
+        "calculation": "(2000 * 0.59 + 500 * 0.79) / 1000000",
+        "cost_usd": 0.001575,
+        "note": "0.16 cents per request"
+      },
+      "ultra_budget": {
+        "model": "gemini-flash-1.5",
+        "calculation": "(2000 * 0.075 + 500 * 0.3) / 1000000",
+        "cost_usd": 0.00030,
+        "note": "0.03 cents per request"
+      }
+    },
+    "crew_activation_scenarios": {
+      "full_crew_premium": {
+        "crew_count": 10,
+        "cost_per_member": 0.0135,
+        "total_cost": 0.135,
+        "note": "All 10 crew with Sonnet 4.5"
+      },
+      "full_crew_standard": {
+        "crew_count": 10,
+        "cost_per_member": 0.01,
+        "total_cost": 0.10,
+        "note": "All 10 crew with GPT-4o"
+      },
+      "full_crew_budget": {
+        "crew_count": 10,
+        "cost_per_member": 0.001575,
+        "total_cost": 0.01575,
+        "note": "All 10 crew with Llama 3.3 70B"
+      },
+      "optimized_crew": {
+        "picard": 0.0135,
+        "riker": 0.01,
+        "selected_3_crew": 0.00472,
+        "total_cost": 0.02822,
+        "note": "Picard (premium) + Riker (standard) + 3 budget crew",
+        "savings_vs_full_premium": "79%",
+        "savings_vs_full_standard": "72%"
+      }
+    }
+  },
+  "roi_guidelines": {
+    "task_complexity_tiers": {
+      "critical": {
+        "description": "High-stakes strategic decisions",
+        "recommended_tier": "premium",
+        "max_crew": "5-7",
+        "examples": ["Architecture decisions", "Major refactoring", "Security incidents"]
+      },
+      "important": {
+        "description": "Significant features or fixes",
+        "recommended_tier": "standard",
+        "max_crew": "3-5",
+        "examples": ["New features", "Bug investigations", "Performance optimization"]
+      },
+      "routine": {
+        "description": "Standard implementation tasks",
+        "recommended_tier": "budget",
+        "max_crew": "2-3",
+        "examples": ["Code reviews", "Documentation", "Simple fixes"]
+      },
+      "trivial": {
+        "description": "Simple queries or formatting",
+        "recommended_tier": "ultra_budget",
+        "max_crew": "1-2",
+        "examples": ["Code formatting", "Simple questions", "Data extraction"]
+      }
+    }
+  }
+}

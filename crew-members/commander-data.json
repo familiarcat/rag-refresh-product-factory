@@ -92,7 +92,33 @@
       "Optimize algorithms and workflows",
       "Provide computational solutions",
       "Reference data and metrics"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "openai/o1-preview",
+        "fallback": "anthropic/claude-sonnet-4.5",
+        "costPerRequest": 0.0375,
+        "description": "Advanced reasoning for complex analysis"
+      },
+      "standard": {
+        "primary": "google/gemini-pro-1.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.00375,
+        "description": "Large context for data analysis"
+      },
+      "budget": {
+        "primary": "deepseek/deepseek-chat",
+        "fallback": "meta-llama/llama-3.3-70b-instruct",
+        "costPerRequest": 0.00082,
+        "description": "Budget-friendly for simple analytics"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -167,10 +193,22 @@
       "Sacrificed life to save Enterprise-E (2379)"
     ],
     "keyRelationships": [
-      { "name": "Geordi La Forge", "relation": "Best friend" },
-      { "name": "Jean-Luc Picard", "relation": "Captain, mentor" },
-      { "name": "Lore", "relation": "Brother android (antagonist)" },
-      { "name": "Spot", "relation": "Pet cat" }
+      {
+        "name": "Geordi La Forge",
+        "relation": "Best friend"
+      },
+      {
+        "name": "Jean-Luc Picard",
+        "relation": "Captain, mentor"
+      },
+      {
+        "name": "Lore",
+        "relation": "Brother android (antagonist)"
+      },
+      {
+        "name": "Spot",
+        "relation": "Pet cat"
+      }
     ],
     "capabilities": [
       "Positronic brain with 100 petabytes storage",
@@ -182,4 +220,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/Data"
   }
 }
-

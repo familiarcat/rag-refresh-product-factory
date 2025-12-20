@@ -89,7 +89,33 @@
       "Be decisive and action-oriented",
       "Focus on 'how' rather than just 'what'",
       "Consider practical constraints in execution"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0135,
+        "description": "High capability for complex tactical coordination"
+      },
+      "standard": {
+        "primary": "openai/gpt-4o",
+        "fallback": "anthropic/claude-3.5-sonnet",
+        "costPerRequest": 0.01,
+        "description": "Balanced performance for tactical execution"
+      },
+      "budget": {
+        "primary": "meta-llama/llama-3.3-70b-instruct",
+        "fallback": "google/gemini-flash-1.5",
+        "costPerRequest": 0.001575,
+        "description": "Cost-efficient for routine coordination"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -166,10 +192,22 @@
       "Commanded Enterprise-E during Battle of Sector 001"
     ],
     "keyRelationships": [
-      { "name": "Jean-Luc Picard", "relation": "Captain, mentor" },
-      { "name": "Deanna Troi", "relation": "Imzadi, wife" },
-      { "name": "Data", "relation": "Trusted colleague" },
-      { "name": "Thomas Riker", "relation": "Transporter duplicate" }
+      {
+        "name": "Jean-Luc Picard",
+        "relation": "Captain, mentor"
+      },
+      {
+        "name": "Deanna Troi",
+        "relation": "Imzadi, wife"
+      },
+      {
+        "name": "Data",
+        "relation": "Trusted colleague"
+      },
+      {
+        "name": "Thomas Riker",
+        "relation": "Transporter duplicate"
+      }
     ],
     "personalTraits": [
       "Plays jazz trombone",
@@ -185,4 +223,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/William_Riker"
   }
 }
-

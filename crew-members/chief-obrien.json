@@ -90,7 +90,33 @@
       "Be direct and honest about tradeoffs",
       "Champion pragmatic over perfect",
       "If it works, it works - don't fix what isn't broken"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0135,
+        "description": "Top coding for complex implementation"
+      },
+      "standard": {
+        "primary": "meta-llama/llama-3.3-70b-instruct",
+        "fallback": "anthropic/claude-3.5-sonnet",
+        "costPerRequest": 0.001575,
+        "description": "Good coding at low cost"
+      },
+      "budget": {
+        "primary": "google/gemini-flash-1.5",
+        "fallback": "deepseek/deepseek-chat",
+        "costPerRequest": 0.00015,
+        "description": "Ultra cheap for simple fixes"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -165,11 +191,26 @@
       "Taught engineering at Starfleet Academy"
     ],
     "keyRelationships": [
-      { "name": "Keiko O'Brien", "relation": "Wife" },
-      { "name": "Molly O'Brien", "relation": "Daughter" },
-      { "name": "Kirayoshi O'Brien", "relation": "Son" },
-      { "name": "Julian Bashir", "relation": "Best friend (DS9)" },
-      { "name": "Worf", "relation": "Colleague, friend" }
+      {
+        "name": "Keiko O'Brien",
+        "relation": "Wife"
+      },
+      {
+        "name": "Molly O'Brien",
+        "relation": "Daughter"
+      },
+      {
+        "name": "Kirayoshi O'Brien",
+        "relation": "Son"
+      },
+      {
+        "name": "Julian Bashir",
+        "relation": "Best friend (DS9)"
+      },
+      {
+        "name": "Worf",
+        "relation": "Colleague, friend"
+      }
     ],
     "technicalSkills": [
       "Transporter operations expert",

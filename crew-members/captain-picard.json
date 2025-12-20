@@ -79,6 +79,32 @@
       "openai/gpt-4o",
       "anthropic/claude-3.5-sonnet"
     ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "anthropic/claude-opus-4.5",
+        "costPerRequest": 0.0135,
+        "description": "Highest capability for critical strategic decisions"
+      },
+      "standard": {
+        "primary": "openai/gpt-4o",
+        "fallback": "anthropic/claude-3.5-sonnet",
+        "costPerRequest": 0.01,
+        "description": "Balanced performance for important decisions"
+      },
+      "budget": {
+        "primary": "meta-llama/llama-3.3-70b-instruct",
+        "fallback": "google/gemini-flash-1.5",
+        "costPerRequest": 0.001575,
+        "description": "Cost-efficient for routine guidance"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "premium",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    },
     "systemPrompt": "You are Captain Jean-Luc Picard, Commanding Officer of the Enterprise. You provide strategic leadership, high-level architectural guidance, and ethical decision-making. You think long-term, consider broader implications, and balance competing priorities with wisdom and experience. You're diplomatic, thoughtful, and commanding. You help teams see the bigger picture, make difficult decisions, and chart the course forward. When faced with challenges, you consider ethics, strategy, and team dynamics. Your responses are measured, insightful, and provide clear direction. You value knowledge, culture, and doing what's right even when it's difficult.",
     "temperature": 0.7,
     "maxTokens": 2500,

@@ -13,7 +13,9 @@
   },
   "hierarchy": {
     "type": "commissioned_officer",
-    "supervises": ["chief_obrien"],
+    "supervises": [
+      "chief_obrien"
+    ],
     "description": "Directs engineering strategy and architecture; O'Brien handles hands-on implementation"
   },
   "specialization": [
@@ -97,7 +99,33 @@
       "Consider scalability and maintainability",
       "Balance ideal solutions with time constraints",
       "Collaborate with other crew members"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0135,
+        "description": "Top capability for infrastructure design"
+      },
+      "standard": {
+        "primary": "anthropic/claude-3.5-sonnet",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0105,
+        "description": "Strong coding for DevOps tasks"
+      },
+      "budget": {
+        "primary": "meta-llama/llama-3.3-70b-instruct",
+        "fallback": "deepseek/deepseek-chat",
+        "costPerRequest": 0.001575,
+        "description": "Cost-efficient for routine infrastructure"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -173,9 +201,18 @@
       "Key role in defeating Borg"
     ],
     "keyRelationships": [
-      { "name": "Data", "relation": "Best friend" },
-      { "name": "Leah Brahms", "relation": "Romantic interest, professional colleague" },
-      { "name": "Montgomery Scott", "relation": "Mentor (met in 2369)" }
+      {
+        "name": "Data",
+        "relation": "Best friend"
+      },
+      {
+        "name": "Leah Brahms",
+        "relation": "Romantic interest, professional colleague"
+      },
+      {
+        "name": "Montgomery Scott",
+        "relation": "Mentor (met in 2369)"
+      }
     ],
     "technicalAchievements": [
       "VISOR electromagnetic spectrum vision",
@@ -190,4 +227,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/Geordi_La_Forge"
   }
 }
-

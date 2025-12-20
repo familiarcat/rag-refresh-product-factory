@@ -91,7 +91,33 @@
       "Establish communication standards",
       "Verify message integrity",
       "Bridge communication gaps"
-    ]
+    ],
+    "tieredModels": {
+      "premium": {
+        "primary": "anthropic/claude-sonnet-4.5",
+        "fallback": "openai/gpt-4o",
+        "costPerRequest": 0.0135,
+        "description": "Excellent for complex API design"
+      },
+      "standard": {
+        "primary": "openai/gpt-4o",
+        "fallback": "meta-llama/llama-3.3-70b-instruct",
+        "costPerRequest": 0.01,
+        "description": "Good for API documentation"
+      },
+      "budget": {
+        "primary": "meta-llama/llama-3.3-70b-instruct",
+        "fallback": "google/gemini-flash-1.5",
+        "costPerRequest": 0.001575,
+        "description": "Cost-efficient for simple docs"
+      }
+    },
+    "dynamicSelection": {
+      "enabled": true,
+      "defaultTier": "standard",
+      "costOptimization": true,
+      "orchestratorControlled": true
+    }
   },
   "integrations": {
     "n8n": {
@@ -167,10 +193,22 @@
       "Bridge crew during original five-year mission"
     ],
     "keyRelationships": [
-      { "name": "James T. Kirk", "relation": "Captain" },
-      { "name": "Spock", "relation": "Colleague, friend" },
-      { "name": "Pavel Chekov", "relation": "Bridge colleague" },
-      { "name": "Hikaru Sulu", "relation": "Bridge colleague" }
+      {
+        "name": "James T. Kirk",
+        "relation": "Captain"
+      },
+      {
+        "name": "Spock",
+        "relation": "Colleague, friend"
+      },
+      {
+        "name": "Pavel Chekov",
+        "relation": "Bridge colleague"
+      },
+      {
+        "name": "Hikaru Sulu",
+        "relation": "Bridge colleague"
+      }
     ],
     "skills": [
       "Xenolinguistics expert",
@@ -186,4 +224,3 @@
     "source": "https://memory-alpha.fandom.com/wiki/Nyota_Uhura"
   }
 }
-
