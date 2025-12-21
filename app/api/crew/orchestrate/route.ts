@@ -7,6 +7,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { orchestrateCrewActivation } from '@/lib/orchestration';
+import { LLMTier } from '@/lib/orchestration/types';
 
 interface OrchestrationRequest {
   task: string;
@@ -49,49 +51,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call Python orchestrator service
-    const pythonServiceUrl = process.env.RAG_API_URL || 'http://localhost:8000';
-    const response = await fetch(`${pythonServiceUrl}/crew/orchestrate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        task: body.task,
-        context: body.context,
-        force_crew_members: body.forceCrewMembers,
-        max_cost: body.maxCost,
-        preferred_tier: body.preferredTier
-      })
-    });
+    // Call TypeScript orchestrator
+    // Note: tierOverride supports drill testing with forceCrewMembers
+    const tierOverride = body.forceCrewMembers
+      ? body.forceCrewMembers.reduce((acc, crewId) => {
+          const tier = body.preferredTier || 'standard';
+          acc[crewId] = tier as LLMTier;
+          return acc;
+        }, {} as Record<string, LLMTier>)
+      : undefined;
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorData.detail || 'Orchestration service error'
-        } as OrchestrationResponse,
-        { status: response.status }
-      );
-    }
-
-    const orchestrationData = await response.json();
+    const orchestration = await orchestrateCrewActivation(
+      body.task,
+      body.context,
+      tierOverride
+    );
 
     return NextResponse.json({
       success: true,
       orchestration: {
-        activatedCrew: orchestrationData.activated_crew,
-        llmAssignments: orchestrationData.llm_assignments,
-        taskComplexity: orchestrationData.task_complexity,
-        estimatedCost: orchestrationData.estimated_cost,
-        picardReasoning: orchestrationData.picard_reasoning,
+        activatedCrew: orchestration.activatedCrew,
+        llmAssignments: orchestration.llmAssignments,
+        taskComplexity: orchestration.taskComplexity,
+        estimatedCost: orchestration.estimatedCost,
+        picardReasoning: orchestration.picardReasoning,
         quarkROI: {
-          totalCostPremium: orchestrationData.quark_roi_analysis.total_cost_premium,
-          totalCostOptimized: orchestrationData.quark_roi_analysis.total_cost_optimized,
-          costSavings: orchestrationData.quark_roi_analysis.cost_savings,
-          savingsPercentage: orchestrationData.quark_roi_analysis.savings_percentage,
-          recommendation: orchestrationData.quark_roi_analysis.recommendation
+          totalCostPremium: orchestration.quarkROIAnalysis.totalCostPremium,
+          totalCostOptimized: orchestration.quarkROIAnalysis.totalCostOptimized,
+          costSavings: orchestration.quarkROIAnalysis.costSavings,
+          savingsPercentage: orchestration.quarkROIAnalysis.savingsPercentage,
+          recommendation: orchestration.quarkROIAnalysis.recommendation
         }
       }
     } as OrchestrationResponse);
