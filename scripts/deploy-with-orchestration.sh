@@ -10,7 +10,9 @@
 #   ./scripts/deploy-with-orchestration.sh
 #   Chat: "@alex deploy orchestration to AWS"
 
-set -e
+set -euo pipefail
+
+source scripts/secrets/load_env.sh
 
 # Colors for output
 RED='\033[0;31m'
@@ -32,22 +34,52 @@ echo ""
 # Start timing
 START_TIME=$(date +%s)
 
-# Load environment variables from .env.local
-if [ -f .env.local ]; then
-    echo -e "${BLUE}📋 Loading environment variables from .env.local...${NC}"
-    export $(grep -v '^#' .env.local | xargs)
-    echo -e "${GREEN}✓ Environment loaded${NC}"
+# --- Env loading (secure, consistent with other /scripts) ---
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+say(){ echo -e "${CYAN}▶${NC} $*"; }
+ok(){ echo -e "${GREEN}✅${NC} $*"; }
+warn(){ echo -e "${YELLOW}⚠️${NC} $*"; }
+die(){ echo -e "${RED}❌${NC} $*"; exit 1; }
+
+ENV_LOCAL="$PROJECT_ROOT/.env.local"
+SECRETS_ENV_LOCAL="$PROJECT_ROOT/.secrets/.env.local"
+SECRETS_SYNC="$SCRIPT_DIR/secrets/sync_from_zshrc.sh"
+
+load_env_file() {
+  local f="$1"
+  [[ -f "$f" ]] || return 1
+  # shellcheck disable=SC1090
+  set -a
+  source "$f"
+  set +a
+  return 0
+}
+
+say "📋 Loading environment variables..."
+if [[ -f "$ENV_LOCAL" ]]; then
+  load_env_file "$ENV_LOCAL" || die "Failed to source $ENV_LOCAL"
+  ok "Loaded $ENV_LOCAL"
+elif [[ -f "$SECRETS_ENV_LOCAL" ]]; then
+  warn ".env.local not found; using generated secrets env at .secrets/.env.local"
+  cp "$SECRETS_ENV_LOCAL" "$ENV_LOCAL"
+  load_env_file "$ENV_LOCAL" || die "Failed to source $ENV_LOCAL"
+  ok "Copied + loaded $ENV_LOCAL"
+elif [[ -x "$SECRETS_SYNC" ]]; then
+  warn "No .env.local found; generating from ~/.zshenv + ~/.zshrc via allowlist..."
+  bash "$SECRETS_SYNC"
+  [[ -f "$SECRETS_ENV_LOCAL" ]] || die "Secrets sync did not produce $SECRETS_ENV_LOCAL"
+  cp "$SECRETS_ENV_LOCAL" "$ENV_LOCAL"
+  load_env_file "$ENV_LOCAL" || die "Failed to source $ENV_LOCAL"
+  ok "Generated + copied + loaded $ENV_LOCAL"
 else
-    echo -e "${RED}❌ .env.local not found. Please create it with required variables.${NC}"
-    echo ""
-    echo "Required variables:"
-    echo "  - OPENROUTER_API_KEY"
-    echo "  - SUPABASE_URL"
-    echo "  - SUPABASE_SERVICE_ROLE_KEY"
-    exit 1
+  die ".env.local not found and secrets sync script missing. Run: npm run secrets:sync"
 fi
 
 # Validate required environment variables
+
 echo ""
 echo -e "${BLUE}🔍 Validating environment variables...${NC}"
 

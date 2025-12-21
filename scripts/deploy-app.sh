@@ -3,13 +3,63 @@
 # Usage: ./scripts/deploy-app.sh
 # Records deployment metrics for cost tracking
 
-set -e
+set -euo pipefail
+
+source scripts/secrets/load_env.sh
 
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
+
+# --- Resolve paths so the script can be run from anywhere ---
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+# --- Secure env loading (matches deploy-with-orchestration.sh) ---
+ENV_LOCAL="$PROJECT_ROOT/.env.local"
+SECRETS_ENV_LOCAL="$PROJECT_ROOT/.secrets/.env.local"
+SECRETS_SYNC_SCRIPT="$PROJECT_ROOT/scripts/secrets/sync_from_zshrc.sh"
+
+say()  { printf "%b\n" "$*"; }
+ok()   { say "${GREEN}✓${NC} $*"; }
+warn() { say "${YELLOW}⚠️${NC}  $*"; }
+die()  { say "${RED}❌${NC} $*"; exit 1; }
+
+load_env_file() {
+  local f="$1"
+  # shellcheck disable=SC1090
+  set -a
+  source "$f"
+  set +a
+  return 0
+}
+
+say "📋 Loading environment variables..."
+if [[ -f "$ENV_LOCAL" ]]; then
+  load_env_file "$ENV_LOCAL" || die "Failed to source $ENV_LOCAL"
+  ok "Loaded $ENV_LOCAL"
+elif [[ -f "$SECRETS_ENV_LOCAL" ]]; then
+  warn ".env.local not found; using generated secrets env at .secrets/.env.local"
+  cp "$SECRETS_ENV_LOCAL" "$ENV_LOCAL"
+  load_env_file "$ENV_LOCAL" || die "Failed to source $ENV_LOCAL"
+  ok "Copied + loaded $ENV_LOCAL"
+elif [[ -x "$SECRETS_SYNC_SCRIPT" ]]; then
+  warn "No .env.local found; generating from ~/.zshrc allowlist via secrets sync..."
+  "$SECRETS_SYNC_SCRIPT" || die "Secrets sync failed"
+  if [[ -f "$SECRETS_ENV_LOCAL" ]]; then
+    cp "$SECRETS_ENV_LOCAL" "$ENV_LOCAL"
+    load_env_file "$ENV_LOCAL" || die "Failed to source $ENV_LOCAL"
+    ok "Generated + loaded $ENV_LOCAL"
+  else
+    die "Secrets sync ran but $SECRETS_ENV_LOCAL was not created"
+  fi
+else
+  warn "No env file found and secrets sync script missing; continuing with existing environment variables."
+fi
+
 
 # Start timing
 START_TIME=$(date +%s)
