@@ -17,6 +17,7 @@
     "milestone:prune": "node scripts/milestone/prune_local.mjs",
     "deploy": "gh workflow run deploy.yml && echo '✅ Deploy triggered! Monitor: gh run list --workflow=deploy.yml --limit 1'",
     "deploy:local": "echo '⚠️  Local deploy is for emergencies only. Use npm run deploy for CI/CD.' && bash scripts/deploy-app.sh",
+    "deploy:orchestration": "bash scripts/deploy-with-orchestration.sh",
     "secrets:sync": "bash scripts/secrets/sync_from_zshrc.sh && cp .secrets/.env.local .env.local",
     "secrets:gh": "bash scripts/secrets/gh_sync_secrets.sh",
     "doctor": "bash scripts/bootstrap/doctor.sh",
