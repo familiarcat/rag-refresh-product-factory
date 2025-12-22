@@ -338,4 +338,95 @@ ${
       }
     })
   );
+
+  /**
+   * FS Commands for chat-driven implementation (manual + safe)
+   * These commands let you paste structured JSON ops from chat and apply them to the workspace.
+   */
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.fs.readFile", async () => {
+      const filePath = await vscode.window.showInputBox({ prompt: "Read file (relative path)" });
+      if (!filePath) return;
+      const fsManager = alexAiService.getFileSystemManager();
+      if (!fsManager) {
+        vscode.window.showErrorMessage("File system manager is not initialized. Run 'alexAi.refreshFileSystem' first.");
+        return;
+      }
+      const result = await fsManager.readFile(filePath);
+      if (!result.success) {
+        vscode.window.showErrorMessage(result.message || "Failed to read file");
+        return;
+      }
+      const content = result.content ?? "";
+      const doc = await vscode.workspace.openTextDocument({ content });
+      await vscode.languages.setTextDocumentLanguage(doc, "plaintext");
+      await vscode.window.showTextDocument(doc, { preview: true });
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.fs.writeFile", async () => {
+      const filePath = await vscode.window.showInputBox({ prompt: "Write file (relative path)" });
+      if (!filePath) return;
+      const content = await vscode.window.showInputBox({ prompt: "Content (single line; for large content use applyPatch or replaceSnippet)" });
+      if (content === undefined) return;
+
+      const fsManager = alexAiService.getFileSystemManager();
+      if (!fsManager) {
+        vscode.window.showErrorMessage("File system manager is not initialized. Run 'alexAi.refreshFileSystem' first.");
+        return;
+      }
+      await fsManager.writeFile(filePath, content);
+      vscode.window.showInformationMessage(`✅ Wrote ${filePath}`);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.fs.replaceSnippet", async () => {
+      const filePath = await vscode.window.showInputBox({ prompt: "File (relative path)" });
+      if (!filePath) return;
+      const oldCode = await vscode.window.showInputBox({ prompt: "Old snippet (exact match)" });
+      if (!oldCode) return;
+      const newCode = await vscode.window.showInputBox({ prompt: "New snippet" });
+      if (newCode === undefined) return;
+
+      const fsManager = alexAiService.getFileSystemManager();
+      if (!fsManager) {
+        vscode.window.showErrorMessage("File system manager is not initialized. Run 'alexAi.refreshFileSystem' first.");
+        return;
+      }
+      const result = await fsManager.replaceSnippet(filePath, oldCode, newCode);
+      const ok = result.success;
+      if (ok) vscode.window.showInformationMessage(`✅ Updated ${filePath}`);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.fs.applyPatch", async () => {
+      const filePath = await vscode.window.showInputBox({ prompt: "File (relative path)" });
+      if (!filePath) return;
+
+      const patchJson = await vscode.window.showInputBox({
+        prompt: "Paste patch JSON: [{startLine,endLine,text}, ...] (1-indexed)"
+      });
+      if (!patchJson) return;
+
+      let edits: Array<{ startLine: number; endLine: number; text: string }>;
+      try {
+        edits = JSON.parse(patchJson);
+      } catch (e) {
+        vscode.window.showErrorMessage("Invalid JSON.");
+        return;
+      }
+
+      const fsManager = alexAiService.getFileSystemManager();
+      if (!fsManager) {
+        vscode.window.showErrorMessage("File system manager is not initialized. Run 'alexAi.refreshFileSystem' first.");
+        return;
+      }
+      // @ts-ignore - method added in v3.1
+      await fsManager.applyPatch(filePath, edits);
+      vscode.window.showInformationMessage(`✅ Patched ${filePath}`);
+    })
+  );
 }

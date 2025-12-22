@@ -41,6 +41,32 @@ const CREW_PERSONAS: Record<string, string> = {
   quark: `You are Quark. Consider business value, cost, and ROI. Be shrewd but helpful.`,
 };
 
+
+function selectModel(crewMember: string, complexity = 3) {
+  try {
+    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!root) return null;
+    const policy = JSON.parse(require("fs").readFileSync(require("path").join(root, "data", "model-policy.json"), "utf8"));
+    const costDb = JSON.parse(require("fs").readFileSync(require("path").join(root, "data", "llm-cost-database.json"), "utf8"));
+    const crew = String(crewMember || "").toLowerCase();
+    const c = Math.max(1, Math.min(10, Number(complexity) || 3));
+    const tier = c <= policy.tiers.cheap.max_complexity ? "cheap" : (c <= policy.tiers.standard.max_complexity ? "standard" : "premium");
+    const minContext = policy.tiers[tier].min_context || 0;
+    const needsTools = policy.tiers[tier].requires_tools ?? true;
+    const candidates = policy.fallback_models
+      .map((id: string) => costDb.models.find((m: any) => m.id === id) || { id })
+      .filter((m: any) => !needsTools || m.supports_tools !== false)
+      .filter((m: any) => (m.context || 0) >= minContext);
+    const scored = candidates
+      .map((m: any) => ({ id: m.id, score: (m.input_per_million ?? 9999) * 0.6 + (m.output_per_million ?? 9999) * 0.4 }))
+      .sort((a: any, b: any) => a.score - b.score);
+    return { model: scored[0]?.id || policy.fallback_models[0], tier };
+  } catch {
+    return null;
+  }
+}
+
+
 export interface SprintStatus {
   id: string;
   name: string;
@@ -121,6 +147,10 @@ export class AlexAiClient {
       // Ignore memory loading errors
     }
 
+
+    const sel = selectModel(crewMember, 3);
+    const modelToUse = sel?.model ?? crew.model;
+
     try {
       const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
@@ -133,7 +163,7 @@ export class AlexAiClient {
             "X-Title": "Alex AI VS Code Extension",
           },
           body: JSON.stringify({
-            model: crew.model,
+            model: modelToUse,
             messages: [
               {
                 role: "system",
@@ -307,6 +337,10 @@ export class AlexAiClient {
               .join("\n\n")}`
           : "";
 
+
+        const sel = selectModel(crewId, 3);
+        const modelToUse = sel?.model ?? crew.model;
+
       try {
         const response = await fetch(
           "https://openrouter.ai/api/v1/chat/completions",
@@ -317,7 +351,7 @@ export class AlexAiClient {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: crew.model,
+              model: modelToUse,
               messages: [
                 {
                   role: "system",
@@ -361,5 +395,4 @@ export class AlexAiClient {
     }));
   }
 }
-
 

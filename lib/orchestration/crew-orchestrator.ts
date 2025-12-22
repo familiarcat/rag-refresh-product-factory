@@ -10,6 +10,7 @@ import fs from "fs";
 import path from "path";
 import { analyzePicardTask } from "./picard-analyzer";
 import { optimizeQuarkROI, calculateCostFromTiers } from "./quark-optimizer";
+import { selectOpenRouterModel } from "@/lib/llm/model-selector";
 import {
   OrchestrationResult,
   LLMTier,

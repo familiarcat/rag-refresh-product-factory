@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-ALLOWLIST="$ROOT/scripts/secrets/allowlist.env"
-OUT="$ROOT/.secrets/.env.local"
+# Minimal shell wrapper: run TS sync (reads from process.env)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$PROJECT_ROOT"
 
-mkdir -p "$ROOT/.secrets"
-: > "$OUT"
-
-while read -r key; do
-  [[ -z "$key" || "$key" =~ ^# ]] && continue
-  val="${!key:-}"
-  [[ -z "$val" ]] && continue
-  printf '%s=%q\n' "$key" "$val" >> "$OUT"
-done < "$ALLOWLIST"
-
-chmod 600 "$OUT"
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm -s script:secrets:sync >/dev/null
+else
+  npx -y tsx scripts/ts/secrets/sync-from-shell.ts >/dev/null
+fi

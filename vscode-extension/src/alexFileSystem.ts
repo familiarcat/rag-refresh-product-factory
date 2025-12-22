@@ -72,7 +72,7 @@ export class AlexFileSystemService {
         }
     }
 
-    async writeFile(relativePath: string, content: string): Promise<FileSystemOperationResult> {
+    async writeFile(relativePath: string, content: string, createDirs?: boolean): Promise<FileSystemOperationResult> {
         try {
             const full = join(this.workspacePath, relativePath);
             await fs.promises.mkdir(dirname(full), { recursive: true });
@@ -82,6 +82,99 @@ export class AlexFileSystemService {
             return {
                 success: false,
                 message: `Failed to write ${relativePath}`,
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async readFile(relativePath: string): Promise<FileSystemOperationResult & { content?: string }> {
+        try {
+            const full = join(this.workspacePath, relativePath);
+            const content = await fs.promises.readFile(full, 'utf8');
+            return { success: true, message: `Read ${relativePath}`, content };
+        } catch (error) {
+            return {
+                success: false,
+                message: `Failed to read ${relativePath}`,
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async applyPatch(
+        relativePath: string,
+        edits: Array<{ startLine: number; endLine: number; text: string }>
+    ): Promise<FileSystemOperationResult> {
+        try {
+            const full = join(this.workspacePath, relativePath);
+            const original = await fs.promises.readFile(full, 'utf8');
+            const lines = original.split(/\r?\n/);
+
+            const sorted = [...edits].sort((a, b) => b.startLine - a.startLine);
+            for (const e of sorted) {
+                const start = Math.max(1, e.startLine);
+                const end = Math.max(start, e.endLine);
+                lines.splice(start - 1, end - (start - 1), ...String(e.text).split(/\r?\n/));
+            }
+
+            await fs.promises.writeFile(full, lines.join('\n'), 'utf8');
+            return { success: true, message: `Patched ${relativePath}` };
+        } catch (error) {
+            return {
+                success: false,
+                message: `Failed to patch ${relativePath}`,
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async replaceSnippet(
+        relativePath: string,
+        oldText: string,
+        newText: string
+    ): Promise<FileSystemOperationResult> {
+        try {
+            const full = join(this.workspacePath, relativePath);
+            const original = await fs.promises.readFile(full, 'utf8');
+            if (!original.includes(oldText)) {
+                return { success: false, message: `Snippet not found in ${relativePath}` };
+            }
+            const updated = original.replace(oldText, newText);
+            await fs.promises.writeFile(full, updated, 'utf8');
+            return { success: true, message: `Replaced snippet in ${relativePath}` };
+        } catch (error) {
+            return {
+                success: false,
+                message: `Failed to replace snippet in ${relativePath}`,
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async listDir(relativeDir: string): Promise<FileSystemOperationResult & { entries?: Array<{ name: string; type: "file" | "dir" }> }> {
+        try {
+            const full = join(this.workspacePath, relativeDir);
+            const items = await fs.promises.readdir(full, { withFileTypes: true });
+            const entries = items.map((d) => ({ name: d.name, type: d.isDirectory() ? "dir" as const : "file" as const }));
+            return { success: true, message: `Listed ${relativeDir}`, entries };
+        } catch (error) {
+            return {
+                success: false,
+                message: `Failed to list ${relativeDir}`,
+                error: error instanceof Error ? error : new Error('Unknown error')
+            };
+        }
+    }
+
+    async deleteFile(relativePath: string): Promise<FileSystemOperationResult> {
+        try {
+            const full = join(this.workspacePath, relativePath);
+            await fs.promises.unlink(full);
+            return { success: true, message: `Deleted ${relativePath}` };
+        } catch (error) {
+            return {
+                success: false,
+                message: `Failed to delete ${relativePath}`,
                 error: error instanceof Error ? error : new Error('Unknown error')
             };
         }

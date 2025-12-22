@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { AlexAiService } from "./alexAiService";
+import { extractAlexFsOps, applyFsOpsWithApproval } from "./fsOps";
 
 /**
  * Register Alex AI as a Chat Participant in VS Code's native Chat panel.

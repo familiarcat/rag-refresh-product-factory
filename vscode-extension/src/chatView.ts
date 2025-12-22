@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { extractAlexFsOps, applyFsOpsWithApproval } from "./fsOps";
 import { AlexAiService, ObservationLoungeResult } from "./alexAiService";
 
 /**
@@ -109,6 +110,28 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     // Get response
     const response = await this.alexAiService.chat(crew, prompt);
 
+    const cfg = vscode.workspace.getConfiguration("alexAi");
+    const enableTools = cfg.get<boolean>("enableChatFileTools", true);
+    const autoApprove = cfg.get<boolean>("autoApproveFileEdits", false);
+
+    let displayResponse = response;
+    if (enableTools && this.alexAiService.fileSystem) {
+      const parsed = extractAlexFsOps(response);
+      displayResponse = parsed.cleanText || response;
+      if (parsed.ops.length > 0) {
+        const toolRun = await applyFsOpsWithApproval({ ops: parsed.ops, fs: this.alexAiService.fileSystem, autoApprove });
+        if (toolRun?.results?.length) {
+          const summaries = toolRun.results.map((r: any) => {
+            if (r.op === 'readFile') return `\n\n[readFile] ${r.filePath}\n\n\`\`\`\n${(r.content ?? '').slice(0, 8000)}\n\`\`\``;
+            if (r.op === 'listDir') return `\n\n[listDir] ${r.dirPath}\n\n\`\`\`\n${JSON.stringify(r.entries ?? [], null, 2)}\n\`\`\``;
+            return '';
+          }).join('');
+          displayResponse = (displayResponse ?? response) + summaries;
+        }
+      }
+    }
+
+
     // Hide typing and show response
     this._view.webview.postMessage({ type: "hideTyping" });
 
@@ -116,7 +139,7 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     this._view.webview.postMessage({
       type: "addMessage",
       role: "assistant",
-      content: response,
+      content: displayResponse,
       crew: crewInfo.name,
       emoji: crewInfo.emoji,
       crewId: crew,
@@ -1461,7 +1484,13 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     
     // Initial load
     vscode.postMessage({ type: 'getCurrentFile' });
-  </script>
+  
+    // Enhance code blocks initially and on mutations
+    enhanceCodeBlocks(document);
+    const mo = new MutationObserver(() => enhanceCodeBlocks(document));
+    mo.observe(document.body, { childList: true, subtree: true });
+
+</script>
 </body>
 </html>`;
   }

@@ -35,17 +35,6 @@ const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const DEFAULT_MODEL = "anthropic/claude-3.5-sonnet";
 
 // Model assignments per crew member (based on their expertise)
-const CREW_MODELS = {
-  captain_picard: "anthropic/claude-3.5-sonnet", // Strategic thinking
-  commander_riker: "anthropic/claude-3.5-sonnet", // Coordination
-  commander_data: "openai/gpt-4-turbo", // Technical analysis
-  geordi_la_forge: "anthropic/claude-3.5-sonnet", // Engineering
-  counselor_troi: "anthropic/claude-3.5-sonnet", // Empathy/UX
-  lieutenant_worf: "openai/gpt-4-turbo", // Security (thorough)
-  chief_obrien: "openai/gpt-4-turbo", // Implementation
-  quark: "openai/gpt-4-turbo", // Business analysis
-};
-
 /**
  * Call OpenRouter API
  */
@@ -322,7 +311,7 @@ async function generateCrewResponse(crewId, query, context = {}) {
     };
   }
 
-  const model = CREW_MODELS[crewId] || DEFAULT_MODEL;
+  const model = selectModel({ crewMember: crewId, complexity: 3, needsRag: true, needsTools: true }).model || DEFAULT_MODEL;
 
   // Load relevant memories for context
   const memories = await loadMemories();
@@ -1327,7 +1316,7 @@ ${Object.entries(CREW_MEMBERS)
     ([id, crew]) =>
       `- ${crew.icon} **${crew.name}** (${crew.title}): ${crew.expertise.join(
         ", "
-      )} [${CREW_MODELS[id]}]`
+      )} [${selectModel({ crewMember: id, complexity: 3, needsRag: true, needsTools: true }).model}]`
   )
   .join("\n")}
 
@@ -1391,7 +1380,7 @@ This system uses OpenRouter for LLM responses, completely independent of Cursor'
 
 **Question from the bridge:** ${args.question}
 
-Please respond in character as ${crew.name}. (Model: ${CREW_MODELS[crewId]})`,
+Please respond in character as ${crew.name}. (Model: ${selectModel({ crewMember: crewId, complexity: 3, needsRag: true, needsTools: true }).model})`,
             },
           },
         ],

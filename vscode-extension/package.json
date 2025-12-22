@@ -166,6 +166,22 @@
       {
         "command": "alexAi.exportPlans",
         "title": "Alex AI: Export Plans to Markdown"
+      },
+      {
+        "command": "alexAi.fs.readFile",
+        "title": "AlexAI: FS Read File"
+      },
+      {
+        "command": "alexAi.fs.writeFile",
+        "title": "AlexAI: FS Write File"
+      },
+      {
+        "command": "alexAi.fs.replaceSnippet",
+        "title": "AlexAI: FS Replace Snippet"
+      },
+      {
+        "command": "alexAi.fs.applyPatch",
+        "title": "AlexAI: FS Apply Patch (JSON)"
       }
     ],
     "viewsContainers": {
@@ -240,7 +256,7 @@
         "alexAi.openRouterApiKey": {
           "type": "string",
           "default": "",
-          "markdownDescription": "**Required**: Your OpenRouter API key for AI responses.\n\nGet your API key at [openrouter.ai](https://openrouter.ai/keys)\n\n⚠️ This key is stored in VS Code settings. Never share it publicly.",
+          "markdownDescription": "**Required**: Your OpenRouter API key for AI responses.\n\nGet your API key at [openrouter.ai](https://openrouter.ai/keys)\n\n\u26a0\ufe0f This key is stored in VS Code settings. Never share it publicly.",
           "order": 1
         },
         "alexAi.defaultCrewMember": {
@@ -257,14 +273,14 @@
             "quark"
           ],
           "enumDescriptions": [
-            "⚡ Commander Riker - Crew coordinator (RECOMMENDED - routes to optimal crew)",
-            "🎖️ Captain Picard - Strategic leadership and architecture",
-            "🤖 Commander Data - Technical analysis and algorithms",
-            "🔧 Lt. Cmdr. La Forge - Infrastructure and DevOps",
-            "💭 Counselor Troi - UX design and user experience",
-            "⚔️ Lt. Worf - Security reviews and testing",
-            "🛠️ Chief O'Brien - Debugging and implementation",
-            "💰 Quark - Cost optimization and efficiency"
+            "\u26a1 Commander Riker - Crew coordinator (RECOMMENDED - routes to optimal crew)",
+            "\ud83c\udf96\ufe0f Captain Picard - Strategic leadership and architecture",
+            "\ud83e\udd16 Commander Data - Technical analysis and algorithms",
+            "\ud83d\udd27 Lt. Cmdr. La Forge - Infrastructure and DevOps",
+            "\ud83d\udcad Counselor Troi - UX design and user experience",
+            "\u2694\ufe0f Lt. Worf - Security reviews and testing",
+            "\ud83d\udee0\ufe0f Chief O'Brien - Debugging and implementation",
+            "\ud83d\udcb0 Quark - Cost optimization and efficiency"
           ],
           "markdownDescription": "Default crew member. **Riker recommended** - he coordinates the crew and routes queries to optimal specialists while optimizing costs with Quark.",
           "order": 2
@@ -316,6 +332,43 @@
           "default": "http://localhost:3001",
           "markdownDescription": "Base URL for Alex AI server (for sprint status and memories). Leave default unless self-hosting.",
           "order": 4
+        },
+        "alexAi.autoApproveFileEdits": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically apply file edits proposed by Alex AI chat without confirmation."
+        },
+        "alexAi.enableChatFileTools": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Alex AI chat to propose filesystem operations (write/patch) via alexfs blocks."
+        },
+        "alexAi.alwaysShowDiffPreview": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show a diff preview before applying file edits, even when auto-approve is enabled."
+        },
+        "alexAi.fsWritableRoots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "src",
+            "app",
+            "lib",
+            "vscode-extension",
+            "docs",
+            "data",
+            "projects",
+            "workspace"
+          ],
+          "description": "Workspace-relative root folders that Alex AI chat is allowed to write/patch/delete within."
+        },
+        "alexAi.allowChatDeletes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow Alex AI chat to delete files via filesystem tools (dangerous)."
         }
       }
     }
@@ -328,7 +381,7 @@
     "package": "vsce package",
     "package:install": "vsce package && code --install-extension alex-ai-assistant-1.0.0.vsix",
     "install-extension": "code --install-extension alex-ai-assistant-1.0.0.vsix",
-    "dev:reload": "npm run compile && npm run package && npm run install-extension && echo '\n✅ Extension reloaded! Reload window: Cmd+Shift+P → \"Developer: Reload Window\"'",
+    "dev:reload": "npm run compile && npm run package && npm run install-extension && echo '\n\u2705 Extension reloaded! Reload window: Cmd+Shift+P \u2192 \"Developer: Reload Window\"'",
     "dev:watch": "npm run compile:watch"
   },
   "devDependencies": {

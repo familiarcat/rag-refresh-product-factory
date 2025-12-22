@@ -11,6 +11,20 @@ import { registerExecutionCommands } from "./executionCommands";
 import { AlexFileSystemService } from "./alexFileSystem";
 import { join } from "path";
 import { exec } from "child_process";
+
+async function isWorkspaceWritable(): Promise<boolean> {
+  try {
+    const folder = vscode.workspace.workspaceFolders?.[0];
+    if (!folder) return false;
+    const testUri = vscode.Uri.joinPath(folder.uri, ".alexai-write-test");
+    await vscode.workspace.fs.writeFile(testUri, Buffer.from("ok", "utf8"));
+    await vscode.workspace.fs.delete(testUri, { useTrash: false });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ❌ REMOVED: import Error from "next/error";
 
 let alexAiService: AlexAiService;
@@ -41,9 +55,16 @@ async function setupFileSystem(
         cancellable: false,
       },
       async () => {
+        const writable = await isWorkspaceWritable();
+        if (!writable) {
+          vscode.window.showErrorMessage(
+            "Setup failed: workspace is read-only or VS Code lacks permission to write files. On macOS, grant VS Code Full Disk Access (Privacy & Security) and reopen the folder from a writable location."
+          );
+          return;
+        }
         try {
           await new Promise<void>((resolve, reject) => {
-            exec(`chmod +x "${setupScript}" && "${setupScript}"`, (error) => {
+            exec(`bash "${setupScript}"`, (error) => {
               if (error) reject(error);
               else resolve();
             });
@@ -58,7 +79,7 @@ async function setupFileSystem(
         } catch (error: unknown) {
           const errorMessage =
             error instanceof Error ? error.message : "Unknown error";
-          vscode.window.showErrorMessage(`Setup failed: ${errorMessage}`);
+          vscode.window.showErrorMessage(`Setup failed: ${errorMessage}. If this mentions read-only file system, grant VS Code permission (macOS Full Disk Access) or move the repo to a writable folder.`);
         }
       }
     );

@@ -330,6 +330,30 @@ export class FileSystemManager {
   /**
    * Execute a recommendation by applying a code change
    */
+
+  /**
+   * Apply a line-based patch to a file (1-indexed line numbers).
+   * This is safer for chat-driven edits than raw search/replace when the snippet is ambiguous.
+   */
+  async applyPatch(
+    file: string,
+    edits: Array<{ startLine: number; endLine: number; text: string }>
+  ): Promise<boolean> {
+    const content = await this.readFile(file);
+    const lines = content.split(/\r?\n/);
+
+    // Apply from bottom to top to keep indices stable
+    const sorted = [...edits].sort((a, b) => b.startLine - a.startLine);
+    for (const e of sorted) {
+      const start = Math.max(1, e.startLine);
+      const end = Math.max(start, e.endLine);
+      lines.splice(start - 1, end - (start - 1), ...e.text.split(/\r?\n/));
+    }
+
+    await this.writeFile(file, lines.join("\n"));
+    return true;
+  }
+
   async executeCodeRecommendation(
     file: string,
     oldCode: string,
