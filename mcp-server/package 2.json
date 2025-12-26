@@ -1,0 +1,29 @@
+{
+  "name": "alex-ai-mcp-server",
+  "version": "1.0.0",
+  "description": "Alex AI Crew System MCP Server for Cursor and VS Code",
+  "type": "module",
+  "main": "index.mjs",
+  "bin": {
+    "alex-ai-mcp": "./index.mjs"
+  },
+  "scripts": {
+    "start": "node index.mjs",
+    "dev": "node --watch index.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "alex-ai",
+    "cursor",
+    "vscode",
+    "chat-agent"
+  ],
+  "author": "RAG Refresh Product Factory",
+  "license": "MIT"
+}
+
+
+

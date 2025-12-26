@@ -51,6 +51,20 @@ export function templateForCategorySlug(slug?: string) {
       'Policy controls (allowed sources, risk thresholds)',
       'Compliance reporting / pricing',
     ];
+  } else if (slug.includes('ddd-web')) {
+    base.sections = [
+      'Domain boundaries (bounded contexts from sitemap)',
+      'Sitemap sources (WordPress XML, custom sitemaps)',
+      'Graph model (nodes: site/section/page/category/date, edges: contains/member/asset)',
+      'Next.js architecture (App Router, RSC, API routes)',
+      'View dimensions (section, category, date, asset-host)',
+      'Layout algorithms (breadthfirst, radial, timeline, force-directed)',
+      'Navigation patterns (drill-down, breadcrumbs, search, filters)',
+      'State management (URL params, local state, server state)',
+      'Metadata extraction (categories, dates, post types from URLs)',
+      'Export formats (Mermaid diagrams, SVG, interactive Cytoscape)',
+      'Packaging (template licensing, implementation, consulting)',
+    ];
   } else {
     base.sections = [
       'Operating model (ownership + oncall)',

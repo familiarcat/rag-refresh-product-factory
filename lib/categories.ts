@@ -44,5 +44,14 @@ export const categories: Category[] = [
     opportunity: 'Leadership-level engagements; strong positioning for Staff/Principal roles.',
     buyers: ['Engineering leadership', 'Platform orgs', 'CTOs in build phase'],
     priceModels: ['Advisory / architecture sprints', 'Workshops', 'Fractional platform architect']
+  },
+  {
+    slug: 'ddd-web-architecture',
+    name: 'DDD Web Architecture & Semantic Mapping',
+    tagline: 'Domain-Driven Next.js with sitemap intelligence, bounded contexts, clean architecture',
+    scores: { demand: 8, effort: 6, monetization: 7, differentiation: 9, risk: 4 },
+    opportunity: 'Transform sitemaps into semantic graphs with multi-dimensional navigation; ideal for content-heavy sites, e-commerce, and enterprise web applications needing maintainable architecture.',
+    buyers: ['WordPress agencies', 'E-commerce platforms', 'Enterprise web teams', 'Digital agencies', 'Content publishers'],
+    priceModels: ['Implementation packages', 'Architecture consulting', 'Template licensing', 'Managed evolution']
   }
 ];

@@ -1,0 +1,343 @@
+{
+  "name": "alex-ai-assistant",
+  "displayName": "Alex AI - Crew Code Assistant",
+  "description": "AI-powered code assistant with Star Trek crew personas. Chat with Picard, Data, and the crew for code analysis and recommendations.",
+  "version": "1.0.0",
+  "publisher": "alex-ai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/familiarcat/rag-refresh-product-factory"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "assistant",
+    "copilot",
+    "chat",
+    "code-analysis",
+    "star-trek"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "alex-ai.crew",
+        "fullName": "Alex AI Crew",
+        "name": "alex",
+        "description": "Chat with the Star Trek crew for code analysis and recommendations",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "picard",
+            "description": "Ask Captain Picard for strategic advice"
+          },
+          {
+            "name": "riker",
+            "description": "Ask Commander Riker for tactical guidance"
+          },
+          {
+            "name": "data",
+            "description": "Ask Commander Data for technical analysis"
+          },
+          {
+            "name": "geordi",
+            "description": "Ask La Forge for engineering solutions"
+          },
+          {
+            "name": "troi",
+            "description": "Ask Counselor Troi for UX perspective"
+          },
+          {
+            "name": "worf",
+            "description": "Ask Lt. Worf for security review"
+          },
+          {
+            "name": "obrien",
+            "description": "Ask Chief O'Brien for debugging help"
+          },
+          {
+            "name": "quark",
+            "description": "Ask Quark for business/cost analysis"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "alexAi.openChat",
+        "title": "Open Alex AI Chat",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "alexAi.askCrew",
+        "title": "Ask Crew About Selection",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "alexAi.explainCode",
+        "title": "Alex AI: Explain Code"
+      },
+      {
+        "command": "alexAi.reviewCode",
+        "title": "Alex AI: Review Code (Worf)"
+      },
+      {
+        "command": "alexAi.optimizeCode",
+        "title": "Alex AI: Optimize Code (Data)"
+      },
+      {
+        "command": "alexAi.sprintStatus",
+        "title": "Alex AI: Sprint Status"
+      },
+      {
+        "command": "alexAi.observationLounge",
+        "title": "Alex AI: Convene Observation Lounge"
+      },
+      {
+        "command": "alexAi.configure",
+        "title": "Alex AI: Configure API Key",
+        "icon": "$(key)"
+      },
+      {
+        "command": "alexAi.openSettings",
+        "title": "Alex AI: Open Settings"
+      },
+      {
+        "command": "alexAi.openNativeChat",
+        "title": "Alex AI: Open in VS Code Chat",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "alexAi.refactorCode",
+        "title": "Alex AI: Suggest Refactoring (Troi)"
+      },
+      {
+        "command": "alexAi.fixCode",
+        "title": "Alex AI: Help Fix Issue (O'Brien)"
+      },
+      {
+        "command": "alexAi.analyzeFile",
+        "title": "Alex AI: Review Current File (Worf)"
+      },
+      {
+        "command": "alexAi.clearDiagnostics",
+        "title": "Alex AI: Clear Code Review Suggestions"
+      },
+      {
+        "command": "alexAi.openPanel",
+        "title": "Alex AI: Open Full Panel",
+        "icon": "$(window)"
+      },
+      {
+        "command": "alexAi.saveRecommendation",
+        "title": "Alex AI: Save Recommendation to File"
+      },
+      {
+        "command": "alexAi.savePlan",
+        "title": "Alex AI: Save Execution Plan to File"
+      },
+      {
+        "command": "alexAi.executeRecommendation",
+        "title": "Alex AI: Execute Code Recommendation"
+      },
+      {
+        "command": "alexAi.viewRecommendations",
+        "title": "Alex AI: View Saved Recommendations"
+      },
+      {
+        "command": "alexAi.viewPlans",
+        "title": "Alex AI: View Saved Plans"
+      },
+      {
+        "command": "alexAi.exportRecommendations",
+        "title": "Alex AI: Export Recommendations to Markdown"
+      },
+      {
+        "command": "alexAi.exportPlans",
+        "title": "Alex AI: Export Plans to Markdown"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "alex-ai",
+          "title": "Alex AI",
+          "icon": "media/starfleet.svg"
+        }
+      ]
+    },
+    "views": {
+      "alex-ai": [
+        {
+          "type": "webview",
+          "id": "alexAi.chatView",
+          "name": "Alex AI",
+          "visibility": "visible"
+        }
+      ]
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "command": "alexAi.askCrew",
+          "group": "alexAi@1",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "alexAi.explainCode",
+          "group": "alexAi@2",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "alexAi.reviewCode",
+          "group": "alexAi@3",
+          "when": "editorHasSelection"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "alexAi.openChat",
+        "key": "ctrl+alt+a",
+        "mac": "cmd+option+a"
+      },
+      {
+        "command": "alexAi.askCrew",
+        "key": "ctrl+alt+q",
+        "mac": "cmd+option+q",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "alexAi.configure",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+option+k"
+      },
+      {
+        "command": "alexAi.openNativeChat",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+option+c"
+      },
+      {
+        "command": "alexAi.openPanel",
+        "key": "ctrl+alt+p",
+        "mac": "cmd+option+p"
+      }
+    ],
+    "configuration": {
+      "title": "Alex AI",
+      "properties": {
+        "alexAi.openRouterApiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "**Required**: Your OpenRouter API key for AI responses.\n\nGet your API key at [openrouter.ai](https://openrouter.ai/keys)\n\n⚠️ This key is stored in VS Code settings. Never share it publicly.",
+          "order": 1
+        },
+        "alexAi.defaultCrewMember": {
+          "type": "string",
+          "default": "riker",
+          "enum": [
+            "riker",
+            "picard",
+            "data",
+            "geordi",
+            "troi",
+            "worf",
+            "obrien",
+            "quark"
+          ],
+          "enumDescriptions": [
+            "⚡ Commander Riker - Crew coordinator (RECOMMENDED - routes to optimal crew)",
+            "🎖️ Captain Picard - Strategic leadership and architecture",
+            "🤖 Commander Data - Technical analysis and algorithms",
+            "🔧 Lt. Cmdr. La Forge - Infrastructure and DevOps",
+            "💭 Counselor Troi - UX design and user experience",
+            "⚔️ Lt. Worf - Security reviews and testing",
+            "🛠️ Chief O'Brien - Debugging and implementation",
+            "💰 Quark - Cost optimization and efficiency"
+          ],
+          "markdownDescription": "Default crew member. **Riker recommended** - he coordinates the crew and routes queries to optimal specialists while optimizing costs with Quark.",
+          "order": 2
+        },
+        "alexAi.autoLoadContext": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Automatically include current file context when chatting with crew members",
+          "order": 3
+        },
+        "alexAi.openChatOnStartup": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Automatically open Alex AI chat panel when VS Code starts",
+          "order": 4
+        },
+        "alexAi.setAsDefaultChatAgent": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Set Alex AI as the preferred chat agent (pre-selects @alex in chat)",
+          "order": 5
+        },
+        "alexAi.enableInlineCompletions": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Enable AI-powered code completions (like GitHub Copilot)",
+          "order": 6
+        },
+        "alexAi.enableHoverExplanations": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Show AI explanations when hovering over code symbols",
+          "order": 7
+        },
+        "alexAi.enableCodeReview": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Automatically review code and show suggestions in Problems panel (on save)",
+          "order": 8
+        },
+        "alexAi.autoDetectSelection": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Automatically detect text selection in editor and prepare it as context for crew chat",
+          "order": 9
+        },
+        "alexAi.baseUrl": {
+          "type": "string",
+          "default": "http://localhost:3001",
+          "markdownDescription": "Base URL for Alex AI server (for sprint status and memories). Leave default unless self-hosting.",
+          "order": 4
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "compile:watch": "tsc -watch -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "package:install": "vsce package && code --install-extension alex-ai-assistant-1.0.0.vsix",
+    "install-extension": "code --install-extension alex-ai-assistant-1.0.0.vsix",
+    "dev:reload": "npm run compile && npm run package && npm run install-extension && echo '\n✅ Extension reloaded! Reload window: Cmd+Shift+P → \"Developer: Reload Window\"'",
+    "dev:watch": "npm run compile:watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "marked": "^12.0.0"
+  }
+}

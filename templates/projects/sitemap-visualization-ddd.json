@@ -1,0 +1,428 @@
+{
+  "id": "proj_sitemap_viz_ddd_001",
+  "name": "WordPress Sitemap Intelligence Platform",
+  "tagline": "Transform sitemaps into semantic knowledge graphs with DDD architecture",
+  "description": "A comprehensive Next.js application that converts WordPress sitemap XML into interactive, multi-dimensional graph visualizations using Domain-Driven Design principles. Features include drill-down navigation, multiple view dimensions (section, category, date, asset-host), alternative layouts (hierarchical, radial, timeline, force-directed), and exportable diagrams.",
+
+  "parentId": null,
+  "isFactory": false,
+
+  "source": "structured",
+  "sourceUrl": null,
+  "createdAt": "2025-12-26T00:00:00.000Z",
+  "updatedAt": "2025-12-26T00:00:00.000Z",
+
+  "status": "active",
+  "progress": 45,
+
+  "primaryCategory": "ddd-web-architecture",
+
+  "domains": [
+    {
+      "slug": "graph",
+      "name": "Semantic Graph Domain",
+      "description": "Core graph model with nodes (site, section, page, category, date, image, asset_host) and edges (contains, page, member, asset, related). Implements graph traversal, metadata extraction, and validation services.",
+      "scores": {
+        "demand": 9,
+        "effort": 7,
+        "monetization": 8,
+        "differentiation": 9,
+        "risk": 4
+      },
+      "features": [
+        "Graph entity (aggregate root) with invariant enforcement",
+        "Node and Edge entities with rich metadata",
+        "NodeId value object with collision-resistant hashing",
+        "GraphTraversalService (BFS, DFS, path finding)",
+        "MetadataExtractionService (categories, dates, post types from URLs)",
+        "GraphValidationService (ensure single root, valid edges)"
+      ],
+      "status": "completed",
+      "progress": 100
+    },
+    {
+      "slug": "ingestion",
+      "name": "Sitemap Ingestion Domain",
+      "description": "WordPress sitemap fetching, parsing, and merging. Handles sitemap.xml index files, recursive child sitemap fetching, and XML normalization.",
+      "scores": {
+        "demand": 7,
+        "effort": 5,
+        "monetization": 6,
+        "differentiation": 6,
+        "risk": 3
+      },
+      "features": [
+        "SitemapSource entity with URL validation",
+        "SitemapFetchService (HTTP client with retries)",
+        "SitemapMergeService (recursive merging)",
+        "SitemapParseService (tolerant XML parsing)",
+        "Support for WordPress, custom sitemaps, and static XML"
+      ],
+      "status": "completed",
+      "progress": 100
+    },
+    {
+      "slug": "visualization",
+      "name": "Visualization & Navigation Domain",
+      "description": "Interactive graph rendering with multiple view dimensions, layout algorithms, search, filtering, and drill-down navigation. Supports Mermaid diagrams and Cytoscape.js interactive graphs.",
+      "scores": {
+        "demand": 9,
+        "effort": 8,
+        "monetization": 9,
+        "differentiation": 10,
+        "risk": 5
+      },
+      "features": [
+        "ViewDimension value object (section, category, date, asset-host)",
+        "LayoutType value object (breadthfirst, radial, timeline, force)",
+        "NavigationState with history tracking",
+        "LayoutEngineService (Cytoscape.js layouts)",
+        "FilterService (focus mode, depth limits, image visibility)",
+        "SearchService with debouncing and highlighting"
+      ],
+      "status": "in-progress",
+      "progress": 75
+    },
+    {
+      "slug": "export",
+      "name": "Export & Rendering Domain",
+      "description": "Generate static Mermaid diagrams, SVG exports, and Cytoscape.js JSON for embedding. Support for sanitized outputs (remove placeholder nodes).",
+      "scores": {
+        "demand": 7,
+        "effort": 4,
+        "monetization": 6,
+        "differentiation": 6,
+        "risk": 2
+      },
+      "features": [
+        "MermaidRenderer (generate .mmd flowcharts)",
+        "SVGExporter (via @mermaid-js/mermaid-cli)",
+        "CytoscapeAdapter (JSON format for interactive viewer)",
+        "PlaceholderSanitizer (clean diagrams for export)",
+        "Format options: index.mmd, unified.mmd, section/*.mmd"
+      ],
+      "status": "completed",
+      "progress": 100
+    },
+    {
+      "slug": "application",
+      "name": "Application Layer (Use Cases)",
+      "description": "CQRS implementation with queries (GetGraph, GetSubgraph, SearchNodes) and commands (IngestSitemap, BuildGraph, ExportGraph). Orchestrates domain services.",
+      "scores": {
+        "demand": 8,
+        "effort": 6,
+        "monetization": 7,
+        "differentiation": 8,
+        "risk": 3
+      },
+      "features": [
+        "GetGraphQuery - Retrieve full graph or filtered subgraph",
+        "SearchNodesQuery - Full-text search across labels, URLs, metadata",
+        "IngestSitemapCommand - Fetch and process WordPress sitemap",
+        "BuildGraphCommand - Generate semantic graph from sitemap entries",
+        "ExportGraphCommand - Generate Mermaid/SVG/JSON outputs",
+        "NavigationService - Drill-down, breadcrumbs, history"
+      ],
+      "status": "in-progress",
+      "progress": 60
+    },
+    {
+      "slug": "infrastructure",
+      "name": "Infrastructure Layer (Adapters)",
+      "description": "Persistence (file system, in-memory for testing), HTTP clients (WordPress API), and rendering engines (Mermaid CLI, Cytoscape).",
+      "scores": {
+        "demand": 6,
+        "effort": 5,
+        "monetization": 5,
+        "differentiation": 5,
+        "risk": 3
+      },
+      "features": [
+        "FileSystemGraphRepository - JSON file storage",
+        "InMemoryGraphRepository - Testing repository",
+        "WordPressSitemapClient - HTTP fetcher with retries",
+        "GraphMapper - DTO ↔ Domain entity conversion",
+        "PrismaGraphRepository (future) - Database persistence"
+      ],
+      "status": "in-progress",
+      "progress": 70
+    },
+    {
+      "slug": "presentation",
+      "name": "Next.js Presentation Layer",
+      "description": "React Server Components, API routes, client components for interactivity. Tab-based UI (Mermaid vs Thought Map), controls, breadcrumbs, search.",
+      "scores": {
+        "demand": 9,
+        "effort": 7,
+        "monetization": 8,
+        "differentiation": 9,
+        "risk": 4
+      },
+      "features": [
+        "Home page with Mermaid viewer (pan, zoom, export)",
+        "Thought Map page with Cytoscape.js canvas",
+        "API routes: /api/graph, /api/search, /api/ingest, /api/export",
+        "BreadcrumbNav component with clickable path",
+        "ControlPanel with dimension/layout/depth selectors",
+        "SearchBox with debounced input and highlighting",
+        "URL state persistence (query params)",
+        "Responsive layout with dark mode support"
+      ],
+      "status": "in-progress",
+      "progress": 65
+    }
+  ],
+
+  "scores": {
+    "demand": 8,
+    "effort": 6,
+    "monetization": 7,
+    "differentiation": 9,
+    "risk": 4
+  },
+
+  "crew": [
+    {
+      "memberId": "captain_picard",
+      "role": "Strategic Architect",
+      "assignment": "Define bounded contexts, approve architecture decisions, ensure alignment with DDD principles",
+      "contributions": [
+        "Defined 7 bounded contexts (graph, ingestion, visualization, export, application, infrastructure, presentation)",
+        "Established ubiquitous language (drill-down, breadcrumb, focus mode, placeholder node)",
+        "Approved clean architecture layers with dependency rules"
+      ]
+    },
+    {
+      "memberId": "commander_data",
+      "role": "Domain Analyst",
+      "assignment": "Analyze sitemap structure, identify entities/value objects, design graph algorithms",
+      "contributions": [
+        "Designed Graph aggregate with Node and Edge entities",
+        "Implemented NodeId value object with FNV-1a hashing",
+        "Created BFS traversal algorithm with depth limiting",
+        "Defined metadata extraction patterns (category, date, postType from URLs)"
+      ]
+    },
+    {
+      "memberId": "geordi_la_forge",
+      "role": "Infrastructure Lead",
+      "assignment": "Set up Next.js project, configure build pipeline, implement repositories",
+      "contributions": [
+        "Next.js 14 App Router setup with standalone output",
+        "FileSystemGraphRepository with JSON persistence",
+        "Docker multi-stage build configuration",
+        "Cytoscape.js vendoring and CDN fallback"
+      ]
+    },
+    {
+      "memberId": "chief_obrien",
+      "role": "Implementation Engineer",
+      "assignment": "Implement domain services, application queries, React components",
+      "contributions": [
+        "GraphTraversalService with BFS, path-finding",
+        "GetSubgraphQuery with dimension filtering",
+        "ThoughtMap component with Cytoscape integration",
+        "BreadcrumbNav with navigation history"
+      ]
+    },
+    {
+      "memberId": "counselor_troi",
+      "role": "UX Designer",
+      "assignment": "Design user interaction patterns, ensure accessibility, validate usability",
+      "contributions": [
+        "Tab-based UI design (Mermaid vs Thought Map)",
+        "Breadcrumb navigation pattern",
+        "Focus mode toggle for reduced cognitive load",
+        "Search highlighting with visual feedback"
+      ]
+    },
+    {
+      "memberId": "lieutenant_worf",
+      "role": "Security & Testing",
+      "assignment": "Implement domain validation, write unit tests, ensure data integrity",
+      "contributions": [
+        "GraphValidationService (single root invariant, edge validation)",
+        "Unit tests for Graph, Node, GraphTraversalService",
+        "Integration tests for GetSubgraphQuery",
+        "Input validation for API routes"
+      ]
+    },
+    {
+      "memberId": "lieutenant_uhura",
+      "role": "API Design",
+      "assignment": "Design REST API routes, define DTOs, document endpoints",
+      "contributions": [
+        "GET /api/graph?root=&dimension=&depth= API design",
+        "POST /api/search with query and filters",
+        "SubgraphDTO and GraphDTO definitions",
+        "API documentation with examples"
+      ]
+    }
+  ],
+
+  "monetization": {
+    "model": "hybrid",
+    "targetPrice": "$199-$999/project for implementation, $2,500-$10,000 for full architecture consulting",
+    "revenueStreams": [
+      "Template licensing ($199-$499 one-time per project)",
+      "Implementation packages ($2,500-$5,000 fixed-price)",
+      "Architecture consulting ($150-$250/hour)",
+      "Custom feature development ($5,000-$15,000 per feature)",
+      "Managed evolution (retainer $2,000-$5,000/month)",
+      "Enterprise licensing ($10,000-$50,000/year unlimited projects)"
+    ],
+    "timeline": "MVP in 5 weeks, first customer in 2 months, $10K MRR in 6 months"
+  },
+
+  "targetMarket": [
+    "WordPress agencies (5,000+ agencies in US)",
+    "E-commerce platforms (Shopify, WooCommerce sites)",
+    "Enterprise web teams (Fortune 500 with complex sites)",
+    "Digital agencies (need architecture differentiation)",
+    "Content publishers (news sites, blogs with 1000+ pages)",
+    "SEO agencies (sitemap analysis for clients)"
+  ],
+
+  "techStack": {
+    "frontend": [
+      "Next.js 14+",
+      "React 18",
+      "TypeScript 5.x",
+      "Cytoscape.js 3.30",
+      "Mermaid.js v11"
+    ],
+    "backend": [
+      "Next.js API Routes",
+      "Node.js 20+",
+      "File system persistence (initial)",
+      "PostgreSQL + Prisma (future)"
+    ],
+    "infrastructure": [
+      "Vercel (deployment)",
+      "Docker (containerization)",
+      "GitHub Actions (CI/CD)",
+      "AWS S3 (static assets, future)"
+    ],
+    "ai": [
+      "Alex AI crew (architecture guidance)",
+      "Claude Sonnet 4.5 (code generation)",
+      "N8N workflows (automation)"
+    ],
+    "other": [
+      "Jest (unit testing)",
+      "Playwright (E2E testing)",
+      "ESLint + Prettier (code quality)",
+      "Zod (runtime validation, future)"
+    ]
+  },
+
+  "mvpFeatures": [
+    "✅ Sitemap XML ingestion (WordPress + custom)",
+    "✅ Semantic graph generation with 8 node types",
+    "✅ Mermaid diagram export (overview + full + sections)",
+    "✅ SVG rendering via mermaid-cli",
+    "✅ Interactive Cytoscape.js viewer",
+    "✅ Drill-down navigation with breadcrumbs",
+    "✅ Multiple view dimensions (section, category, date, asset-host)",
+    "✅ Alternative layouts (breadthfirst, radial, timeline, force)",
+    "✅ Search with highlighting",
+    "✅ URL state persistence",
+    "⏳ Database persistence (Prisma + PostgreSQL)",
+    "⏳ User authentication (NextAuth.js)",
+    "⏳ Multi-project support",
+    "⏳ Real-time sitemap monitoring",
+    "⏳ AI-powered domain analysis (suggest bounded contexts)"
+  ],
+
+  "completedFeatures": [
+    "Sitemap XML ingestion",
+    "Semantic graph generation",
+    "Mermaid diagram export",
+    "SVG rendering",
+    "Interactive Cytoscape.js viewer",
+    "Drill-down navigation",
+    "View dimensions (4 types)",
+    "Alternative layouts (4 types)",
+    "Search functionality",
+    "URL state persistence"
+  ],
+
+  "milestones": [
+    {
+      "id": "m1",
+      "name": "Domain Model Complete",
+      "description": "All domain entities, value objects, and services implemented with unit tests",
+      "targetDate": "2025-01-15",
+      "completedAt": "2025-01-12",
+      "status": "completed"
+    },
+    {
+      "id": "m2",
+      "name": "Application Layer Complete",
+      "description": "All queries, commands, and application services with integration tests",
+      "targetDate": "2025-01-31",
+      "status": "in-progress"
+    },
+    {
+      "id": "m3",
+      "name": "Next.js UI Complete",
+      "description": "Full React UI with Mermaid viewer, Thought Map, and all controls",
+      "targetDate": "2025-02-15",
+      "status": "in-progress"
+    },
+    {
+      "id": "m4",
+      "name": "Database Migration",
+      "description": "Migrate from file system to PostgreSQL + Prisma",
+      "targetDate": "2025-02-28",
+      "status": "pending"
+    },
+    {
+      "id": "m5",
+      "name": "Multi-tenancy Support",
+      "description": "User authentication, project isolation, team collaboration",
+      "targetDate": "2025-03-31",
+      "status": "pending"
+    },
+    {
+      "id": "m6",
+      "name": "Production Launch",
+      "description": "Deploy to Vercel, onboard first 5 paying customers",
+      "targetDate": "2025-04-30",
+      "status": "pending"
+    }
+  ],
+
+  "successMetrics": [
+    "Graph generation time < 2 seconds for 200+ page sitemaps",
+    "Page load time < 1.2 seconds (Lighthouse performance > 90)",
+    "User can drill down to 5 levels deep without lag",
+    "Search results appear < 300ms after typing",
+    "Zero data loss (all sitemap URLs captured)",
+    "Test coverage > 80% (domain + application layers)",
+    "5 paying customers within first 2 months",
+    "$10K MRR within 6 months",
+    "Net Promoter Score > 50",
+    "Customer retention rate > 85%"
+  ],
+
+  "notes": "This project serves as both a production application AND a reference implementation for DDD architecture in Next.js. The codebase demonstrates clean architecture principles, bounded contexts, rich domain models, and comprehensive testing. It can be used as a template for future Alex AI projects requiring similar patterns.\n\nKey architectural decisions:\n1. Pure domain layer (no framework dependencies) for long-term maintainability\n2. CQRS pattern for clear read/write separation\n3. Repository pattern for data access abstraction\n4. Value objects for type safety (NodeId, EdgeId, ViewDimension)\n5. Application services for use case orchestration\n6. Infrastructure adapters for external concerns\n\nThe project is intentionally over-engineered for a sitemap visualizer to showcase enterprise-grade patterns that can be applied to more complex domains (e-commerce, CRM, content management, etc.).",
+
+  "tags": [
+    "ddd",
+    "clean-architecture",
+    "nextjs",
+    "typescript",
+    "sitemap",
+    "graph-visualization",
+    "cytoscape",
+    "mermaid",
+    "wordpress",
+    "semantic-web",
+    "bounded-contexts",
+    "cqrs",
+    "repository-pattern",
+    "enterprise-architecture",
+    "reference-implementation"
+  ]
+}
