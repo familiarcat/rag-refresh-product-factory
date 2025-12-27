@@ -22,7 +22,11 @@
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.952.0",
+    "cytoscape": "^3.30.0",
+    "cytoscape-dagre": "^2.5.0",
+    "dagre": "^0.8.5",
     "marked": "12.0.2",
+    "mermaid": "^11.0.0",
     "next": "^16.0.10",
     "react": "18.2.0",
     "react-dom": "18.2.0"
