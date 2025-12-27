@@ -27,7 +27,9 @@
       "Bash(grep:*)",
       "Bash(xargs:*)",
       "Bash(node scripts/crew-automation/optimize-collaboration.mjs:*)",
-      "Bash(node scripts/crew-automation/execute-improvements.mjs:*)"
+      "Bash(node scripts/crew-automation/execute-improvements.mjs:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ]
   }
 }
