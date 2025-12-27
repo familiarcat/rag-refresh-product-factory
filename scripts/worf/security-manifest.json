@@ -1,0 +1,128 @@
+{
+  "system": "Lt. Worf Security System",
+  "version": "1.0.0",
+  "description": "Centralized secrets management and security governance for Alex AI",
+  "motto": "Today is a good day to secure secrets",
+
+  "secrets": {
+    "categories": {
+      "infrastructure": {
+        "description": "Cloud infrastructure credentials",
+        "secrets": [
+          "AWS_ACCOUNT_ID",
+          "AWS_REGION",
+          "AWS_ACCESS_KEY_ID",
+          "AWS_SECRET_ACCESS_KEY",
+          "AWS_ROLE_TO_ASSUME",
+          "ECR_REPO",
+          "EC2_HOST",
+          "EC2_USER"
+        ],
+        "environments": ["local", "ci", "production"]
+      },
+      "database": {
+        "description": "Database and backend services",
+        "secrets": [
+          "SUPABASE_URL",
+          "SUPABASE_SERVICE_ROLE_KEY",
+          "SUPABASE_ANON_KEY",
+          "DATABASE_URL"
+        ],
+        "environments": ["local", "ci", "production"]
+      },
+      "ai_services": {
+        "description": "AI and ML service credentials",
+        "secrets": [
+          "OPENAI_API_KEY",
+          "OPENAI_EMBED_MODEL",
+          "ANTHROPIC_API_KEY"
+        ],
+        "environments": ["local", "ci"]
+      },
+      "integrations": {
+        "description": "Third-party integrations",
+        "secrets": [
+          "N8N_WEBHOOK_URL",
+          "N8N_PROJECT_WEBHOOK_URL",
+          "GITHUB_TOKEN"
+        ],
+        "environments": ["local", "ci"]
+      }
+    }
+  },
+
+  "sources": {
+    "local": {
+      "type": "shell_env",
+      "path": "~/.zshrc",
+      "description": "Primary source of truth for developer credentials"
+    },
+    "github": {
+      "type": "github_secrets",
+      "description": "GitHub Actions secrets for CI/CD"
+    },
+    "supabase": {
+      "type": "supabase_vault",
+      "description": "Supabase project secrets (future)"
+    }
+  },
+
+  "destinations": {
+    "local_env": {
+      "path": ".env.local",
+      "mode": "0600",
+      "description": "Local development environment"
+    },
+    "secrets_vault": {
+      "path": ".secrets/.env.local",
+      "mode": "0600",
+      "description": "Encrypted secrets vault"
+    },
+    "github_actions": {
+      "description": "GitHub Actions secrets via gh CLI"
+    }
+  },
+
+  "security": {
+    "audit_log": ".secrets/audit.log",
+    "allowed_users": ["*"],
+    "require_confirmation": {
+      "github_push": true,
+      "production_sync": true
+    },
+    "validation": {
+      "check_format": true,
+      "check_completeness": true,
+      "warn_missing": true
+    }
+  },
+
+  "workflows": {
+    "local_dev": {
+      "description": "Setup local development environment",
+      "steps": [
+        "sync_from_shell",
+        "validate_secrets",
+        "copy_to_local_env"
+      ]
+    },
+    "ci_setup": {
+      "description": "Setup CI/CD secrets",
+      "steps": [
+        "sync_from_shell",
+        "validate_secrets",
+        "push_to_github",
+        "verify_github_secrets"
+      ]
+    },
+    "supabase_migrate": {
+      "description": "Run Supabase migrations with credentials",
+      "steps": [
+        "load_from_vault",
+        "link_supabase_project",
+        "run_migrations",
+        "verify_connection"
+      ]
+    }
+  }
+}

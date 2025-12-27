@@ -53,8 +53,9 @@ export function registerChatParticipant(
       const crewInfo = alexAiService.getCrewInfo(crewMember);
 
       // Show which crew member is responding
+      // Note: Removed emoji from markdown to avoid ByteString conversion errors in VS Code Chat API
       stream.markdown(
-        `${crewInfo.emoji} **${crewInfo.name}** analyzing...\n\n`
+        `**${crewInfo.name}** analyzing...\n\n`
       );
 
       // Build context from chat history

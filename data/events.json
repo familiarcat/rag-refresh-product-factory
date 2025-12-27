@@ -219,5 +219,20 @@
     "sprintId": "sprint_proj_1765948227414_iw68yf_1_1766045377844",
     "projectId": "proj_1765948227414_iw68yf",
     "sprintNumber": 1
+  },
+  {
+    "type": "sprint-created",
+    "at": "2025-12-26T09:06:37.485Z",
+    "sprintId": "sprint_proj_1765948227502_1m0gpk_1_1766739997483",
+    "projectId": "proj_1765948227502_1m0gpk",
+    "sprintNumber": 1
+  },
+  {
+    "type": "project-updated",
+    "at": "2025-12-26T09:10:14.416Z",
+    "projectId": "proj_1765948227502_1m0gpk",
+    "updates": [
+      "status"
+    ]
   }
 ]

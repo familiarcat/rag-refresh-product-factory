@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { extractAlexFsOps, applyFsOpsWithApproval } from "./fsOps";
 import { AlexAiService, ObservationLoungeResult } from "./alexAiService";
+import { visionClient } from "./visionClient";
 
 /**
  * Alex AI Comprehensive Sidebar View
@@ -32,6 +33,9 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       switch (message.type) {
         case "sendMessage":
           await this.handleUserMessage(message.text, message.crew, message.context);
+          break;
+        case "analyzeImage":
+          await this.handleImageAnalysis(message.imageData, message.prompt, message.crew);
           break;
         case "selectCrew":
           this.currentCrew = message.crew;
@@ -144,6 +148,72 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       emoji: crewInfo.emoji,
       crewId: crew,
     });
+  }
+
+  private async handleImageAnalysis(imageData: string, prompt: string, crew: string) {
+    if (!this._view) return;
+
+    // Show user message with image preview
+    this._view.webview.postMessage({
+      type: "addMessage",
+      role: "user",
+      content: prompt || "Analyze this image",
+      imageData: imageData,
+    });
+
+    // Show typing indicator
+    this._view.webview.postMessage({
+      type: "showTyping",
+      crew,
+    });
+
+    try {
+      // Remove data:image prefix if present
+      const base64Data = imageData.includes(',')
+        ? imageData.split(',')[1]
+        : imageData;
+
+      // Analyze with vision client
+      const result = await visionClient.analyzeImage({
+        image: base64Data,
+        prompt: prompt || "What do you see in this image? Please describe it in detail.",
+        crewMember: crew,
+        extractText: true,
+      });
+
+      // Hide typing
+      this._view.webview.postMessage({ type: "hideTyping" });
+
+      // Build response with extracted text if available
+      let displayResponse = result.analysis;
+      if (result.extractedText) {
+        displayResponse += `\n\n**Extracted Text (OCR)**:\n\`\`\`\n${result.extractedText}\n\`\`\``;
+      }
+
+      const crewInfo = this.alexAiService.getCrewInfo(crew);
+      this._view.webview.postMessage({
+        type: "addMessage",
+        role: "assistant",
+        content: displayResponse,
+        crew: crewInfo.name,
+        emoji: crewInfo.emoji,
+        crewId: crew,
+      });
+
+    } catch (error) {
+      // Hide typing
+      this._view.webview.postMessage({ type: "hideTyping" });
+
+      // Show error
+      this._view.webview.postMessage({
+        type: "addMessage",
+        role: "assistant",
+        content: `❌ Image analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        crew: "System",
+        emoji: "⚠️",
+        crewId: "system",
+      });
+    }
   }
 
   private async sendWorkspaceFiles() {
@@ -649,7 +719,29 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     
     .send-btn:hover { filter: brightness(1.15); }
     .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    
+
+    .image-btn {
+      padding: 8px 10px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+
+    .image-btn:hover {
+      background: rgba(124,92,255,.2);
+      border-color: var(--accent1);
+      transform: scale(1.05);
+    }
+
+    .image-btn.has-image {
+      background: rgba(90,230,255,.2);
+      border-color: var(--good);
+    }
+
     /* File Explorer */
     .file-section {
       padding: 10px;
@@ -1049,10 +1141,16 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       </div>
       
       <div class="input-area">
+        <div id="imagePreview" style="display: none; margin: 0 10px 8px; position: relative;">
+          <img id="previewImg" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid var(--line);">
+          <button id="removeImageBtn" style="position: absolute; top: 5px; right: 5px; background: rgba(255,77,109,.9); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 16px; line-height: 1;">×</button>
+        </div>
         <div class="input-row">
+          <button class="image-btn" id="imageBtn" title="Upload or paste image (Cmd+V)">📷</button>
           <textarea class="chat-input" id="chatInput" placeholder="Ask the crew..." rows="1"></textarea>
           <button class="send-btn" id="sendBtn">Send</button>
         </div>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;">
       </div>
     </div>
     
@@ -1116,13 +1214,19 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     let currentContext = null;
     let currentFile = null;
     let hasMessages = false;
-    
+    let currentImage = null; // base64 image data
+
     // DOM
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
     const contextBar = document.getElementById('contextBar');
     const contextFile = document.getElementById('contextFile');
+    const imageBtn = document.getElementById('imageBtn');
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const removeImageBtn = document.getElementById('removeImageBtn');
     
     // Navigation
     document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1157,42 +1261,89 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
     // Chat
     function sendMessage() {
       const text = chatInput.value.trim();
-      if (!text) return;
-      
-      vscode.postMessage({
-        type: 'sendMessage',
-        text: text,
-        crew: currentCrew,
-        context: currentContext
-      });
-      
+      if (!text && !currentImage) return;
+
+      // If image is attached, send image analysis
+      if (currentImage) {
+        vscode.postMessage({
+          type: 'analyzeImage',
+          imageData: currentImage,
+          prompt: text || 'What do you see in this image?',
+          crew: currentCrew
+        });
+        clearImage();
+      } else {
+        // Normal text message
+        vscode.postMessage({
+          type: 'sendMessage',
+          text: text,
+          crew: currentCrew,
+          context: currentContext
+        });
+      }
+
       chatInput.value = '';
       chatInput.style.height = 'auto';
     }
+
+    // Image handling
+    function showImagePreview(base64Data) {
+      currentImage = base64Data;
+      previewImg.src = base64Data;
+      imagePreview.style.display = 'block';
+      imageBtn.classList.add('has-image');
+    }
+
+    function clearImage() {
+      currentImage = null;
+      imagePreview.style.display = 'none';
+      imageInput.value = '';
+      imageBtn.classList.remove('has-image');
+    }
+
+    function handleImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        showImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
     
-    function addMessage(role, content, crew, emoji, crewId) {
+    function addMessage(role, content, crew, emoji, crewId, imageData) {
       if (!hasMessages) {
         chatMessages.innerHTML = '';
         hasMessages = true;
       }
-      
+
       const div = document.createElement('div');
       div.className = 'message ' + role;
-      
+
+      let messageContent = '';
+
+      // Add image if present (for user messages with images)
+      if (imageData && role === 'user') {
+        messageContent += '<img src="' + imageData + '" style="max-width: 100%; max-height: 300px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--line);">';
+      }
+
       if (role === 'assistant' && crew) {
         const crewColors = {
           riker: 'var(--good)', picard: 'var(--warn)', data: 'var(--accent2)',
           worf: 'var(--risk)', geordi: 'var(--accent3)', troi: 'var(--accent1)',
           obrien: 'var(--ok)', quark: 'var(--accent3)'
         };
-        div.innerHTML = '<div class="message-header">' +
+        messageContent += '<div class="message-header">' +
           '<span>' + emoji + '</span>' +
           '<span class="crew-badge" style="border-color:' + (crewColors[crewId] || 'var(--good)') + '50; background:' + (crewColors[crewId] || 'var(--good)') + '15; color:' + (crewColors[crewId] || 'var(--good)') + '">' + crew + '</span>' +
-          '</div>' + formatContent(content);
-      } else {
-        div.innerHTML = formatContent(content);
+          '</div>';
       }
-      
+
+      messageContent += formatContent(content);
+      div.innerHTML = messageContent;
+
       chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -1233,7 +1384,42 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       chatInput.style.height = 'auto';
       chatInput.style.height = Math.min(chatInput.scrollHeight, 100) + 'px';
     });
-    
+
+    // Image upload button
+    imageBtn.addEventListener('click', () => {
+      imageInput.click();
+    });
+
+    // File input change
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleImageFile(file);
+      }
+    });
+
+    // Remove image button
+    removeImageBtn.addEventListener('click', () => {
+      clearImage();
+    });
+
+    // Paste event for images
+    chatInput.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          e.preventDefault();
+          const file = items[i].getAsFile();
+          if (file) {
+            handleImageFile(file);
+          }
+          break;
+        }
+      }
+    });
+
     // Context
     document.getElementById('clearContext').addEventListener('click', () => {
       currentContext = null;
@@ -1269,7 +1455,7 @@ export class CrewChatViewProvider implements vscode.WebviewViewProvider {
       
       switch (msg.type) {
         case 'addMessage':
-          addMessage(msg.role, msg.content, msg.crew, msg.emoji, msg.crewId);
+          addMessage(msg.role, msg.content, msg.crew, msg.emoji, msg.crewId, msg.imageData);
           break;
         case 'showTyping':
           showTyping(msg.crew);
