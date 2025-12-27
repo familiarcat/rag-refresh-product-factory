@@ -1,0 +1,201 @@
+{
+  "name": "Alex AI Crew Collaboration Optimizer",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 */6 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule: Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "schedule-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/projects",
+        "options": {}
+      },
+      "name": "Get Active Projects",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "id": "get-projects"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Find high-priority domains needing attention\nconst projects = $input.all()[0].json.projects || [];\nconst opportunities = [];\n\nfor (const project of projects) {\n  if (project.status !== 'active') continue;\n  \n  for (const domain of project.domains || []) {\n    // High priority: progress < 25% or status = in-progress + progress < 50%\n    const priority = domain.progress < 25 ? 'high' : \n                     (domain.status === 'in-progress' && domain.progress < 50) ? 'medium' : 'low';\n    \n    if (priority === 'high' || priority === 'medium') {\n      opportunities.push({\n        projectId: project.id,\n        projectName: project.name,\n        domainSlug: domain.slug,\n        domainName: domain.name,\n        progress: domain.progress,\n        priority,\n        features: domain.features || [],\n        description: domain.description\n      });\n    }\n  }\n}\n\n// Sort by priority\nopportunities.sort((a, b) => {\n  const priorityOrder = { high: 0, medium: 1, low: 2 };\n  return priorityOrder[a.priority] - priorityOrder[b.priority];\n});\n\nreturn opportunities.map(opp => ({ json: opp }));"
+      },
+      "name": "Identify Opportunities",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300],
+      "id": "identify-opportunities"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Assign optimal crew based on domain type\nconst opportunity = $input.item.json;\n\n// Crew specialization mapping\nconst crewAssignments = {\n  // AI/ML domains\n  'ai-engine': ['commander_data', 'geordi_la_forge'],\n  'rag-memory-system': ['commander_data', 'geordi_la_forge', 'quark'],\n  'collaboration-engine': ['commander_riker', 'commander_data', 'counselor_troi'],\n  \n  // Infrastructure\n  'infrastructure': ['geordi_la_forge', 'chief_obrien'],\n  'deployment': ['geordi_la_forge', 'lieutenant_worf'],\n  \n  // Security\n  'security': ['lieutenant_worf', 'commander_data'],\n  'authentication': ['lieutenant_worf', 'geordi_la_forge'],\n  \n  // UI/UX\n  'ui': ['counselor_troi', 'lieutenant_uhura'],\n  'dashboard': ['counselor_troi', 'chief_obrien'],\n  \n  // Business\n  'monetization': ['quark', 'captain_picard'],\n  'cost-optimization': ['quark', 'geordi_la_forge']\n};\n\n// Find best crew match\nlet assignedCrew = null;\nfor (const [key, crew] of Object.entries(crewAssignments)) {\n  if (opportunity.domainSlug.includes(key) || \n      opportunity.domainName.toLowerCase().includes(key)) {\n    assignedCrew = crew;\n    break;\n  }\n}\n\n// Default to generalist team\nif (!assignedCrew) {\n  assignedCrew = ['commander_riker', 'chief_obrien', 'counselor_troi'];\n}\n\nreturn {\n  json: {\n    ...opportunity,\n    assignedCrew,\n    teamSize: assignedCrew.length\n  }\n};"
+      },
+      "name": "Assign Crew",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300],
+      "id": "assign-crew"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Optimize LLM selection based on task complexity\nconst item = $input.item.json;\n\n// Cost-optimized model selection\n// Haiku: $0.25/$1.25 per 1M tokens (cheapest)\n// GPT-4 Turbo: $10/$30 per 1M tokens\n// Claude 3.5 Sonnet: $3/$15 per 1M tokens\n\nconst modelAssignments = {\n  // Simple tasks → Haiku\n  simple: 'anthropic/claude-3-haiku',\n  \n  // Medium complexity → GPT-4 Turbo or Sonnet\n  medium: 'openai/gpt-4-turbo',\n  \n  // High complexity or strategic → Sonnet\n  complex: 'anthropic/claude-3.5-sonnet',\n  \n  // Analysis heavy → GPT-4\n  analysis: 'openai/gpt-4-turbo'\n};\n\n// Determine task complexity\nlet complexity = 'medium';\nif (item.priority === 'high' && item.progress < 15) {\n  complexity = 'complex'; // New domains need strategic thinking\n} else if (item.features && item.features.length > 5) {\n  complexity = 'complex'; // Many features = complex\n} else if (item.progress > 50) {\n  complexity = 'simple'; // Later stage work is often simpler\n}\n\n// Assign models per crew member based on their role\nconst crewModels = {};\nfor (const crewId of item.assignedCrew) {\n  if (crewId === 'captain_picard' || crewId === 'commander_riker') {\n    crewModels[crewId] = modelAssignments.complex; // Leaders get best models\n  } else if (crewId === 'commander_data' || crewId === 'quark') {\n    crewModels[crewId] = modelAssignments.analysis; // Analysts get GPT-4\n  } else {\n    crewModels[crewId] = modelAssignments[complexity];\n  }\n}\n\nreturn {\n  json: {\n    ...item,\n    crewModels,\n    estimatedCost: calculateCost(crewModels)\n  }\n};\n\nfunction calculateCost(models) {\n  const costs = {\n    'anthropic/claude-3-haiku': 0.001, // $0.001 per 1K tokens (avg)\n    'openai/gpt-4-turbo': 0.020,       // $0.020 per 1K tokens (avg)\n    'anthropic/claude-3.5-sonnet': 0.009 // $0.009 per 1K tokens (avg)\n  };\n  \n  let total = 0;\n  for (const model of Object.values(models)) {\n    total += costs[model] || 0.010;\n  }\n  \n  return total;\n}"
+      },
+      "name": "Optimize LLM Selection",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300],
+      "id": "optimize-llm"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/crew/collaborate",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "opportunity",
+              "value": "={{ $json }}"
+            },
+            {
+              "name": "activatedCrew",
+              "value": "={{ $json.assignedCrew }}"
+            },
+            {
+              "name": "llmAssignments",
+              "value": "={{ $json.crewModels }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Execute Collaboration",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 300],
+      "id": "execute-collaboration"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse collaboration results and update project\nconst result = $input.item.json;\n\nreturn {\n  json: {\n    timestamp: new Date().toISOString(),\n    projectId: result.projectId,\n    domainSlug: result.domainSlug,\n    crew: result.assignedCrew,\n    insights: result.insights || [],\n    progressDelta: result.progressDelta || 0,\n    tokenUsage: result.tokenUsage || {},\n    cost: result.cost || 0,\n    success: true\n  }\n};"
+      },
+      "name": "Log Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300],
+      "id": "log-results"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/crew/metrics",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "metrics",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Save Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1650, 300],
+      "id": "save-metrics"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.priority }}",
+              "operation": "equal",
+              "value2": "high"
+            }
+          ]
+        }
+      },
+      "name": "High Priority?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 500],
+      "id": "priority-check"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/notifications/slack",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "🚨 High priority domain needs attention:\\n{{ $json.projectName }} → {{ $json.domainName }}\\nProgress: {{ $json.progress }}%\\nCrew assigned: {{ $json.assignedCrew.join(', ') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Alert Team",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 500],
+      "id": "alert-team"
+    }
+  ],
+  "connections": {
+    "Schedule: Every 6 Hours": {
+      "main": [[{ "node": "Get Active Projects", "type": "main", "index": 0 }]]
+    },
+    "Get Active Projects": {
+      "main": [[{ "node": "Identify Opportunities", "type": "main", "index": 0 }]]
+    },
+    "Identify Opportunities": {
+      "main": [[{ "node": "Assign Crew", "type": "main", "index": 0 }]]
+    },
+    "Assign Crew": {
+      "main": [
+        [
+          { "node": "Optimize LLM Selection", "type": "main", "index": 0 },
+          { "node": "High Priority?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Optimize LLM Selection": {
+      "main": [[{ "node": "Execute Collaboration", "type": "main", "index": 0 }]]
+    },
+    "Execute Collaboration": {
+      "main": [[{ "node": "Log Results", "type": "main", "index": 0 }]]
+    },
+    "Log Results": {
+      "main": [[{ "node": "Save Metrics", "type": "main", "index": 0 }]]
+    },
+    "High Priority?": {
+      "main": [[{ "node": "Alert Team", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-12-27T12:00:00.000Z",
+  "versionId": "1"
+}
