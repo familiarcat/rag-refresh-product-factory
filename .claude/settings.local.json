@@ -29,7 +29,9 @@
       "Bash(node scripts/crew-automation/optimize-collaboration.mjs:*)",
       "Bash(node scripts/crew-automation/execute-improvements.mjs:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(aws sts get-caller-identity:*)",
+      "Bash(export AWS_REGION=us-east-2:*)"
     ]
   }
 }

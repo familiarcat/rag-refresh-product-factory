@@ -73,6 +73,21 @@ if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
     exit 1
 fi
 
+# Validate AWS credentials and region
+echo -e "${YELLOW}Validating AWS credentials...${NC}"
+if ! aws sts get-caller-identity >/dev/null 2>&1; then
+    echo -e "${RED}❌ AWS credentials are invalid or expired${NC}"
+    echo ""
+    echo "Troubleshooting steps:"
+    echo "1. Check your credentials in .env.local"
+    echo "2. Verify AWS_REGION is set correctly (should be us-east-2)"
+    echo "3. Run: aws configure list"
+    echo "4. Run: aws sts get-caller-identity"
+    echo ""
+    exit 1
+fi
+echo -e "${GREEN}✓ AWS credentials valid${NC}"
+
 # Configuration
 AWS_REGION="${AWS_REGION:-us-east-2}"
 AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-860268930466}"
