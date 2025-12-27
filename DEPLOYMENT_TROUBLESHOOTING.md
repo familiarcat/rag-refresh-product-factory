@@ -31,17 +31,42 @@ Your AWS credentials in `.env.local` are either:
 
 ### Quick Fix
 
-Run the credential fix helper:
+**Option 1: Use Worf Secure Vault (Recommended)**
 
 ```bash
 ./scripts/fix-aws-credentials.sh
+# Choose option 1: Worf secure vault
 ```
 
-This interactive script will:
-1. Check your current credentials
-2. Guide you through getting new ones
-3. Update your `.env.local` file
-4. Test the credentials
+This stores credentials in `~/.alexai-secrets/api-keys.env` which:
+- ✅ Is automatically loaded via `load_alex_ai_secrets()` in your `~/.zshrc`
+- ✅ Works across all projects
+- ✅ Is centrally managed by Worf security system
+- ✅ Supports sync to GitHub Actions secrets
+
+**Option 2: Use Project-Local Storage**
+
+```bash
+./scripts/fix-aws-credentials.sh
+# Choose option 2: Local project only
+```
+
+This stores credentials in `.env.local` for this project only.
+
+### Worf Security System Integration
+
+You can also use Worf directly:
+
+```bash
+# Full development setup (sync all secrets)
+./scripts/worf/worf.sh dev
+
+# Just sync AWS secrets from ~/.alexai-secrets
+source ~/.zshrc  # Loads load_alex_ai_secrets()
+
+# Secure deployment with pre-checks
+./scripts/worf/secure-deployment.sh deploy
+```
 
 ### Manual Fix
 

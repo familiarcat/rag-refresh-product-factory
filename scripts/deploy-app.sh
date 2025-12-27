@@ -5,7 +5,16 @@
 
 set -euo pipefail
 
-source scripts/secrets/load_env.sh
+# Load secrets via Worf security system (prefers ~/.alexai-secrets)
+if [ -f "$HOME/.alexai-secrets/api-keys.env" ]; then
+    set -a
+    source "$HOME/.alexai-secrets/api-keys.env"
+    set +a
+    echo "✓ Loaded secrets from Worf secure vault (~/.alexai-secrets)"
+else
+    # Fallback to legacy load_env.sh
+    source scripts/secrets/load_env.sh
+fi
 
 # Colors
 RED='\033[0;31m'
