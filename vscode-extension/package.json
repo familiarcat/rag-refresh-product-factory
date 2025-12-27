@@ -329,8 +329,8 @@
         },
         "alexAi.baseUrl": {
           "type": "string",
-          "default": "http://localhost:3001",
-          "markdownDescription": "Base URL for Alex AI server (for sprint status and memories). Leave default unless self-hosting.",
+          "default": "https://rag.pbradygeorgen.com",
+          "markdownDescription": "Base URL for Alex AI API server.\n\n- **Production** (default): `https://rag.pbradygeorgen.com`\n- **Local development**: `http://localhost:3000`\n\nChange this to your local URL when developing or to a custom deployment URL.",
           "order": 4
         },
         "alexAi.autoApproveFileEdits": {
