@@ -26,7 +26,8 @@
       "Bash(bash -c 'if command -v pbcopy &> /dev/null; then cat supabase/migrations/20251220_create_drill_system.sql | pbcopy && echo \"\"✅ Migration SQL copied to clipboard!\"\" && echo \"\"   You can now paste it directly into the Supabase SQL Editor\"\"; else echo \"\"ℹ️  Please manually copy: supabase/migrations/20251220_create_drill_system.sql\"\"; fi')",
       "Bash(grep:*)",
       "Bash(xargs:*)",
-      "Bash(node scripts/crew-automation/optimize-collaboration.mjs:*)"
+      "Bash(node scripts/crew-automation/optimize-collaboration.mjs:*)",
+      "Bash(node scripts/crew-automation/execute-improvements.mjs:*)"
     ]
   }
 }
