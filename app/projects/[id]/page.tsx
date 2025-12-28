@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import Link from 'next/link';
+import { ProjectTimeline, Milestone } from '@/components/ProjectTimeline';
 
 interface Project {
   id: string;
@@ -24,8 +25,9 @@ interface Project {
   createdAt: string;
   updatedAt: string;
   domainCount?: number;
-  domains?: Array<{ name: string; progress: number }>;
-  crew?: Array<{ id: string; name: string; role: string }>;
+  domains?: Array<{ name: string; progress: number; status?: string }>;
+  crew?: Array<{ memberId: string; role: string; assignment?: string }>;
+  milestones?: Milestone[];
 }
 
 interface ProjectsData {
@@ -140,6 +142,22 @@ export default async function ProjectDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Timeline Visualization */}
+      {project.milestones && project.milestones.length > 0 && (
+        <ProjectTimeline
+          projectName={project.name}
+          projectProgress={project.progress}
+          milestones={project.milestones.map((m) => ({
+            ...m,
+            progress: m.status === 'completed' ? 100 : m.status === 'in-progress' ? 50 : 0,
+            assignees: project.crew?.map((c) => c.memberId) || [],
+          }))}
+          mode="detailed"
+          zoomLevel="all"
+          interactive={true}
+        />
+      )}
 
       {/* Quick Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
