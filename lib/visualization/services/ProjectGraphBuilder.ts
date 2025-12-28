@@ -47,6 +47,7 @@ export interface Milestone {
   name: string;
   status?: string;
   date?: string;
+  description?: string;
 }
 
 export type ViewDimension = 'domains' | 'tech-stack' | 'crew' | 'milestones' | 'full';

@@ -10,7 +10,7 @@ export async function loadMarkdown(name: string) {
   const safe = sanitize(name);
   const p = path.join(process.cwd(), 'content', safe);
   const md = await readFile(p, 'utf-8');
-  const html = marked.parse(md);
+  const html = await marked.parse(md);
   return { md, html };
 }
 
@@ -27,7 +27,7 @@ export async function loadMarkdownSafe(name: string) {
     return { ok: true, md, html, available };
   } catch (e: any) {
     const msg = (e && e.message) ? e.message : String(e);
-    const html = marked.parse(`# Document not found\n\nWe couldn't load **${safe}**.`);
+    const html = await marked.parse(`# Document not found\n\nWe couldn't load **${safe}**.`);
     return { ok: false, md: '', html, error: msg, available };
   }
 }

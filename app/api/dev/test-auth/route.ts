@@ -9,15 +9,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDevApiKey } from '@/lib/auth/api-keys';
 import { checkSupabaseConnection, getDatabaseStats, supabase } from '@/lib/supabase';
 
-// Only allow in development
-if (process.env.NODE_ENV === 'production') {
-  throw new Error('test-auth endpoint cannot be loaded in production');
-}
-
 /**
  * GET /api/dev/test-auth - Get development utilities and stats
  */
 export async function GET(req: NextRequest) {
+  // Only allow in development
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Development endpoint not available in production' },
+      { status: 404 }
+    );
+  }
   const { searchParams } = new URL(req.url);
   const action = searchParams.get('action');
 
@@ -86,6 +88,14 @@ export async function GET(req: NextRequest) {
  * POST /api/dev/test-auth - Test authentication with provided API key
  */
 export async function POST(req: NextRequest) {
+  // Only allow in development
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json(
+      { error: 'Development endpoint not available in production' },
+      { status: 404 }
+    );
+  }
+
   const { api_key } = await req.json();
 
   if (!api_key) {

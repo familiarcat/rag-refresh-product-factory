@@ -32,7 +32,7 @@ export interface BatchedRequest {
   modelId: string;
   crewRequests: CrewLLMRequest[];
   combinedPrompt: string;
-  temperature: float;
+  temperature: number;
   maxTokens: number;
   metadata?: Record<string, any>;
 }
