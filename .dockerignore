@@ -37,6 +37,11 @@ README.md
 docs/
 *.md
 
+# Backups
+*.backup
+**/2
+**/* 2
+
 
 
 
