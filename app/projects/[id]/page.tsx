@@ -186,6 +186,23 @@ export default async function ProjectDetailPage({
 
       {/* Quick Actions */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+        <Link href={`/projects/${project.id}/sitemap`} style={{ textDecoration: 'none' }}>
+          <div
+            className="card"
+            style={{
+              cursor: 'pointer',
+              transition: 'transform 0.2s',
+              borderLeft: '3px solid var(--accent1)',
+            }}
+          >
+            <div style={{ fontSize: 24, marginBottom: 8 }}>🗺️</div>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16 }}>Project Sitemap</h3>
+            <p className="small" style={{ margin: 0, color: 'var(--muted)' }}>
+              Visualize domain dependencies
+            </p>
+          </div>
+        </Link>
+
         <Link href={`/projects/${project.id}/domains`} style={{ textDecoration: 'none' }}>
           <div
             className="card"

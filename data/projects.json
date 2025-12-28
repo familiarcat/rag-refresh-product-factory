@@ -30,7 +30,19 @@
             "Grammar check"
           ],
           "status": "in-progress",
-          "progress": 65
+          "progress": 65,
+          "dependencies": [
+            {
+              "targetSlug": "ai-engine",
+              "type": "data-flow",
+              "description": "Sends text content for AI processing and suggestions"
+            },
+            {
+              "targetSlug": "user-management",
+              "type": "shared-model",
+              "description": "Requires user context and preferences"
+            }
+          ]
         },
         {
           "slug": "ai-engine",
@@ -50,7 +62,14 @@
             "Response streaming"
           ],
           "status": "in-progress",
-          "progress": 50
+          "progress": 50,
+          "dependencies": [
+            {
+              "targetSlug": "user-management",
+              "type": "shared-model",
+              "description": "Validates API keys and tracks usage quotas"
+            }
+          ]
         },
         {
           "slug": "user-management",
