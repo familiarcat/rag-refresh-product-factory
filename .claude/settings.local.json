@@ -31,7 +31,29 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(aws sts get-caller-identity:*)",
-      "Bash(export AWS_REGION=us-east-2:*)"
+      "Bash(export AWS_REGION=us-east-2:*)",
+      "Bash(AWS_PROFILE=rag-refresh-deploy aws sts:*)",
+      "Bash(AWS_PROFILE=pbradygeorgen-amplify aws sts get-caller-identity:*)",
+      "Bash(AWS_PROFILE=AmplifyUser aws sts get-caller-identity:*)",
+      "Bash(echo:*)",
+      "Bash(source ~/.alexai-secrets/api-keys.env)",
+      "Bash(AWS_PROFILE=rag-refresh-deploy AWS_REGION=us-east-2 aws sts get-caller-identity:*)",
+      "Bash(for profile in rag-refresh-deploy pbradygeorgen-amplify AmplifyUser)",
+      "Bash(do echo \"=== Testing profile: $profile ===\" AWS_PROFILE=$profile AWS_REGION=us-east-2 aws sts get-caller-identity)",
+      "Bash(do echo \"=== IAM user info for profile: $profile ===\" AWS_PROFILE=$profile AWS_REGION=us-east-2 aws iam get-user)",
+      "Bash(AWS_PROFILE=pbradygeorgen-amplify AWS_REGION=us-east-2 aws sts get-caller-identity:*)",
+      "Bash(AWS_PROFILE=AmplifyUser AWS_REGION=us-east-2 aws sts:*)",
+      "Bash(~/.alexai-secrets/api-keys.env.tmp)",
+      "Bash(./scripts/worf/secure-deployment.sh:*)",
+      "Bash(source .env.local)",
+      "Bash(./scripts/secrets/sync_from_zshrc.sh:*)",
+      "Bash(./scripts/deploy-with-orchestration.sh:*)",
+      "Bash(open:*)",
+      "Bash(tee:*)",
+      "Bash(npm install:*)",
+      "Bash(rm:*)",
+      "Bash(npm ls:*)",
+      "Bash(curl:*)"
     ]
   }
 }
