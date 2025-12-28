@@ -30,3 +30,10 @@ export async function callOpenRouterChat(input: OpenRouterCallInput) {
   }
   return res.json();
 }
+
+// Client class wrapper for compatibility with batch executor
+export class OpenRouterClient {
+  async call(input: OpenRouterCallInput) {
+    return callOpenRouterChat(input);
+  }
+}

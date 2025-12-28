@@ -53,7 +53,10 @@
       "Bash(npm install:*)",
       "Bash(rm:*)",
       "Bash(npm ls:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm run build:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)"
     ]
   }
 }
