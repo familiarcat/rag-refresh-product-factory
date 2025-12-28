@@ -50,12 +50,3 @@ export class AlexUriHandler implements vscode.UriHandler {
         vscode.window.showInformationMessage(`Alex AI: Connected to Project ID ${projectId}`);
     }
 }
-```
-
-### **2. Image Reading System (Drag & Drop in VSCode)**
-
-To enable dragging images into the chat, we need a React hook for the Webview side of the extension. This will capture `drop` and `paste` events, convert files to Base64, and send them to the extension host (which then forwards them to the Gemini/Crew agent).
-
-I will create a hook that you can use in your Chat Component.
-
-```diff

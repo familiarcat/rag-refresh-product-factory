@@ -277,113 +277,166 @@ export class AlexAiPanel {
     }
     
     .app {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      min-height: 100vh;
-    }
-    
-    /* Sidebar */
-    .sidebar {
-      background: linear-gradient(180deg, rgba(13,16,34,.97), rgba(11,15,29,.92));
-      border-right: 1px solid var(--line);
-      padding: 16px;
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
+      padding-bottom: 70px; /* Space for bottom nav */
     }
-    
-    .brand {
+
+    /* Mobile-First Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(13,16,34,.97), rgba(11,15,29,.95));
+      border-top: 1px solid var(--line);
       display: flex;
+      justify-content: space-around;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--line);
+      padding: 0 16px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
     }
-    
-    .brand-icon { font-size: 28px; }
-    .brand-text h1 { font-size: 16px; font-weight: 700; margin: 0; }
-    .brand-text p { font-size: 11px; color: var(--muted); margin: 2px 0 0; }
-    
-    .nav-section { margin-top: 16px; }
-    .nav-header {
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 8px 16px;
+      border-radius: 12px;
+      flex: 1;
+      max-width: 100px;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,.05);
+    }
+
+    .nav-item.active {
+      background: rgba(124,92,255,.15);
+      color: var(--accent1);
+    }
+
+    .nav-icon {
+      font-size: 24px;
+      transition: transform 0.2s;
+    }
+
+    .nav-item.active .nav-icon {
+      transform: scale(1.15);
+    }
+
+    .nav-label {
       font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Crew Modal (replaces fixed sidebar crew) */
+    .crew-modal {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(13,16,34,.98), rgba(11,15,29,.95));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      display: none;
+      z-index: 99;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .crew-modal.show {
+      display: block;
+    }
+
+    .crew-modal-header {
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       font-weight: 600;
+      text-align: center;
     }
-    
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 4px;
-      border: 1px solid transparent;
-      background: rgba(255,255,255,.03);
-      font-size: 13px;
-    }
-    
-    .nav-item:hover {
-      background: rgba(255,255,255,.07);
-      border-color: var(--line);
-    }
-    
-    .nav-item.active {
-      background: rgba(124,92,255,.18);
-      border-color: var(--accent1);
-      color: var(--accent1);
-    }
-    
-    .nav-icon { font-size: 16px; }
-    
-    /* Crew Status */
-    .crew-status {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid var(--line);
-    }
-    
+
     .crew-avatars {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
     }
-    
+
     .crew-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
       background: rgba(124,92,255,.2);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 20px;
       cursor: pointer;
       transition: all 0.2s;
       border: 2px solid transparent;
     }
-    
+
     .crew-avatar:hover {
       border-color: var(--accent1);
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
-    
+
     .crew-avatar.selected {
       border-color: var(--good);
       background: rgba(90,230,255,.2);
     }
-    
+
+    .crew-name {
+      font-size: 8px;
+      margin-top: 4px;
+      text-align: center;
+    }
+
     /* Main Content */
     .main {
-      padding: 20px;
+      padding: 16px;
       overflow-y: auto;
+      flex: 1;
     }
+
+    /* Top Header (replaces brand in sidebar) */
+    .top-header {
+      position: sticky;
+      top: 0;
+      background: rgba(7,8,18,.95);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-icon { font-size: 24px; }
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-text p { font-size: 10px; color: var(--muted); margin: 2px 0 0; }
     
     .page { display: none; }
     .page.active { display: block; }
@@ -838,51 +891,15 @@ export class AlexAiPanel {
 </head>
 <body>
   <div class="app">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="brand">
-        <div class="brand-icon">🖖</div>
-        <div class="brand-text">
-          <h1>Alex AI</h1>
-          <p>Crew Code Assistant</p>
-        </div>
-      </div>
-      
-      <div class="nav-section">
-        <div class="nav-header">Navigation</div>
-        <div class="nav-item active" data-page="chat">
-          <span class="nav-icon">💬</span>
-          <span>Crew Chat</span>
-        </div>
-        <div class="nav-item" data-page="codebase">
-          <span class="nav-icon">📁</span>
-          <span>Codebase</span>
-        </div>
-        <div class="nav-item" data-page="projects">
-          <span class="nav-icon">📦</span>
-          <span>Projects</span>
-        </div>
-        <div class="nav-item" data-page="lounge">
-          <span class="nav-icon">🚀</span>
-          <span>Observation Lounge</span>
-        </div>
-      </div>
-      
-      <div class="crew-status">
-        <div class="nav-header">Active Crew</div>
-        <div class="crew-avatars">
-          <div class="crew-avatar selected" data-crew="riker" title="Commander Riker (Coordinator)">⚡</div>
-          <div class="crew-avatar" data-crew="picard" title="Captain Picard">🎖️</div>
-          <div class="crew-avatar" data-crew="data" title="Commander Data">🤖</div>
-          <div class="crew-avatar" data-crew="worf" title="Lt. Worf">⚔️</div>
-          <div class="crew-avatar" data-crew="geordi" title="Lt. Cmdr. La Forge">🔧</div>
-          <div class="crew-avatar" data-crew="troi" title="Counselor Troi">💭</div>
-          <div class="crew-avatar" data-crew="obrien" title="Chief O'Brien">🛠️</div>
-          <div class="crew-avatar" data-crew="quark" title="Quark">💰</div>
-        </div>
+    <!-- Top Header -->
+    <div class="top-header">
+      <div class="brand-icon">🖖</div>
+      <div class="brand-text">
+        <h1>Alex AI</h1>
+        <p>Crew Code Assistant</p>
       </div>
     </div>
-    
+
     <!-- Main Content -->
     <div class="main">
       <!-- Chat Page -->
@@ -1004,8 +1021,67 @@ export class AlexAiPanel {
         </div>
       </div>
     </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-item active" data-page="chat">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">Chat</span>
+      </div>
+      <div class="nav-item" data-page="projects">
+        <span class="nav-icon">📦</span>
+        <span class="nav-label">Projects</span>
+      </div>
+      <div class="nav-item" data-page="codebase">
+        <span class="nav-icon">📁</span>
+        <span class="nav-label">Files</span>
+      </div>
+      <div class="nav-item" id="crew-toggle">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Crew</span>
+      </div>
+    </div>
+
+    <!-- Crew Modal -->
+    <div class="crew-modal" id="crewModal">
+      <div class="crew-modal-header">Select Crew Member</div>
+      <div class="crew-avatars">
+        <div class="crew-avatar selected" data-crew="riker" title="Commander Riker">
+          <span>⚡</span>
+          <div class="crew-name">Riker</div>
+        </div>
+        <div class="crew-avatar" data-crew="picard" title="Captain Picard">
+          <span>🎖️</span>
+          <div class="crew-name">Picard</div>
+        </div>
+        <div class="crew-avatar" data-crew="data" title="Commander Data">
+          <span>🤖</span>
+          <div class="crew-name">Data</div>
+        </div>
+        <div class="crew-avatar" data-crew="worf" title="Lt. Worf">
+          <span>⚔️</span>
+          <div class="crew-name">Worf</div>
+        </div>
+        <div class="crew-avatar" data-crew="geordi" title="Lt. Cmdr. La Forge">
+          <span>🔧</span>
+          <div class="crew-name">Geordi</div>
+        </div>
+        <div class="crew-avatar" data-crew="troi" title="Counselor Troi">
+          <span>💭</span>
+          <div class="crew-name">Troi</div>
+        </div>
+        <div class="crew-avatar" data-crew="obrien" title="Chief O'Brien">
+          <span>🛠️</span>
+          <div class="crew-name">O'Brien</div>
+        </div>
+        <div class="crew-avatar" data-crew="quark" title="Quark">
+          <span>💰</span>
+          <div class="crew-name">Quark</div>
+        </div>
+      </div>
+    </div>
   </div>
-  
+
   <script>
     const vscode = acquireVsCodeApi();
     
@@ -1049,6 +1125,22 @@ export class AlexAiPanel {
       });
     });
     
+    // Crew Modal Toggle
+    const crewToggle = document.getElementById('crew-toggle');
+    const crewModal = document.getElementById('crewModal');
+
+    crewToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      crewModal.classList.toggle('show');
+    });
+
+    // Close modal when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!crewModal.contains(e.target) && !crewToggle.contains(e.target)) {
+        crewModal.classList.remove('show');
+      }
+    });
+
     // Crew selection
     document.querySelectorAll('.crew-avatar').forEach(avatar => {
       avatar.addEventListener('click', () => {
@@ -1056,9 +1148,11 @@ export class AlexAiPanel {
         avatar.classList.add('selected');
         currentCrew = avatar.dataset.crew;
         crewSelect.value = currentCrew;
+        // Close modal after selection
+        crewModal.classList.remove('show');
       });
     });
-    
+
     crewSelect.addEventListener('change', () => {
       currentCrew = crewSelect.value;
       document.querySelectorAll('.crew-avatar').forEach(a => {
