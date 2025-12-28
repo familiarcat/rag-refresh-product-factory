@@ -369,6 +369,20 @@
           "type": "boolean",
           "default": false,
           "description": "Allow Alex AI chat to delete files via filesystem tools (dangerous)."
+        },
+        "alexAi.enableHotReload": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "**Development Mode**: Enable hot reload to automatically sync with web dashboard.\n\n⚡ Real-time updates when projects, crew status, or metrics change.\n\n⚠️ Only enable during development - polls server every 5 seconds.",
+          "order": 50
+        },
+        "alexAi.hotReloadInterval": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 1000,
+          "maximum": 60000,
+          "markdownDescription": "Hot reload polling interval in milliseconds (1000-60000).\n\nDefault: 5000ms (5 seconds)",
+          "order": 51
         }
       }
     }
@@ -382,7 +396,8 @@
     "package:install": "vsce package && code --install-extension alex-ai-assistant-1.0.0.vsix",
     "install-extension": "code --install-extension alex-ai-assistant-1.0.0.vsix",
     "dev:reload": "npm run compile && npm run package && npm run install-extension && echo '\n\u2705 Extension reloaded! Reload window: Cmd+Shift+P \u2192 \"Developer: Reload Window\"'",
-    "dev:watch": "npm run compile:watch"
+    "dev:watch": "npm run compile:watch",
+    "dev:hot": "node scripts/dev-hot-reload.js"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
