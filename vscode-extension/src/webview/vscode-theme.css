@@ -1,0 +1,298 @@
+/**
+ * VSCode Theme Mappings for Sprint Timeline
+ *
+ * Maps VSCode theme variables to utility classes that match Tailwind patterns
+ * used in the web SprintTimeline component. This ensures the IDE view matches
+ * VSCode's active theme (light/dark/high contrast).
+ */
+
+/* ============================================================================
+   CSS Variables - VSCode Theme Integration
+   ============================================================================ */
+
+:root {
+  /* Background colors */
+  --color-bg-primary: var(--vscode-editor-background);
+  --color-bg-secondary: var(--vscode-sideBar-background);
+  --color-bg-tertiary: var(--vscode-editorGroupHeader-tabsBackground);
+  --color-bg-hover: var(--vscode-list-hoverBackground);
+  --color-bg-active: var(--vscode-list-activeSelectionBackground);
+
+  /* Text colors */
+  --color-text-primary: var(--vscode-foreground);
+  --color-text-secondary: var(--vscode-descriptionForeground);
+  --color-text-muted: var(--vscode-disabledForeground);
+
+  /* Border colors */
+  --color-border: var(--vscode-panel-border);
+  --color-border-light: var(--vscode-widget-border);
+
+  /* Accent colors */
+  --color-accent: var(--vscode-button-background);
+  --color-accent-hover: var(--vscode-button-hoverBackground);
+  --color-accent-text: var(--vscode-button-foreground);
+
+  /* Status colors */
+  --color-info: var(--vscode-editorInfo-foreground, #3b82f6);
+  --color-warning: var(--vscode-editorWarning-foreground, #f59e0b);
+  --color-error: var(--vscode-editorError-foreground, #ef4444);
+  --color-success: var(--vscode-testing-iconPassed, #10b981);
+
+  /* Sprint-specific colors (match web component) */
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-100: #dbeafe;
+  --color-blue-800: #1e40af;
+  --color-gray-50: var(--vscode-editor-background);
+  --color-gray-100: var(--vscode-sideBar-background);
+  --color-gray-200: var(--vscode-input-background);
+  --color-gray-300: var(--vscode-input-border);
+  --color-gray-700: var(--vscode-foreground);
+  --color-gray-900: var(--vscode-editor-foreground);
+
+  /* Story status colors */
+  --color-status-backlog: #6b7280;
+  --color-status-planned: #3b82f6;
+  --color-status-in-progress: #f59e0b;
+  --color-status-in-review: #8b5cf6;
+  --color-status-completed: #10b981;
+  --color-status-blocked: #ef4444;
+}
+
+/* ============================================================================
+   Global Styles
+   ============================================================================ */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   Utility Classes - Tailwind-compatible
+   ============================================================================ */
+
+/* Background colors */
+.bg-white { background-color: var(--color-bg-primary); }
+.bg-gray-50 { background-color: var(--color-bg-secondary); }
+.bg-gray-100 { background-color: var(--color-bg-tertiary); }
+.bg-gray-200 { background-color: var(--color-border-light); }
+.bg-blue-100 { background-color: rgba(59, 130, 246, 0.1); }
+.bg-blue-500 { background-color: var(--color-blue-500); }
+.bg-blue-600 { background-color: var(--color-blue-600); }
+
+/* Text colors */
+.text-gray-900 { color: var(--color-text-primary); }
+.text-gray-700 { color: var(--color-text-primary); }
+.text-gray-600 { color: var(--color-text-secondary); }
+.text-gray-500 { color: var(--color-text-muted); }
+.text-white { color: var(--color-text-primary); }
+.text-blue-800 { color: var(--color-blue-800); }
+
+/* Status badge colors */
+.bg-gray-200.text-gray-700 {
+  background-color: rgba(107, 114, 128, 0.2);
+  color: #6b7280;
+}
+.bg-blue-200.text-blue-700 {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+.bg-yellow-200.text-yellow-800 {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+.bg-purple-200.text-purple-700 {
+  background-color: rgba(139, 92, 246, 0.2);
+  color: #8b5cf6;
+}
+.bg-green-200.text-green-800 {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+.bg-red-200.text-red-700 {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* Borders */
+.border { border: 1px solid var(--color-border); }
+.border-gray-200 { border-color: var(--color-border); }
+.border-gray-300 { border-color: var(--color-border-light); }
+.border-blue-500 { border-color: var(--color-blue-500); }
+
+/* Spacing - Tailwind-compatible */
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+
+.m-0 { margin: 0; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+
+/* Layout */
+.flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Grid */
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+
+/* Typography */
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.text-right { text-align: right; }
+
+/* Border radius */
+.rounded { border-radius: 0.25rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-full { border-radius: 9999px; }
+
+/* Shadows */
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+
+/* Hover states */
+.hover\:shadow-md:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.hover\:border-blue-500:hover {
+  border-color: var(--color-blue-500);
+}
+.hover\:bg-gray-50:hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* Cursor */
+.cursor-pointer { cursor: pointer; }
+
+/* Overflow */
+.overflow-x-auto { overflow-x: auto; }
+.overflow-hidden { overflow: hidden; }
+
+/* Width/Height */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-w-0 { min-width: 0; }
+
+/* Display */
+.hidden { display: none; }
+.block { display: block; }
+
+/* Position */
+.relative { position: relative; }
+
+/* Transition */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* ============================================================================
+   Custom Sprint Timeline Styles
+   ============================================================================ */
+
+.sprint-card {
+  background: linear-gradient(135deg, var(--color-blue-500) 0%, var(--color-blue-600) 100%);
+  color: var(--color-accent-text);
+}
+
+.progress-bar-bg {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.progress-bar-fill {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Scrollbar styling for VSCode theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vscode-scrollbarSlider-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-hoverBackground);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-activeBackground);
+}
+
+/* Select dropdown styling */
+select {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+}
+
+select:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+/* Button styling */
+button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+}
+
+button:hover {
+  background-color: var(--vscode-button-hoverBackground);
+}
+
+button:active {
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

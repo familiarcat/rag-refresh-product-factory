@@ -389,9 +389,11 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && node scripts/build-webview.mjs",
     "compile:watch": "tsc -watch -p ./",
-    "watch": "tsc -watch -p ./",
+    "watch": "tsc -watch -p ./ & node scripts/build-webview.mjs --watch",
+    "build:webview": "node scripts/build-webview.mjs",
+    "build:webview:watch": "node scripts/build-webview.mjs --watch",
     "package": "vsce package",
     "package:install": "vsce package && code --install-extension alex-ai-assistant-1.0.0.vsix",
     "install-extension": "code --install-extension alex-ai-assistant-1.0.0.vsix",
