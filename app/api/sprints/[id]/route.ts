@@ -16,7 +16,7 @@ const supabase = createClient(
 );
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
@@ -33,7 +33,7 @@ export async function GET(
   { params }: RouteContext
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
 
     const includeStories = searchParams.get('include_stories') !== 'false';
@@ -107,7 +107,7 @@ export async function PATCH(
   { params }: RouteContext
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Build update object (only include provided fields)
@@ -205,7 +205,7 @@ export async function DELETE(
   { params }: RouteContext
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Check if sprint exists
     const { data: sprint } = await supabase

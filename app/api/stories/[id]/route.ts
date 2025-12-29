@@ -16,7 +16,7 @@ const supabase = createClient(
 );
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
@@ -29,7 +29,7 @@ export async function GET(
   { params }: RouteContext
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const { data, error } = await supabase
       .from('stories')
@@ -90,7 +90,7 @@ export async function PATCH(
   { params }: RouteContext
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body: UpdateStoryRequest = await request.json();
 
     // Build update object
@@ -198,7 +198,7 @@ export async function DELETE(
   { params }: RouteContext
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Check if story exists
     const { data: story } = await supabase

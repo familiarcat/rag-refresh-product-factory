@@ -29,7 +29,7 @@ const supabase = createClient(
 );
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
@@ -80,7 +80,7 @@ export async function POST(
   { params }: RouteContext
 ) {
   try {
-    const { id: storyId } = params;
+    const { id: storyId } = await params;
 
     // Fetch story with persona
     const { data: story, error: storyError } = await supabase
