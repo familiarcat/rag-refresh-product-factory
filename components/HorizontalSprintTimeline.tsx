@@ -18,8 +18,6 @@ import { CREW_MEMBERS } from '@/types/sprint';
 export interface HorizontalSprintTimelineProps {
   projectId?: string;
   sprintId?: string; // Show specific sprint or current active sprint
-  onStoryClick?: (story: StoryWithDetails) => void;
-  onCrewClick?: (crew: CrewMember) => void;
 }
 
 interface SprintWithStories extends Sprint {
@@ -35,14 +33,25 @@ interface TimelineDay {
 
 export default function HorizontalSprintTimeline({
   projectId,
-  sprintId,
-  onStoryClick,
-  onCrewClick
+  sprintId
 }: HorizontalSprintTimelineProps) {
   const [sprint, setSprint] = useState<SprintWithStories | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hoveredStory, setHoveredStory] = useState<string | null>(null);
+
+  // Internal click handlers
+  const handleStoryClick = (story: StoryWithDetails) => {
+    // Open story in new tab or show modal
+    console.log('Story clicked:', story.id);
+    // TODO: Implement story detail view
+  };
+
+  const handleCrewClick = (crew: CrewMember) => {
+    // Filter or show crew details
+    console.log('Crew clicked:', crew);
+    // TODO: Implement crew filtering
+  };
 
   // Fetch sprint data
   useEffect(() => {
@@ -333,7 +342,7 @@ export default function HorizontalSprintTimeline({
                     {/* Crew Info Column */}
                     <div
                       className="w-40 flex-shrink-0 p-3 bg-gradient-to-r from-gray-50 to-white border-r border-gray-200 cursor-pointer hover:from-blue-50 hover:to-blue-50"
-                      onClick={() => crewKey !== 'unassigned' && onCrewClick?.(crewKey as CrewMember)}
+                      onClick={() => crewKey !== 'unassigned' && handleCrewClick(crewKey as CrewMember)}
                     >
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-sm">
@@ -374,7 +383,7 @@ export default function HorizontalSprintTimeline({
                                 isHovered={hoveredStory === story.id}
                                 onHover={() => setHoveredStory(story.id)}
                                 onLeave={() => setHoveredStory(null)}
-                                onClick={() => onStoryClick?.(story)}
+                                onClick={() => handleStoryClick(story)}
                               />
                             ))}
                           </div>

@@ -69,14 +69,6 @@ export default async function ProjectSprintsPage({ params }: ProjectSprintsPageP
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <HorizontalSprintTimeline
           projectId={projectId}
-          onStoryClick={(story) => {
-            // Open story detail modal or navigate to story page
-            console.log('Story clicked:', story);
-          }}
-          onCrewClick={(crew) => {
-            // Filter or navigate to crew view
-            console.log('Crew clicked:', crew);
-          }}
         />
       </div>
 
