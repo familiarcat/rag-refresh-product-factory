@@ -6,6 +6,7 @@
  */
 
 import SprintTimeline from '@/components/SprintTimeline';
+import HorizontalSprintTimeline from '@/components/HorizontalSprintTimeline';
 
 interface ProjectSprintsPageProps {
   params: Promise<{
@@ -64,13 +65,35 @@ export default async function ProjectSprintsPage({ params }: ProjectSprintsPageP
         </div>
       </div>
 
-      {/* Sprint Timeline */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <SprintTimeline
+      {/* Horizontal Sprint Timeline */}
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <HorizontalSprintTimeline
           projectId={projectId}
-          viewMode="full"
-          showFilters={true}
+          onStoryClick={(story) => {
+            // Open story detail modal or navigate to story page
+            console.log('Story clicked:', story);
+          }}
+          onCrewClick={(crew) => {
+            // Filter or navigate to crew view
+            console.log('Crew clicked:', crew);
+          }}
         />
+      </div>
+
+      {/* Traditional Sprint Timeline (Collapsed/Expandable) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <details className="bg-white rounded-lg border border-gray-200 shadow-sm">
+          <summary className="cursor-pointer p-4 font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+            Alternative View: Swimlane Timeline
+          </summary>
+          <div className="p-4 border-t border-gray-200">
+            <SprintTimeline
+              projectId={projectId}
+              viewMode="full"
+              showFilters={true}
+            />
+          </div>
+        </details>
       </div>
 
       {/* Project Sprint Stats */}

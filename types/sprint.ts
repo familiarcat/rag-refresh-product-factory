@@ -93,6 +93,7 @@ export interface Story {
   assigned_crew_member?: string;        // 'picard', 'data', 'troi', etc.
   story_points?: number;                // Fibonacci: 1, 2, 3, 5, 8, 13, 21
   priority: number;                     // 1 (highest) to 5 (lowest)
+  estimated_completion?: string;        // ISO date: estimated completion date
   created_at?: string;
   updated_at?: string;
 }
