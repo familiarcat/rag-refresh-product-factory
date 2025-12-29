@@ -236,6 +236,23 @@ export default async function ProjectDetailPage({
             </p>
           </div>
         </Link>
+
+        <Link href={`/projects/${project.id}/sprints`} style={{ textDecoration: 'none' }}>
+          <div
+            className="card"
+            style={{
+              cursor: 'pointer',
+              transition: 'transform 0.2s',
+              borderLeft: '3px solid #3b82f6',
+            }}
+          >
+            <div style={{ fontSize: 24, marginBottom: 8 }}>🚀</div>
+            <h3 style={{ margin: '0 0 4px', fontSize: 16 }}>Sprint Management</h3>
+            <p className="small" style={{ margin: 0, color: 'var(--muted)' }}>
+              View sprints and story timeline
+            </p>
+          </div>
+        </Link>
       </div>
 
       {/* Description */}

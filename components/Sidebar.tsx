@@ -202,7 +202,8 @@ export function Sidebar() {
         <div className="navBlock">
           {!isCollapsed && <div className="navHeader"><Icon name="projects" size={14} style={{marginRight: 6}} /> Projects</div>}
           <NavItem href="/portfolio" iconName="portfolio" label="Portfolio Overview" isCollapsed={isCollapsed} isActive={isActive('/portfolio')} onHover={handleNavHover} onLeave={handleNavLeave} />
-          
+          <NavItem href="/sprints" iconName="timeline" label="All Sprints" isCollapsed={isCollapsed} isActive={isActive('/sprints')} onHover={handleNavHover} onLeave={handleNavLeave} />
+
           {/* All Projects Accordion */}
           {!isCollapsed ? (
             <div>
