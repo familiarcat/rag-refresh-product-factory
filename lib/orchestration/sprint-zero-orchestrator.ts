@@ -202,6 +202,7 @@ export function organizeRikerStories(
       assigned_crew_member: bestCrew,
       story_points: complexityPoints[analysis.complexity],
       priority: Math.min(index + 1, 5), // Goals in order, capped at 5
+      related_goals: [goal], // Track which sprint goal this story addresses
     };
 
     stories.push(story);

@@ -118,6 +118,14 @@ export default function HorizontalSprintTimeline({
     );
   }
 
+  // Helper to get crew avatar path
+  const getCrewAvatarPath = (crewKey: string): string => {
+    if (crewKey === 'unassigned') {
+      return '/starfleet-delta.svg'; // Fallback for unassigned
+    }
+    return `/crew-avatars/${crewKey}.jpg`;
+  };
+
   // Event handlers
   const handleStoryClick = (story: StoryWithDetails) => {
     console.log('Story clicked:', story.id);
@@ -153,6 +161,14 @@ interface SingleSprintViewProps {
 
 function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintViewProps) {
   const [hoveredStory, setHoveredStory] = useState<string | null>(null);
+
+  // Helper to get crew avatar path
+  const getCrewAvatarPath = (crewKey: string): string => {
+    if (crewKey === 'unassigned') {
+      return '/starfleet-delta.svg'; // Fallback for unassigned
+    }
+    return `/crew-avatars/${crewKey}.jpg`;
+  };
 
   const getTimelineDays = (): TimelineDay[] => {
     const days: TimelineDay[] = [];
@@ -341,7 +357,16 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                   >
                     <div className={styles.crewHeader}>
                       <div className={styles.crewAvatar}>
-                        {crewInfo.name.charAt(0)}
+                        <img
+                          src={getCrewAvatarPath(crewKey)}
+                          alt={crewInfo.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
                       </div>
                       <div className={styles.crewDetails}>
                         <div className={styles.crewName}>{crewInfo.name}</div>
