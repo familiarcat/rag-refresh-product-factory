@@ -333,7 +333,7 @@ interface CrewSwimlaneProps {
 
 function CrewSwimlane({ crewInfo, stories, viewMode, onStoryClick }: CrewSwimlaneProps) {
   const totalPoints = stories.reduce((sum, s) => sum + (s.story_points || 0), 0);
-  const completedStories = stories.filter(s => s.status === 'done').length;
+  const completedStories = stories.filter(s => s.status === 'completed').length;
 
   return (
     <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
@@ -354,7 +354,7 @@ function CrewSwimlane({ crewInfo, stories, viewMode, onStoryClick }: CrewSwimlan
         <div className="text-right">
           <div className="text-sm font-semibold">{totalPoints} pts</div>
           <div className="text-xs text-gray-600">
-            {completedStories}/{stories.length} done
+            {completedStories}/{stories.length} completed
           </div>
         </div>
       </div>
@@ -392,9 +392,8 @@ function StoryCardMini({ story, viewMode, onClick }: StoryCardMiniProps) {
     backlog: 'bg-gray-200 text-gray-700',
     planned: 'bg-blue-200 text-blue-700',
     in_progress: 'bg-yellow-200 text-yellow-800',
-    review: 'bg-purple-200 text-purple-700',
-    testing: 'bg-orange-200 text-orange-700',
-    done: 'bg-green-200 text-green-800',
+    in_review: 'bg-purple-200 text-purple-700',
+    completed: 'bg-green-200 text-green-800',
     blocked: 'bg-red-200 text-red-700'
   };
 

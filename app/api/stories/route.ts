@@ -26,7 +26,7 @@ const supabase = createClient(
  *   - project_id: Filter by project (required)
  *   - sprint_id: Filter by sprint (use 'backlog' for unassigned)
  *   - status: Filter by status (backlog, planned, in_progress, etc.)
- *   - story_type: Filter by type (user_story, developer_story, bug, technical_debt)
+ *   - story_type: Filter by type (user_story, developer_story, bug_fix, technical_task)
  *   - assigned_crew_member: Filter by assigned crew member
  *   - persona_id: Filter by persona
  *   - priority: Filter by priority (1-5)
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validStoryTypes = ['user_story', 'developer_story', 'bug', 'technical_debt'];
+    const validStoryTypes = ['user_story', 'developer_story', 'bug_fix', 'technical_task'];
     if (!validStoryTypes.includes(body.story_type)) {
       return NextResponse.json(
         { error: `Invalid story_type. Must be one of: ${validStoryTypes.join(', ')}` },

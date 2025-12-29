@@ -19,16 +19,15 @@ export type StoryStatus =
   | 'backlog'       // Not started
   | 'planned'       // Planned for sprint
   | 'in_progress'   // Being worked on
-  | 'review'        // In code review
-  | 'testing'       // Being tested
-  | 'done'          // Completed
+  | 'in_review'     // In code review
+  | 'completed'     // Completed
   | 'blocked';      // Blocked by dependency
 
 export type StoryType =
   | 'user_story'    // As a [persona], I want [goal]
   | 'developer_story' // As a [developer persona], I need [technical goal]
-  | 'bug'           // Bug fix
-  | 'technical_debt'; // Technical debt
+  | 'technical_task' // Technical task
+  | 'bug_fix';      // Bug fix
 
 export type PersonaType =
   | 'user'          // End user persona

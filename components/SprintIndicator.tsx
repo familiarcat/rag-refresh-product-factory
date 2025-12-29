@@ -7,7 +7,7 @@ interface Sprint {
   projectId: string;
   name: string;
   goal: string;
-  status: "planning" | "active" | "review" | "completed";
+  status: "planning" | "active" | "in_review" | "completed";
   committedPoints: number;
   completedPoints: number;
   stories: Array<{
@@ -221,8 +221,8 @@ export function SprintIndicator({
           count={storyStats.inProgress}
           color="#f59e0b"
         />
-        <StatusPill label="Review" count={storyStats.review} color="#8b5cf6" />
-        <StatusPill label="Done" count={storyStats.done} color="#10b981" />
+        <StatusPill label="In Review" count={storyStats.inReview} color="#8b5cf6" />
+        <StatusPill label="Completed" count={storyStats.completed} color="#10b981" />
         {storyStats.blocked > 0 && (
           <StatusPill
             label="Blocked"
@@ -304,8 +304,8 @@ function getStatusConfig(status: Sprint["status"]) {
       return { icon: "📋", color: "#3b82f6", label: "Planning" };
     case "active":
       return { icon: "🏃", color: "#10b981", label: "Active" };
-    case "review":
-      return { icon: "👀", color: "#8b5cf6", label: "Review" };
+    case "in_review":
+      return { icon: "👀", color: "#8b5cf6", label: "In Review" };
     case "completed":
       return { icon: "✅", color: "#6b7280", label: "Completed" };
   }
@@ -316,8 +316,8 @@ function getStoryStats(stories: Array<{ status: string }>) {
     backlog: stories.filter((s) => s.status === "backlog").length,
     todo: stories.filter((s) => s.status === "todo").length,
     inProgress: stories.filter((s) => s.status === "in_progress").length,
-    review: stories.filter((s) => s.status === "review").length,
-    done: stories.filter((s) => s.status === "done").length,
+    inReview: stories.filter((s) => s.status === "in_review").length,
+    completed: stories.filter((s) => s.status === "completed").length,
     blocked: stories.filter((s) => s.status === "blocked").length,
   };
 }

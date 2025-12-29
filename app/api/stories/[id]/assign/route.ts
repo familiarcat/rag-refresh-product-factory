@@ -216,7 +216,7 @@ function calculateSkillMatch(story: any, crewMember: CrewMember): number {
     },
     la_forge: {
       keywords: ['infrastructure', 'devops', 'deployment', 'ci/cd', 'docker', 'kubernetes', 'aws'],
-      storyTypes: ['technical_debt']
+      storyTypes: ['technical_task']
     },
     troi: {
       keywords: ['ux', 'ui', 'user experience', 'interface', 'design', 'accessibility', 'frontend'],
@@ -224,11 +224,11 @@ function calculateSkillMatch(story: any, crewMember: CrewMember): number {
     },
     worf: {
       keywords: ['security', 'testing', 'qa', 'test', 'vulnerability', 'auth', 'encryption'],
-      storyTypes: ['bug']
+      storyTypes: ['bug_fix']
     },
     crusher: {
       keywords: ['performance', 'optimization', 'monitoring', 'health', 'metrics'],
-      storyTypes: ['technical_debt']
+      storyTypes: ['technical_task']
     },
     uhura: {
       keywords: ['api', 'integration', 'webhook', 'external', 'communication', 'rest', 'graphql'],
@@ -240,7 +240,7 @@ function calculateSkillMatch(story: any, crewMember: CrewMember): number {
     },
     obrien: {
       keywords: ['implementation', 'maintenance', 'bug', 'fix', 'refactor'],
-      storyTypes: ['bug', 'technical_debt']
+      storyTypes: ['bug_fix', 'technical_task']
     }
   };
 

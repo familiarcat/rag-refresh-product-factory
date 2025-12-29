@@ -101,7 +101,7 @@ export async function PATCH(
 
     if (body.status !== undefined) {
       const validStatuses: StoryStatus[] = [
-        'backlog', 'planned', 'in_progress', 'review', 'testing', 'done', 'blocked'
+        'backlog', 'planned', 'in_progress', 'in_review', 'completed', 'blocked'
       ];
       if (!validStatuses.includes(body.status)) {
         return NextResponse.json(
