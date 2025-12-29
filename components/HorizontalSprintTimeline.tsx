@@ -17,6 +17,7 @@ import type { Sprint, Story, StoryWithDetails, CrewMember } from '@/types/sprint
 import { CREW_MEMBERS } from '@/types/sprint';
 import styles from './HorizontalSprintTimeline.module.css';
 import StoryEditModal from './StoryEditModal';
+import StoryDurationBar from './StoryDurationBar';
 
 export interface HorizontalSprintTimelineProps {
   projectId?: string;
@@ -180,7 +181,8 @@ interface SingleSprintViewProps {
 function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintViewProps) {
   const [hoveredStory, setHoveredStory] = useState<string | null>(null);
   const [editingStory, setEditingStory] = useState<StoryWithDetails | null>(null);
-  const [draggedStory, setDraggedStory] = useState<{ story: StoryWithDetails; fromCrew: string; fromDay: number } | null>(null);
+  const [draggedStory, setDraggedStory] = useState<StoryWithDetails | null>(null);
+  const [dropTargetCrew, setDropTargetCrew] = useState<string | null>(null);
 
   // Helper to get crew avatar path
   const getCrewAvatarPath = (crewKey: string): string => {
@@ -256,22 +258,16 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
     }
   };
 
-  const getStoriesByCrewAndDay = (): Record<string, Record<number, StoryWithDetails[]>> => {
-    const grouped: Record<string, Record<number, StoryWithDetails[]>> = {};
-    const days = getTimelineDays();
+  const getStoriesByCrew = (): Record<string, StoryWithDetails[]> => {
+    const grouped: Record<string, StoryWithDetails[]> = {};
 
     [...Object.keys(CREW_MEMBERS), 'unassigned'].forEach(crew => {
-      grouped[crew] = {};
+      grouped[crew] = [];
     });
 
     sprint.stories?.forEach(story => {
       const crew = story.assigned_crew_member || 'unassigned';
-      const day = getStoryCompletionDay(story, days.length);
-
-      if (!grouped[crew][day]) {
-        grouped[crew][day] = [];
-      }
-      grouped[crew][day].push(story);
+      grouped[crew].push(story);
     });
 
     return grouped;
@@ -286,38 +282,47 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
     return [...crewWithStories];
   };
 
-  // Drag and drop handlers
-  const handleDragStart = (story: StoryWithDetails, crew: string, day: number) => {
-    setDraggedStory({ story, fromCrew: crew, fromDay: day });
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = async (toCrew: string, toDay: number) => {
-    if (!draggedStory) return;
-
-    const { story, fromCrew, fromDay } = draggedStory;
-
-    // Don't update if dropped in same position
-    if (fromCrew === toCrew && fromDay === toDay) {
-      setDraggedStory(null);
-      return;
-    }
-
-    // Calculate new estimated completion date
-    const days = getTimelineDays();
-    const targetDay = days[toDay - 1];
-    const newEstimatedCompletion = targetDay?.date.toISOString().split('T')[0];
-
-    // Update story
-    await updateStory(story.id, {
-      assigned_crew_member: toCrew === 'unassigned' ? undefined : toCrew as CrewMember,
-      estimated_completion: newEstimatedCompletion
+  // Handle duration changes from drag/resize
+  const handleDurationChange = async (storyId: string, newStartDate: string, newEndDate: string) => {
+    await updateStory(storyId, {
+      start_date: newStartDate,
+      estimated_completion: newEndDate
     });
+  };
 
-    setDraggedStory(null);
+  // Handle drag over timeline track
+  const handleDragOver = (e: React.DragEvent, crewKey: string) => {
+    e.preventDefault();
+    setDropTargetCrew(crewKey);
+  };
+
+  // Handle drop on timeline track
+  const handleDrop = async (e: React.DragEvent, targetCrew: string) => {
+    e.preventDefault();
+    setDropTargetCrew(null);
+
+    const storyId = e.dataTransfer.getData('storyId');
+    const storyDataStr = e.dataTransfer.getData('storyData');
+
+    if (!storyId) return;
+
+    try {
+      const storyData = JSON.parse(storyDataStr);
+
+      // Only update if crew changed
+      if (storyData.assigned_crew_member !== targetCrew) {
+        await updateStory(storyId, {
+          assigned_crew_member: targetCrew === 'unassigned' ? undefined : targetCrew as CrewMember
+        });
+      }
+    } catch (error) {
+      console.error('Drop error:', error);
+    }
+  };
+
+  // Handle drag leave
+  const handleDragLeave = () => {
+    setDropTargetCrew(null);
   };
 
   // Update story via API
@@ -353,8 +358,9 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
   };
 
   const timelineDays = getTimelineDays();
-  const storiesByCrewAndDay = getStoriesByCrewAndDay();
+  const storiesByCrew = getStoriesByCrew();
   const visibleCrew = getVisibleCrew();
+  const dayWidth = 120; // Width of each day column in pixels
 
   const totalStories = sprint.stories?.length || 0;
   const completedStories = sprint.stories?.filter(s => s.status === 'completed').length || 0;
@@ -445,10 +451,8 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                 ? { id: 'unassigned' as CrewMember, name: 'Unassigned', role: 'Backlog', specialty: 'No crew assigned' }
                 : CREW_MEMBERS[crewKey as CrewMember];
 
-              const crewStories = storiesByCrewAndDay[crewKey] || {};
-              const totalCrewPoints = Object.values(crewStories)
-                .flat()
-                .reduce((sum, s) => sum + (s.story_points || 0), 0);
+              const crewStories = storiesByCrew[crewKey] || [];
+              const totalCrewPoints = crewStories.reduce((sum, s) => sum + (s.story_points || 0), 0);
 
               return (
                 <div key={crewKey} className={styles.swimlane}>
@@ -475,39 +479,40 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                     </div>
                     <div className={styles.crewStats}>
                       <div className={styles.crewPoints}>{totalCrewPoints} pts</div>
-                      <div>{Object.values(crewStories).flat().length} stories</div>
+                      <div>{crewStories.length} stories</div>
                     </div>
                   </div>
 
-                  {/* Timeline Days with Story Cards */}
-                  {timelineDays.map((day) => {
-                    const dayStories = crewStories[day.dayNumber] || [];
-
-                    return (
+                  {/* Timeline Area with Duration Bars */}
+                  <div
+                    className={`${styles.timelineTrack} ${dropTargetCrew === crewKey ? styles.dropTarget : ''}`}
+                    onDragOver={(e) => handleDragOver(e, crewKey)}
+                    onDrop={(e) => handleDrop(e, crewKey)}
+                    onDragLeave={handleDragLeave}
+                  >
+                    {/* Day Grid Background */}
+                    {timelineDays.map((day) => (
                       <div
                         key={day.dayNumber}
                         className={`${styles.dayCell} ${day.isToday ? styles.today : ''} ${day.isWeekend ? styles.weekend : ''}`}
-                        onDragOver={handleDragOver}
-                        onDrop={() => handleDrop(crewKey, day.dayNumber)}
-                      >
-                        <div className={styles.storyCards}>
-                          {dayStories.map((story) => (
-                            <StoryTimelineCard
-                              key={story.id}
-                              story={story}
-                              crewKey={crewKey}
-                              dayNumber={day.dayNumber}
-                              isHovered={hoveredStory === story.id}
-                              onHover={() => setHoveredStory(story.id)}
-                              onLeave={() => setHoveredStory(null)}
-                              onClick={() => handleStoryCardClick(story)}
-                              onDragStart={handleDragStart}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+                        style={{ width: `${dayWidth}px` }}
+                      />
+                    ))}
+
+                    {/* Story Duration Bars (Absolutely Positioned) */}
+                    <div className={styles.storiesLayer}>
+                      {crewStories.map((story) => (
+                        <StoryDurationBar
+                          key={story.id}
+                          story={story}
+                          sprintStartDate={sprint.start_date}
+                          dayWidth={dayWidth}
+                          onDurationChange={handleDurationChange}
+                          onClick={() => handleStoryCardClick(story)}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               );
             })}

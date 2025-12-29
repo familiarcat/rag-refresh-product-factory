@@ -93,7 +93,9 @@ export interface Story {
   assigned_crew_member?: string;        // 'picard', 'data', 'troi', etc.
   story_points?: number;                // Fibonacci: 1, 2, 3, 5, 8, 13, 21
   priority: number;                     // 1 (highest) to 5 (lowest)
+  start_date?: string;                  // ISO date: when work begins
   estimated_completion?: string;        // ISO date: estimated completion date
+  estimated_hours?: number;             // Estimated hours for Riker's timeline
   related_goals?: string[];             // Sprint goals this story addresses
   created_at?: string;
   updated_at?: string;

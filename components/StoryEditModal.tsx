@@ -41,8 +41,9 @@ export default function StoryEditModal({
     story_points: story.story_points || 0,
     priority: story.priority,
     assigned_crew_member: story.assigned_crew_member || '',
+    start_date: story.start_date || '',
     estimated_completion: story.estimated_completion || '',
-    estimated_hours: 0,
+    estimated_hours: story.estimated_hours || 0,
     cost_estimate: 0,
   });
 
@@ -59,8 +60,9 @@ export default function StoryEditModal({
         story_points: story.story_points || 0,
         priority: story.priority,
         assigned_crew_member: story.assigned_crew_member || '',
+        start_date: story.start_date || '',
         estimated_completion: story.estimated_completion || '',
-        estimated_hours: 0,
+        estimated_hours: story.estimated_hours || 0,
         cost_estimate: 0,
       });
     }
@@ -81,7 +83,9 @@ export default function StoryEditModal({
         story_points: formData.story_points,
         priority: formData.priority,
         assigned_crew_member: formData.assigned_crew_member || undefined,
+        start_date: formData.start_date || undefined,
         estimated_completion: formData.estimated_completion || undefined,
+        estimated_hours: formData.estimated_hours || undefined,
       });
       onClose();
     } catch (error) {
@@ -257,19 +261,32 @@ export default function StoryEditModal({
                   <p className={styles.tabSubtitle}>Commander Riker's execution planning</p>
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Estimated Completion Date</label>
-                  <input
-                    type="date"
-                    className={styles.input}
-                    value={formData.estimated_completion}
-                    onChange={(e) => handleChange('estimated_completion', e.target.value)}
-                    min={sprintStartDate}
-                    max={sprintEndDate}
-                  />
-                  <p className={styles.helpText}>
-                    Sprint runs from {new Date(sprintStartDate).toLocaleDateString()} to {new Date(sprintEndDate).toLocaleDateString()}
-                  </p>
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Start Date</label>
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={formData.start_date}
+                      onChange={(e) => handleChange('start_date', e.target.value)}
+                      min={sprintStartDate}
+                      max={sprintEndDate}
+                    />
+                    <p className={styles.helpText}>When work begins on this story</p>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Estimated Completion Date</label>
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={formData.estimated_completion}
+                      onChange={(e) => handleChange('estimated_completion', e.target.value)}
+                      min={formData.start_date || sprintStartDate}
+                      max={sprintEndDate}
+                    />
+                    <p className={styles.helpText}>When work should be completed</p>
+                  </div>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -282,8 +299,21 @@ export default function StoryEditModal({
                     min="0"
                     step="0.5"
                   />
-                  <p className={styles.helpText}>Total hours needed to complete this story</p>
+                  <p className={styles.helpText}>Total hours needed to complete this story (used to calculate duration if dates not set)</p>
                 </div>
+
+                {formData.start_date && formData.estimated_completion && (
+                  <div className={styles.infoBox}>
+                    <div className={styles.infoIcon}>📊</div>
+                    <div>
+                      <strong>Duration Calculated</strong>
+                      <p>
+                        {Math.ceil((new Date(formData.estimated_completion).getTime() - new Date(formData.start_date).getTime()) / (1000 * 60 * 60 * 24))} days
+                        {formData.estimated_hours > 0 && ` (${(formData.estimated_hours / Math.max(1, Math.ceil((new Date(formData.estimated_completion).getTime() - new Date(formData.start_date).getTime()) / (1000 * 60 * 60 * 24)))).toFixed(1)}h per day)`}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className={styles.infoBox}>
                   <div className={styles.infoIcon}>ℹ️</div>

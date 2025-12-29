@@ -72,7 +72,9 @@ export async function PATCH(
       'story_points',
       'priority',
       'assigned_crew_member',
+      'start_date',
       'estimated_completion',
+      'estimated_hours',
       'sprint_id',
       'persona_id',
       'related_goals'

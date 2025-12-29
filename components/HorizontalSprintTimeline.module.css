@@ -268,12 +268,23 @@
   font-size: 12px;
 }
 
+.timelineTrack {
+  flex: 1;
+  display: flex;
+  position: relative;
+  min-height: 120px;
+  overflow: visible;
+  transition: background 0.2s;
+}
+
+.timelineTrack.dropTarget {
+  background: rgba(124, 92, 255, 0.1);
+  box-shadow: inset 0 0 0 2px rgba(124, 92, 255, 0.3);
+}
+
 .dayCell {
-  width: 120px;
   flex-shrink: 0;
-  padding: 8px;
   border-left: 1px solid var(--line);
-  min-height: 100px;
 }
 
 .dayCell.today {
@@ -284,10 +295,17 @@
   background: rgba(0, 0, 0, 0.1);
 }
 
-.storyCards {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.storiesLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.storiesLayer > * {
+  pointer-events: auto;
 }
 
 .storyCard {
