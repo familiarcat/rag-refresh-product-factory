@@ -309,11 +309,43 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
     try {
       const storyData = JSON.parse(storyDataStr);
 
-      // Only update if crew changed
-      if (storyData.assigned_crew_member !== targetCrew) {
+      // Calculate which day was dropped on based on mouse position
+      const rect = e.currentTarget.getBoundingClientRect();
+      const relativeX = e.clientX - rect.left;
+      const droppedDay = Math.floor(relativeX / dayWidth) + 1;
+      const days = getTimelineDays();
+
+      if (droppedDay >= 1 && droppedDay <= days.length) {
+        const targetDate = days[droppedDay - 1].date;
+
+        // Calculate story duration
+        let durationDays = 1;
+        if (storyData.start_date && storyData.estimated_completion) {
+          const start = new Date(storyData.start_date);
+          const end = new Date(storyData.estimated_completion);
+          durationDays = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+        } else if (storyData.estimated_hours) {
+          durationDays = Math.max(1, Math.ceil(storyData.estimated_hours / 8));
+        }
+
+        // Calculate new start and end dates maintaining duration
+        const newStartDate = new Date(targetDate);
+        const newEndDate = new Date(targetDate);
+        newEndDate.setDate(newEndDate.getDate() + durationDays - 1);
+
+        // Update story with new crew and dates
         await updateStory(storyId, {
-          assigned_crew_member: targetCrew === 'unassigned' ? undefined : targetCrew as CrewMember
+          assigned_crew_member: targetCrew === 'unassigned' ? undefined : targetCrew as CrewMember,
+          start_date: newStartDate.toISOString().split('T')[0],
+          estimated_completion: newEndDate.toISOString().split('T')[0]
         });
+      } else {
+        // If dropped outside valid day range, just update crew
+        if (storyData.assigned_crew_member !== targetCrew) {
+          await updateStory(storyId, {
+            assigned_crew_member: targetCrew === 'unassigned' ? undefined : targetCrew as CrewMember
+          });
+        }
       }
     } catch (error) {
       console.error('Drop error:', error);

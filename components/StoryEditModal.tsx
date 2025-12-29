@@ -14,6 +14,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Story, StoryWithDetails, CrewMember, StoryType, StoryStatus } from '@/types/sprint';
 import { CREW_MEMBERS } from '@/types/sprint';
+import { getEstimationRecommendation, calculateDurationDays } from '@/utils/story-estimation';
 import styles from './StoryEditModal.module.css';
 
 export interface StoryEditModalProps {
@@ -97,7 +98,33 @@ export default function StoryEditModal({
   };
 
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+
+      // Auto-calculate estimates when story points or crew changes
+      if (field === 'story_points' || field === 'assigned_crew_member' || field === 'story_type') {
+        const estimation = getEstimationRecommendation(
+          field === 'story_points' ? value : updated.story_points,
+          field === 'story_type' ? value : updated.story_type,
+          updated.priority,
+          field === 'assigned_crew_member' ? (value || undefined) : (updated.assigned_crew_member || undefined) as CrewMember
+        );
+
+        updated.estimated_hours = estimation.estimatedHours;
+        updated.cost_estimate = estimation.estimatedCost;
+
+        // Auto-calculate end date if start date is set
+        if (updated.start_date && estimation.estimatedHours > 0) {
+          const durationDays = calculateDurationDays(estimation.estimatedHours);
+          const startDate = new Date(updated.start_date);
+          const endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + durationDays - 1);
+          updated.estimated_completion = endDate.toISOString().split('T')[0];
+        }
+      }
+
+      return updated;
+    });
   };
 
   const getCrewInfo = (crewId: string) => {
@@ -298,8 +325,12 @@ export default function StoryEditModal({
                     onChange={(e) => handleChange('estimated_hours', parseFloat(e.target.value))}
                     min="0"
                     step="0.5"
+                    readOnly
                   />
-                  <p className={styles.helpText}>Total hours needed to complete this story (used to calculate duration if dates not set)</p>
+                  <p className={styles.helpText}>
+                    Auto-calculated by Commander Data based on {formData.story_points} story points
+                    {formData.assigned_crew_member && ` and ${CREW_MEMBERS[formData.assigned_crew_member as CrewMember]?.name}'s efficiency`}
+                  </p>
                 </div>
 
                 {formData.start_date && formData.estimated_completion && (
@@ -352,7 +383,7 @@ export default function StoryEditModal({
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Cost Estimate (Latinum)</label>
+                  <label className={styles.label}>Cost Estimate (GPL)</label>
                   <input
                     type="number"
                     className={styles.input}
@@ -360,9 +391,33 @@ export default function StoryEditModal({
                     onChange={(e) => handleChange('cost_estimate', parseFloat(e.target.value))}
                     min="0"
                     step="10"
+                    readOnly
                   />
-                  <p className={styles.helpText}>Estimated cost in Gold-Pressed Latinum bars</p>
+                  <p className={styles.helpText}>
+                    Auto-calculated by Quark: {formData.estimated_hours}h × crew hourly rate
+                    {formData.assigned_crew_member && ` (${CREW_MEMBERS[formData.assigned_crew_member as CrewMember]?.name})`}
+                  </p>
                 </div>
+
+                {formData.story_points > 0 && (
+                  <div className={styles.infoBox} style={{ background: 'rgba(255, 209, 102, 0.1)', borderColor: 'rgba(255, 209, 102, 0.3)' }}>
+                    <div className={styles.infoIcon}>🎯</div>
+                    <div>
+                      <strong>Quark's Recommendation</strong>
+                      <p>
+                        {(() => {
+                          const estimation = getEstimationRecommendation(
+                            formData.story_points,
+                            formData.story_type,
+                            formData.priority,
+                            formData.assigned_crew_member as CrewMember
+                          );
+                          return estimation.recommendation;
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className={styles.infoBox}>
                   <div className={styles.infoIcon}>💎</div>
@@ -374,7 +429,7 @@ export default function StoryEditModal({
 
                 {formData.story_points > 0 && formData.cost_estimate > 0 && (
                   <div className={styles.estimateCard}>
-                    <h4>ROI Analysis</h4>
+                    <h4>ROI Analysis (Quark's Formula)</h4>
                     <div className={styles.calculation}>
                       <div className={styles.calcRow}>
                         <span>Cost per Story Point:</span>
@@ -383,21 +438,28 @@ export default function StoryEditModal({
                         </span>
                       </div>
                       <div className={styles.calcRow}>
-                        <span>Priority Level:</span>
-                        <span className={styles.calcValue}>{formData.priority}</span>
+                        <span>Priority Weight:</span>
+                        <span className={styles.calcValue}>{6 - formData.priority}/5</span>
                       </div>
                       <div className={styles.calcRow}>
                         <span>ROI Score:</span>
                         <span className={styles.calcValue}>
-                          {((6 - formData.priority) / (formData.cost_estimate / formData.story_points) * 100).toFixed(0)}%
+                          {(() => {
+                            const estimation = getEstimationRecommendation(
+                              formData.story_points,
+                              formData.story_type,
+                              formData.priority,
+                              formData.assigned_crew_member as CrewMember
+                            );
+                            return estimation.roiScore;
+                          })()}/100
                         </span>
                       </div>
+                      <div className={styles.calcRow}>
+                        <span>Estimated Hours:</span>
+                        <span className={styles.calcValue}>{formData.estimated_hours}h</span>
+                      </div>
                     </div>
-                    <p className={styles.helpText}>
-                      {formData.priority <= 2 && formData.cost_estimate / formData.story_points > 50
-                        ? '⚠️ High-cost, high-priority story - ensure value justifies investment'
-                        : '✅ Balanced cost-to-value ratio'}
-                    </p>
                   </div>
                 )}
               </div>
