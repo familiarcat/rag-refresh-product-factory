@@ -37,6 +37,10 @@ README.md
 docs/
 *.md
 
+# VSCode Extension (separate deployment domain - build locally only)
+vscode-extension/
+*.vsix
+
 # Backups
 *.backup
 **/2
