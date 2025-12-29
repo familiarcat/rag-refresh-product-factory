@@ -12,6 +12,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import type { Sprint, Story, StoryWithDetails, CrewMember } from '@/types/sprint';
 import { CREW_MEMBERS } from '@/types/sprint';
 import styles from './HorizontalSprintTimeline.module.css';
@@ -123,7 +124,23 @@ export default function HorizontalSprintTimeline({
     if (crewKey === 'unassigned') {
       return '/starfleet-delta.svg'; // Fallback for unassigned
     }
-    return `/crew-avatars/${crewKey}.jpg`;
+
+    // Map crew IDs to avatar filenames
+    const avatarMap: Record<string, string> = {
+      'picard': 'captain_picard',
+      'riker': 'commander_riker',
+      'data': 'commander_data',
+      'la_forge': 'geordi_la_forge',
+      'troi': 'counselor_troi',
+      'worf': 'lieutenant_worf',
+      'crusher': 'dr_crusher',
+      'uhura': 'lieutenant_uhura',
+      'quark': 'quark',
+      'obrien': 'chief_obrien'
+    };
+
+    const avatarName = avatarMap[crewKey] || crewKey;
+    return `/crew-avatars/${avatarName}.jpg`;
   };
 
   // Event handlers
@@ -167,7 +184,23 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
     if (crewKey === 'unassigned') {
       return '/starfleet-delta.svg'; // Fallback for unassigned
     }
-    return `/crew-avatars/${crewKey}.jpg`;
+
+    // Map crew IDs to avatar filenames
+    const avatarMap: Record<string, string> = {
+      'picard': 'captain_picard',
+      'riker': 'commander_riker',
+      'data': 'commander_data',
+      'la_forge': 'geordi_la_forge',
+      'troi': 'counselor_troi',
+      'worf': 'lieutenant_worf',
+      'crusher': 'dr_crusher',
+      'uhura': 'lieutenant_uhura',
+      'quark': 'quark',
+      'obrien': 'chief_obrien'
+    };
+
+    const avatarName = avatarMap[crewKey] || crewKey;
+    return `/crew-avatars/${avatarName}.jpg`;
   };
 
   const getTimelineDays = (): TimelineDay[] => {
@@ -357,15 +390,13 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                   >
                     <div className={styles.crewHeader}>
                       <div className={styles.crewAvatar}>
-                        <img
+                        <Image
                           src={getCrewAvatarPath(crewKey)}
                           alt={crewInfo.name}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            borderRadius: '50%'
-                          }}
+                          fill
+                          sizes="40px"
+                          className="avatarImage"
+                          priority
                         />
                       </div>
                       <div className={styles.crewDetails}>

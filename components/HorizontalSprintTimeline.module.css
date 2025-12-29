@@ -227,6 +227,12 @@
   flex-shrink: 0;
   overflow: hidden;
   border: 2px solid var(--line);
+  position: relative;
+}
+
+.crewAvatar :global(.avatarImage) {
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .crewDetails {
