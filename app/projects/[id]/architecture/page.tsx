@@ -29,9 +29,10 @@ async function getProject(id: string): Promise<Project | null> {
 export default async function ProjectArchitecturePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const project = await getProject(params.id);
+  const { id } = await params;
+  const project = await getProject(id);
 
   if (!project) {
     notFound();

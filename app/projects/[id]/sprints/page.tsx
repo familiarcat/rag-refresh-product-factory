@@ -8,20 +8,21 @@
 import SprintTimeline from '@/components/SprintTimeline';
 
 interface ProjectSprintsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: ProjectSprintsPageProps) {
+  const { id } = await params;
   return {
-    title: `Sprints - ${params.id} | Alex AI`,
-    description: `Sprint timeline for ${params.id}`
+    title: `Sprints - ${id} | Alex AI`,
+    description: `Sprint timeline for ${id}`
   };
 }
 
-export default function ProjectSprintsPage({ params }: ProjectSprintsPageProps) {
-  const projectId = params.id;
+export default async function ProjectSprintsPage({ params }: ProjectSprintsPageProps) {
+  const { id: projectId } = await params;
 
   return (
     <div className="min-h-screen bg-gray-50">
