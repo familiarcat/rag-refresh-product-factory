@@ -101,6 +101,10 @@ export default function SprintTimelineWebview({ vscode, projectId, apiBaseUrl }:
   const [error, setError] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('active');
   const [selectedCrew, setSelectedCrew] = useState<string | null>(null);
+  const [selectedStoryType, setSelectedStoryType] = useState<string | null>(null);
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [editingStory, setEditingStory] = useState<string | null>(null);
 
   // Request sprint data from extension host
   const fetchSprints = useCallback(() => {
@@ -114,6 +118,15 @@ export default function SprintTimelineWebview({ vscode, projectId, apiBaseUrl }:
       }
     });
   }, [vscode, projectId, selectedStatus]);
+
+  // Filter stories client-side for advanced filters
+  const filterStories = (stories: StoryWithDetails[]): StoryWithDetails[] => {
+    return stories.filter(story => {
+      if (selectedStoryType && story.story_type !== selectedStoryType) return false;
+      if (selectedPriority && story.priority !== parseInt(selectedPriority)) return false;
+      return true;
+    });
+  };
 
   // Listen for messages from extension host
   useEffect(() => {
@@ -147,12 +160,28 @@ export default function SprintTimelineWebview({ vscode, projectId, apiBaseUrl }:
     fetchSprints();
   }, [fetchSprints]);
 
-  // Handle story click
-  const handleStoryClick = (story: StoryWithDetails) => {
+  // Handle story click (double-click to edit)
+  const handleStoryClick = (story: StoryWithDetails, event: React.MouseEvent) => {
+    if (event.detail === 2) {
+      // Double-click to edit
+      setEditingStory(story.id);
+    } else {
+      // Single click to open in browser
+      vscode.postMessage({
+        command: 'openStory',
+        storyId: story.id
+      });
+    }
+  };
+
+  // Handle story update
+  const handleStoryUpdate = (storyId: string, updates: Partial<Story>) => {
     vscode.postMessage({
-      command: 'openStory',
-      storyId: story.id
+      command: 'updateStory',
+      storyId,
+      updates
     });
+    setEditingStory(null);
   };
 
   // Handle sprint click
@@ -235,22 +264,22 @@ export default function SprintTimelineWebview({ vscode, projectId, apiBaseUrl }:
   return (
     <div className="p-4">
       {/* Filter Controls */}
-      <div className="mb-4 flex gap-3 items-center flex-wrap">
-        <div>
-          <label className="text-sm text-gray-600 mr-2">Status:</label>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-1 rounded border border-gray-300"
-          >
-            <option value="planning">Planning</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
+      <div className="mb-4">
+        <div className="flex gap-3 items-center flex-wrap mb-2">
+          <div>
+            <label className="text-sm text-gray-600 mr-2">Status:</label>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 py-1 rounded border border-gray-300"
+            >
+              <option value="planning">Planning</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
 
-        {selectedCrew !== null && (
           <div>
             <label className="text-sm text-gray-600 mr-2">Crew:</label>
             <select
@@ -264,18 +293,76 @@ export default function SprintTimelineWebview({ vscode, projectId, apiBaseUrl }:
               ))}
             </select>
           </div>
-        )}
 
-        <button onClick={fetchSprints} className="ml-auto">
-          Refresh
-        </button>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="text-sm px-2 py-1"
+          >
+            {showFilters ? '▼' : '▶'} Advanced Filters
+          </button>
+
+          <button onClick={fetchSprints} className="ml-auto">
+            ↻ Refresh
+          </button>
+        </div>
+
+        {/* Advanced Filters */}
+        {showFilters && (
+          <div className="flex gap-3 items-center flex-wrap p-3 bg-gray-50 rounded border border-gray-200">
+            <div>
+              <label className="text-sm text-gray-600 mr-2">Story Type:</label>
+              <select
+                value={selectedStoryType || 'all'}
+                onChange={(e) => setSelectedStoryType(e.target.value === 'all' ? null : e.target.value)}
+                className="px-3 py-1 rounded border border-gray-300"
+              >
+                <option value="all">All Types</option>
+                <option value="user_story">User Story</option>
+                <option value="developer_story">Developer Story</option>
+                <option value="technical_task">Technical Task</option>
+                <option value="bug_fix">Bug Fix</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm text-gray-600 mr-2">Priority:</label>
+              <select
+                value={selectedPriority || 'all'}
+                onChange={(e) => setSelectedPriority(e.target.value === 'all' ? null : e.target.value)}
+                className="px-3 py-1 rounded border border-gray-300"
+              >
+                <option value="all">All Priorities</option>
+                <option value="1">P1 - Highest</option>
+                <option value="2">P2 - High</option>
+                <option value="3">P3 - Medium</option>
+                <option value="4">P4 - Low</option>
+                <option value="5">P5 - Lowest</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => {
+                setSelectedStoryType(null);
+                setSelectedPriority(null);
+              }}
+              className="text-sm px-2 py-1"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Sprint Timeline */}
       <div className="grid grid-cols-1 gap-6">
         {sprints.map((sprint) => {
-          const visibleCrew = getVisibleCrewMembers(sprint);
-          const storiesByCrew = getStoriesByCrew(sprint);
+          // Apply advanced filters to stories
+          const filteredSprint = {
+            ...sprint,
+            stories: filterStories(sprint.stories || [])
+          };
+          const visibleCrew = getVisibleCrewMembers(filteredSprint);
+          const storiesByCrew = getStoriesByCrew(filteredSprint);
           const totalStories = sprint.stories?.length || 0;
           const completedStories = sprint.stories?.filter(s => s.status === 'completed').length || 0;
           const progressPercent = totalStories > 0 ? Math.round((sprint.velocity_actual / sprint.velocity_target) * 100) : 0;
@@ -338,22 +425,84 @@ export default function SprintTimelineWebview({ vscode, projectId, apiBaseUrl }:
 
                     {/* Story Cards */}
                     <div className="flex gap-2 overflow-x-auto">
-                      {stories.map(story => (
-                        <div
-                          key={story.id}
-                          className="border border-gray-300 rounded p-2.5 bg-white shadow-sm hover:shadow-md hover:border-blue-500 cursor-pointer transition-all min-w-[180px]"
-                          onClick={() => handleStoryClick(story)}
-                        >
-                          <div className={`text-xs px-2 py-1 rounded mb-2 inline-block ${statusColors[story.status]}`}>
-                            {story.status.replace(/_/g, ' ')}
+                      {stories.map(story => {
+                        const isEditing = editingStory === story.id;
+
+                        return isEditing ? (
+                          // Editable Story Card
+                          <div
+                            key={story.id}
+                            className="border border-blue-500 rounded p-2.5 bg-white shadow-md min-w-[200px]"
+                          >
+                            <div className="mb-2">
+                              <label className="text-xs text-gray-600">Status:</label>
+                              <select
+                                className="w-full text-xs px-1 py-1 border rounded"
+                                defaultValue={story.status}
+                                onChange={(e) => handleStoryUpdate(story.id, { status: e.target.value as any })}
+                              >
+                                <option value="backlog">Backlog</option>
+                                <option value="planned">Planned</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_review">In Review</option>
+                                <option value="completed">Completed</option>
+                                <option value="blocked">Blocked</option>
+                              </select>
+                            </div>
+                            <div className="text-sm font-medium mb-2">{story.title}</div>
+                            <div className="mb-2">
+                              <label className="text-xs text-gray-600">Crew:</label>
+                              <select
+                                className="w-full text-xs px-1 py-1 border rounded"
+                                defaultValue={story.assigned_crew_member || 'unassigned'}
+                                onChange={(e) => handleStoryUpdate(story.id, { assigned_crew_member: e.target.value === 'unassigned' ? undefined : e.target.value })}
+                              >
+                                <option value="unassigned">Unassigned</option>
+                                {Object.entries(CREW_MEMBERS).map(([id, info]) => (
+                                  <option key={id} value={id}>{info.name}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="mb-2">
+                              <label className="text-xs text-gray-600">Points:</label>
+                              <input
+                                type="number"
+                                className="w-full text-xs px-1 py-1 border rounded"
+                                defaultValue={story.story_points || 0}
+                                min="0"
+                                max="100"
+                                onBlur={(e) => handleStoryUpdate(story.id, { story_points: parseInt(e.target.value) || 0 })}
+                              />
+                            </div>
+                            <button
+                              onClick={() => setEditingStory(null)}
+                              className="text-xs px-2 py-1 w-full"
+                            >
+                              Close
+                            </button>
                           </div>
-                          <div className="text-sm font-medium mb-1">{story.title}</div>
-                          <div className="flex justify-between items-center text-xs text-gray-600">
-                            <span>{story.story_type.replace(/_/g, ' ')}</span>
-                            <span className="font-semibold">{story.story_points || 0} pts</span>
+                        ) : (
+                          // Regular Story Card
+                          <div
+                            key={story.id}
+                            className="border border-gray-300 rounded p-2.5 bg-white shadow-sm hover:shadow-md hover:border-blue-500 cursor-pointer transition-all min-w-[180px]"
+                            onClick={(e) => handleStoryClick(story, e)}
+                            title="Double-click to edit, single-click to view"
+                          >
+                            <div className={`text-xs px-2 py-1 rounded mb-2 inline-block ${statusColors[story.status]}`}>
+                              {story.status.replace(/_/g, ' ')}
+                            </div>
+                            <div className="text-sm font-medium mb-1">{story.title}</div>
+                            <div className="flex justify-between items-center text-xs text-gray-600 mb-1">
+                              <span>{story.story_type.replace(/_/g, ' ')}</span>
+                              <span className="font-semibold">{story.story_points || 0} pts</span>
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {story.assigned_crew_member ? CREW_MEMBERS[story.assigned_crew_member as keyof typeof CREW_MEMBERS]?.name.split(' ')[1] : 'Unassigned'}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );

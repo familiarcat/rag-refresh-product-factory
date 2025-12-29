@@ -13,6 +13,8 @@ export class SprintPanel {
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
   private _currentFilters: any = {};
+  private _refreshInterval?: NodeJS.Timeout;
+  private readonly _defaultRefreshInterval = 30000; // 30 seconds
 
   public static createOrShow(extensionUri: vscode.Uri, projectId?: string) {
     const column = vscode.window.activeTextEditor
@@ -93,6 +95,9 @@ export class SprintPanel {
       null,
       this._disposables
     );
+
+    // Start auto-refresh
+    this._startAutoRefresh();
   }
 
   public updateProject(projectId: string) {
@@ -103,6 +108,9 @@ export class SprintPanel {
 
   public dispose() {
     SprintPanel.currentPanel = undefined;
+
+    // Stop auto-refresh
+    this._stopAutoRefresh();
 
     // Clean up resources
     this._panel.dispose();
@@ -125,7 +133,7 @@ export class SprintPanel {
     return config.get<string>('baseUrl') || 'http://localhost:3000';
   }
 
-  private async _fetchSprints(filters: any) {
+  private async _fetchSprints(filters: any, isAutoRefresh = false) {
     try {
       this._currentFilters = filters;
       const apiUrl = this._getApiUrl();
@@ -147,7 +155,8 @@ export class SprintPanel {
       // Send data back to webview
       this._panel.webview.postMessage({
         command: 'sprintsData',
-        sprints: data.sprints || []
+        sprints: data.sprints || [],
+        isAutoRefresh
       });
     } catch (error: any) {
       console.error('Error fetching sprints:', error);
@@ -252,6 +261,32 @@ export class SprintPanel {
     // Open create sprint dialog
     vscode.window.showInformationMessage('Create sprint functionality coming soon!');
     // TODO: Implement create sprint dialog
+  }
+
+  private _startAutoRefresh() {
+    const config = vscode.workspace.getConfiguration('alexAi');
+    const enabled = config.get<boolean>('enableSprintAutoRefresh', true);
+
+    if (!enabled) {
+      return;
+    }
+
+    const interval = config.get<number>('sprintRefreshInterval', this._defaultRefreshInterval);
+
+    this._refreshInterval = setInterval(async () => {
+      try {
+        await this._fetchSprints(this._currentFilters, true);
+      } catch (error) {
+        console.error('Auto-refresh failed:', error);
+      }
+    }, interval);
+  }
+
+  private _stopAutoRefresh() {
+    if (this._refreshInterval) {
+      clearInterval(this._refreshInterval);
+      this._refreshInterval = undefined;
+    }
   }
 }
 

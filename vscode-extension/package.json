@@ -398,6 +398,20 @@
           "maximum": 60000,
           "markdownDescription": "Hot reload polling interval in milliseconds (1000-60000).\n\nDefault: 5000ms (5 seconds)",
           "order": 51
+        },
+        "alexAi.enableSprintAutoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "**Sprint Timeline**: Automatically refresh sprint data at regular intervals.\n\n✅ Keeps sprint board up-to-date with latest changes\n\n⚠️ Sends API request every 30 seconds (configurable)",
+          "order": 52
+        },
+        "alexAi.sprintRefreshInterval": {
+          "type": "number",
+          "default": 30000,
+          "minimum": 5000,
+          "maximum": 300000,
+          "markdownDescription": "Sprint auto-refresh interval in milliseconds (5000-300000).\n\nDefault: 30000ms (30 seconds)",
+          "order": 53
         }
       }
     }
