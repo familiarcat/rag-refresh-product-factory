@@ -157,7 +157,11 @@ echo "   • app/api/crew/orchestrate/ (Orchestration endpoint)"
 echo "   • app/api/crew/execute/ (Execution endpoint)"
 echo ""
 
-docker buildx build --platform linux/amd64 -t ${FULL_IMAGE} --push .
+docker buildx build --platform linux/amd64 \
+  --build-arg SUPABASE_URL="${SUPABASE_URL}" \
+  --build-arg SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY}" \
+  --build-arg OPENROUTER_API_KEY="${OPENROUTER_API_KEY}" \
+  -t ${FULL_IMAGE} --push .
 echo ""
 echo -e "${GREEN}✓ Built and pushed to ECR${NC}"
 echo ""

@@ -7,6 +7,16 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+# Build arguments for environment variables
+ARG SUPABASE_URL
+ARG SUPABASE_SERVICE_ROLE_KEY
+ARG OPENROUTER_API_KEY
+
+# Set environment variables for build
+ENV SUPABASE_URL=$SUPABASE_URL
+ENV SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
+ENV OPENROUTER_API_KEY=$OPENROUTER_API_KEY
+
 # Copy source and build
 COPY . .
 RUN npm run build
