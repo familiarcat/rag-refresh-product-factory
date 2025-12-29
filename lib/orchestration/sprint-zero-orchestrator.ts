@@ -201,7 +201,7 @@ export function organizeRikerStories(
       status: 'planned',
       assigned_crew_member: bestCrew,
       story_points: complexityPoints[analysis.complexity],
-      priority: index + 1, // Goals in order are priority order
+      priority: Math.min(index + 1, 5), // Goals in order, capped at 5
     };
 
     stories.push(story);
