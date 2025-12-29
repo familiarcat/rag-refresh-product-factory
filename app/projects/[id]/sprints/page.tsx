@@ -5,7 +5,6 @@
  * Accessed from "All Projects" when clicking on a project.
  */
 
-import SprintTimeline from '@/components/SprintTimeline';
 import HorizontalSprintTimeline from '@/components/HorizontalSprintTimeline';
 
 interface ProjectSprintsPageProps {
@@ -70,22 +69,6 @@ export default async function ProjectSprintsPage({ params }: ProjectSprintsPageP
         <HorizontalSprintTimeline
           projectId={projectId}
         />
-      </div>
-
-      {/* Traditional Sprint Timeline (Collapsed/Expandable) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <details className="bg-white rounded-lg border border-gray-200 shadow-sm">
-          <summary className="cursor-pointer p-4 font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-            Alternative View: Swimlane Timeline
-          </summary>
-          <div className="p-4 border-t border-gray-200">
-            <SprintTimeline
-              projectId={projectId}
-              viewMode="full"
-              showFilters={true}
-            />
-          </div>
-        </details>
       </div>
 
       {/* Project Sprint Stats */}

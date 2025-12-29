@@ -1,6 +1,18 @@
 'use client';
 
 /**
+ * @deprecated This component is deprecated as of December 29, 2024.
+ *
+ * REASON: Uses Tailwind CSS classes which are not available in this app.
+ * The app uses a custom CSS design system with CSS variables (--bg, --panel, --text, etc.)
+ *
+ * REPLACEMENT: Use HorizontalSprintTimeline instead, which uses CSS Modules
+ * and the app's custom design system.
+ *
+ * This file is kept for reference only and should not be used in production.
+ *
+ * ---
+ *
  * SprintTimeline - Shared Sprint Visualization Component
  *
  * Content-reactive sprint timeline that works in both web and IDE views.

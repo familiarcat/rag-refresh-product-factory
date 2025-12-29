@@ -19,6 +19,7 @@ import styles from './HorizontalSprintTimeline.module.css';
 export interface HorizontalSprintTimelineProps {
   projectId?: string;
   sprintId?: string;
+  showAllSprints?: boolean;  // If true, shows all active sprints (for /sprints page)
 }
 
 interface SprintWithStories extends Sprint {
@@ -34,13 +35,90 @@ interface TimelineDay {
 
 export default function HorizontalSprintTimeline({
   projectId,
-  sprintId
+  sprintId,
+  showAllSprints = false
 }: HorizontalSprintTimelineProps) {
-  const [sprint, setSprint] = useState<SprintWithStories | null>(null);
+  const [sprints, setSprints] = useState<SprintWithStories[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hoveredStory, setHoveredStory] = useState<string | null>(null);
 
+  const fetchSprints = async () => {
+    console.log('[HorizontalSprintTimeline] Fetching sprints...', { projectId, sprintId, showAllSprints });
+    setLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams();
+      if (!showAllSprints && projectId) params.append('project_id', projectId);
+      if (!showAllSprints && sprintId) params.append('sprint_id', sprintId);
+      params.append('status', 'active');
+      params.append('include_stories', 'true');
+
+      const url = `/api/sprints?${params}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch sprints');
+
+      const data = await response.json();
+      const fetchedSprints = data.sprints || [];
+
+      console.log(`[HorizontalSprintTimeline] ${fetchedSprints.length} sprint(s) loaded`);
+      setSprints(fetchedSprints);
+    } catch (err: any) {
+      console.error('[HorizontalSprintTimeline] Error:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSprints();
+  }, [projectId, sprintId, showAllSprints]);
+
+  // Helper functions moved to SingleSprintView component
+
+  if (loading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <span style={{ color: 'var(--muted)' }}>Loading sprint timeline...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.error}>
+        <div className={styles.errorContent}>
+          <div className={styles.errorIcon}>⚠️</div>
+          <div className={styles.errorTitle}>Error loading sprints</div>
+          <div className={styles.errorMessage}>{error}</div>
+          <button className={styles.errorButton} onClick={fetchSprints}>
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (sprints.length === 0) {
+    return (
+      <div className={styles.empty}>
+        <div className={styles.emptyContent}>
+          <div className={styles.emptyIcon}>📅</div>
+          <div className={styles.emptyTitle}>No active sprints found</div>
+          <div className={styles.emptyMessage}>
+            Create a sprint to get started with your project timeline
+          </div>
+          {projectId && (
+            <button className={styles.emptyButton}>Create Sprint</button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Event handlers
   const handleStoryClick = (story: StoryWithDetails) => {
     console.log('Story clicked:', story.id);
     // TODO: Implement story detail modal
@@ -51,46 +129,32 @@ export default function HorizontalSprintTimeline({
     // TODO: Implement crew filtering
   };
 
-  const fetchSprint = async () => {
-    console.log('[HorizontalSprintTimeline] Fetching sprint...', { projectId, sprintId });
-    setLoading(true);
-    setError(null);
+  // Render all sprints
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      {sprints.map(sprint => (
+        <SingleSprintView
+          key={sprint.id}
+          sprint={sprint}
+          onStoryClick={handleStoryClick}
+          onCrewClick={handleCrewClick}
+        />
+      ))}
+    </div>
+  );
+}
 
-    try {
-      const params = new URLSearchParams();
-      if (projectId) params.append('project_id', projectId);
-      if (sprintId) params.append('sprint_id', sprintId);
-      params.append('status', 'active');
-      params.append('include_stories', 'true');
+// Single Sprint View Component
+interface SingleSprintViewProps {
+  sprint: SprintWithStories;
+  onStoryClick: (story: StoryWithDetails) => void;
+  onCrewClick: (crew: CrewMember) => void;
+}
 
-      const url = `/api/sprints?${params}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch sprint');
-
-      const data = await response.json();
-      const sprints = data.sprints || [];
-
-      if (sprints.length > 0) {
-        console.log('[HorizontalSprintTimeline] Sprint loaded:', sprints[0].id);
-        setSprint(sprints[0]);
-      } else {
-        setSprint(null);
-      }
-    } catch (err: any) {
-      console.error('[HorizontalSprintTimeline] Error:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSprint();
-  }, [projectId, sprintId]);
+function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintViewProps) {
+  const [hoveredStory, setHoveredStory] = useState<string | null>(null);
 
   const getTimelineDays = (): TimelineDay[] => {
-    if (!sprint) return [];
-
     const days: TimelineDay[] = [];
     const startDate = new Date(sprint.start_date);
     const endDate = new Date(sprint.end_date);
@@ -121,7 +185,7 @@ export default function HorizontalSprintTimeline({
   const getStoryCompletionDay = (story: StoryWithDetails, sprintDays: number): number => {
     if (story.estimated_completion) {
       const completionDate = new Date(story.estimated_completion);
-      const startDate = new Date(sprint!.start_date);
+      const startDate = new Date(sprint.start_date);
       const daysDiff = Math.ceil((completionDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
       return Math.max(1, Math.min(daysDiff, sprintDays));
     }
@@ -141,8 +205,6 @@ export default function HorizontalSprintTimeline({
   };
 
   const getStoriesByCrewAndDay = (): Record<string, Record<number, StoryWithDetails[]>> => {
-    if (!sprint) return {};
-
     const grouped: Record<string, Record<number, StoryWithDetails[]>> = {};
     const days = getTimelineDays();
 
@@ -164,8 +226,6 @@ export default function HorizontalSprintTimeline({
   };
 
   const getVisibleCrew = (): string[] => {
-    if (!sprint) return [];
-
     const crewWithStories = new Set<string>();
     sprint.stories?.forEach(story => {
       crewWithStories.add(story.assigned_crew_member || 'unassigned');
@@ -173,47 +233,6 @@ export default function HorizontalSprintTimeline({
 
     return [...crewWithStories];
   };
-
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.spinner}></div>
-        <span style={{ color: 'var(--muted)' }}>Loading sprint timeline...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.error}>
-        <div className={styles.errorContent}>
-          <div className={styles.errorIcon}>⚠️</div>
-          <div className={styles.errorTitle}>Error loading sprint</div>
-          <div className={styles.errorMessage}>{error}</div>
-          <button className={styles.errorButton} onClick={fetchSprint}>
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!sprint) {
-    return (
-      <div className={styles.empty}>
-        <div className={styles.emptyContent}>
-          <div className={styles.emptyIcon}>📅</div>
-          <div className={styles.emptyTitle}>No active sprints found</div>
-          <div className={styles.emptyMessage}>
-            Create a sprint to get started with your project timeline
-          </div>
-          {projectId && (
-            <button className={styles.emptyButton}>Create Sprint</button>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   const timelineDays = getTimelineDays();
   const storiesByCrewAndDay = getStoriesByCrewAndDay();
