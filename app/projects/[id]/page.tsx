@@ -8,6 +8,7 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import Link from 'next/link';
 import { ProjectTimeline, Milestone } from '@/components/ProjectTimeline';
+import HorizontalSprintTimeline from '@/components/HorizontalSprintTimeline';
 
 interface Project {
   id: string;
@@ -158,6 +159,43 @@ export default async function ProjectDetailPage({
           interactive={true}
         />
       )}
+
+      {/* Sprint Management Section */}
+      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div style={{
+          padding: '16px 24px',
+          borderBottom: '1px solid var(--line)',
+          background: 'linear-gradient(135deg, var(--accent1), var(--accent2))',
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div>
+            <h2 style={{ margin: '0 0 4px', fontSize: 18 }}>🚀 Sprint Timeline</h2>
+            <p style={{ margin: 0, fontSize: 13, opacity: 0.9 }}>
+              Current sprint progress and story management
+            </p>
+          </div>
+          <Link
+            href={`/projects/${project.id}/sprints`}
+            style={{
+              color: 'white',
+              textDecoration: 'none',
+              padding: '8px 16px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '6px',
+              fontSize: '14px',
+              transition: 'background 0.2s'
+            }}
+          >
+            Full View →
+          </Link>
+        </div>
+        <div style={{ padding: '24px' }}>
+          <HorizontalSprintTimeline projectId={project.id} />
+        </div>
+      </div>
 
       {/* Quick Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
