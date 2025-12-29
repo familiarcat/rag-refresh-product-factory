@@ -1,243 +1,135 @@
-/**
- * Individual Story API Endpoints
- *
- * GET /api/stories/[id] - Get story by ID
- * PATCH /api/stories/[id] - Update story
- * DELETE /api/stories/[id] - Delete story
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import type { UpdateStoryRequest, StoryStatus } from '@/types/sprint';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-interface RouteContext {
-  params: Promise<{ id: string }>;
-}
-
 /**
  * GET /api/stories/[id]
- *
- * Get a single story with all details
+ * Fetch a single story by ID with details
  */
 export async function GET(
   request: NextRequest,
-  { params }: RouteContext
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
-    const { data, error } = await supabase
+    const { data: story, error } = await supabase
       .from('stories')
       .select(`
         *,
-        persona:personas (*),
-        acceptance_criteria (*),
-        tasks (*),
-        comments (*)
+        persona:personas(*),
+        acceptance_criteria:acceptance_criteria(*),
+        tasks:tasks(*),
+        comments:comments(*)
       `)
       .eq('id', id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Story not found' },
-          { status: 404 }
-        );
-      }
-
-      console.error('Error fetching story:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch story', details: error.message },
-        { status: 500 }
-      );
+      console.error('Supabase error:', error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json(data);
+    if (!story) {
+      return NextResponse.json({ error: 'Story not found' }, { status: 404 });
+    }
 
+    return NextResponse.json({ story }, { status: 200 });
   } catch (error: any) {
-    console.error('Unexpected error in GET /api/stories/[id]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
-      { status: 500 }
-    );
+    console.error('GET /api/stories/[id] error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 /**
  * PATCH /api/stories/[id]
- *
- * Update a story
- *
- * Request body (all fields optional):
- * {
- *   "title": "Updated title",
- *   "description": "Updated description",
- *   "status": "in_progress",
- *   "assigned_crew_member": "data",
- *   "story_points": 8,
- *   "priority": 1,
- *   "sprint_id": "uuid" // or null to move to backlog
- * }
+ * Update a story (drag-drop, modal edits)
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: RouteContext
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    const body: UpdateStoryRequest = await request.json();
+    const { id } = params;
+    const updates = await request.json();
 
-    // Build update object
-    const updates: Partial<any> = {};
+    console.log(`Updating story ${id}:`, updates);
 
-    if (body.title !== undefined) updates.title = body.title;
-    if (body.description !== undefined) updates.description = body.description;
+    // Only allow updating specific fields
+    const allowedFields = [
+      'title',
+      'description',
+      'story_type',
+      'status',
+      'story_points',
+      'priority',
+      'assigned_crew_member',
+      'estimated_completion',
+      'sprint_id',
+      'persona_id',
+      'related_goals'
+    ];
 
-    if (body.status !== undefined) {
-      const validStatuses: StoryStatus[] = [
-        'backlog', 'planned', 'in_progress', 'in_review', 'completed', 'blocked'
-      ];
-      if (!validStatuses.includes(body.status)) {
-        return NextResponse.json(
-          { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
-          { status: 400 }
-        );
+    const cleanedUpdates: Record<string, any> = {};
+    for (const field of allowedFields) {
+      if (field in updates) {
+        cleanedUpdates[field] = updates[field];
       }
-      updates.status = body.status;
     }
 
-    if (body.assigned_crew_member !== undefined) {
-      updates.assigned_crew_member = body.assigned_crew_member;
-    }
+    cleanedUpdates.updated_at = new Date().toISOString();
 
-    if (body.story_points !== undefined) {
-      if (body.story_points < 0 || body.story_points > 100) {
-        return NextResponse.json(
-          { error: 'story_points must be between 0 and 100' },
-          { status: 400 }
-        );
-      }
-      updates.story_points = body.story_points;
-    }
-
-    if (body.priority !== undefined) {
-      if (body.priority < 1 || body.priority > 5) {
-        return NextResponse.json(
-          { error: 'priority must be between 1 and 5' },
-          { status: 400 }
-        );
-      }
-      updates.priority = body.priority;
-    }
-
-    if (body.sprint_id !== undefined) {
-      updates.sprint_id = body.sprint_id;
-    }
-
-    if (Object.keys(updates).length === 0) {
-      return NextResponse.json(
-        { error: 'No valid fields to update' },
-        { status: 400 }
-      );
-    }
-
-    // Perform update
-    const { data, error } = await supabase
+    const { data: story, error } = await supabase
       .from('stories')
-      .update(updates)
+      .update(cleanedUpdates)
       .eq('id', id)
-      .select(`
-        *,
-        persona:personas (*),
-        acceptance_criteria (*),
-        tasks (*),
-        comments (*)
-      `)
+      .select()
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Story not found' },
-          { status: 404 }
-        );
-      }
-
-      console.error('Error updating story:', error);
-      return NextResponse.json(
-        { error: 'Failed to update story', details: error.message },
-        { status: 500 }
-      );
+      console.error('Supabase error:', error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json(data);
+    if (!story) {
+      return NextResponse.json({ error: 'Story not found' }, { status: 404 });
+    }
 
+    return NextResponse.json({ story }, { status: 200 });
   } catch (error: any) {
-    console.error('Unexpected error in PATCH /api/stories/[id]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
-      { status: 500 }
-    );
+    console.error('PATCH /api/stories/[id] error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 /**
  * DELETE /api/stories/[id]
- *
  * Delete a story
- * WARNING: This will cascade delete acceptance criteria, tasks, and comments
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteContext
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
-    // Check if story exists
-    const { data: story } = await supabase
-      .from('stories')
-      .select('id, title')
-      .eq('id', id)
-      .single();
-
-    if (!story) {
-      return NextResponse.json(
-        { error: 'Story not found' },
-        { status: 404 }
-      );
-    }
-
-    // Delete story
     const { error } = await supabase
       .from('stories')
       .delete()
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting story:', error);
-      return NextResponse.json(
-        { error: 'Failed to delete story', details: error.message },
-        { status: 500 }
-      );
+      console.error('Supabase error:', error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json({
-      message: 'Story deleted successfully',
-      deleted: story
-    });
-
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error: any) {
-    console.error('Unexpected error in DELETE /api/stories/[id]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
-      { status: 500 }
-    );
+    console.error('DELETE /api/stories/[id] error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

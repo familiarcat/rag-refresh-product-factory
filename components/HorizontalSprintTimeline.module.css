@@ -305,6 +305,16 @@
   z-index: 5;
 }
 
+.storyCard:active {
+  cursor: grabbing;
+  opacity: 0.7;
+}
+
+.dayCell.dragOver {
+  background: rgba(124, 92, 255, 0.15);
+  border: 2px dashed var(--accent1);
+}
+
 .storyCard.status-planned {
   background: rgba(90, 230, 255, 0.15);
   border-color: var(--good);

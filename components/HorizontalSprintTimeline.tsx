@@ -16,6 +16,7 @@ import Image from 'next/image';
 import type { Sprint, Story, StoryWithDetails, CrewMember } from '@/types/sprint';
 import { CREW_MEMBERS } from '@/types/sprint';
 import styles from './HorizontalSprintTimeline.module.css';
+import StoryEditModal from './StoryEditModal';
 
 export interface HorizontalSprintTimelineProps {
   projectId?: string;
@@ -178,6 +179,8 @@ interface SingleSprintViewProps {
 
 function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintViewProps) {
   const [hoveredStory, setHoveredStory] = useState<string | null>(null);
+  const [editingStory, setEditingStory] = useState<StoryWithDetails | null>(null);
+  const [draggedStory, setDraggedStory] = useState<{ story: StoryWithDetails; fromCrew: string; fromDay: number } | null>(null);
 
   // Helper to get crew avatar path
   const getCrewAvatarPath = (crewKey: string): string => {
@@ -281,6 +284,72 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
     });
 
     return [...crewWithStories];
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (story: StoryWithDetails, crew: string, day: number) => {
+    setDraggedStory({ story, fromCrew: crew, fromDay: day });
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (toCrew: string, toDay: number) => {
+    if (!draggedStory) return;
+
+    const { story, fromCrew, fromDay } = draggedStory;
+
+    // Don't update if dropped in same position
+    if (fromCrew === toCrew && fromDay === toDay) {
+      setDraggedStory(null);
+      return;
+    }
+
+    // Calculate new estimated completion date
+    const days = getTimelineDays();
+    const targetDay = days[toDay - 1];
+    const newEstimatedCompletion = targetDay?.date.toISOString().split('T')[0];
+
+    // Update story
+    await updateStory(story.id, {
+      assigned_crew_member: toCrew === 'unassigned' ? undefined : toCrew as CrewMember,
+      estimated_completion: newEstimatedCompletion
+    });
+
+    setDraggedStory(null);
+  };
+
+  // Update story via API
+  const updateStory = async (storyId: string, updates: Partial<Story>) => {
+    try {
+      const response = await fetch(`/api/stories/${storyId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update story');
+      }
+
+      // Refresh sprint data
+      window.location.reload(); // TODO: Replace with optimistic update
+    } catch (error) {
+      console.error('Error updating story:', error);
+      alert('Failed to update story. Please try again.');
+    }
+  };
+
+  // Handle story click to open edit modal
+  const handleStoryCardClick = (story: StoryWithDetails) => {
+    setEditingStory(story);
+  };
+
+  // Handle save from modal
+  const handleSaveStory = async (updates: Partial<Story>) => {
+    if (!editingStory) return;
+    await updateStory(editingStory.id, updates);
   };
 
   const timelineDays = getTimelineDays();
@@ -418,16 +487,21 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                       <div
                         key={day.dayNumber}
                         className={`${styles.dayCell} ${day.isToday ? styles.today : ''} ${day.isWeekend ? styles.weekend : ''}`}
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop(crewKey, day.dayNumber)}
                       >
                         <div className={styles.storyCards}>
                           {dayStories.map((story) => (
                             <StoryTimelineCard
                               key={story.id}
                               story={story}
+                              crewKey={crewKey}
+                              dayNumber={day.dayNumber}
                               isHovered={hoveredStory === story.id}
                               onHover={() => setHoveredStory(story.id)}
                               onLeave={() => setHoveredStory(null)}
-                              onClick={() => handleStoryClick(story)}
+                              onClick={() => handleStoryCardClick(story)}
+                              onDragStart={handleDragStart}
                             />
                           ))}
                         </div>
@@ -468,6 +542,18 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
           </div>
         </div>
       </div>
+
+      {/* Story Edit Modal */}
+      {editingStory && (
+        <StoryEditModal
+          story={editingStory}
+          isOpen={true}
+          onClose={() => setEditingStory(null)}
+          onSave={handleSaveStory}
+          sprintStartDate={sprint.start_date}
+          sprintEndDate={sprint.end_date}
+        />
+      )}
     </div>
   );
 }
@@ -475,26 +561,41 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
 // Story Timeline Card Component
 interface StoryTimelineCardProps {
   story: StoryWithDetails;
+  crewKey: string;
+  dayNumber: number;
   isHovered: boolean;
   onHover: () => void;
   onLeave: () => void;
   onClick: () => void;
+  onDragStart: (story: StoryWithDetails, crew: string, day: number) => void;
 }
 
-function StoryTimelineCard({ story, isHovered, onHover, onLeave, onClick }: StoryTimelineCardProps) {
+function StoryTimelineCard({
+  story,
+  crewKey,
+  dayNumber,
+  isHovered,
+  onHover,
+  onLeave,
+  onClick,
+  onDragStart
+}: StoryTimelineCardProps) {
   const completedCriteria = story.acceptance_criteria?.filter(ac => ac.is_completed).length || 0;
   const totalCriteria = story.acceptance_criteria?.length || 0;
   const criteriaProgress = totalCriteria > 0 ? Math.round((completedCriteria / totalCriteria) * 100) : 0;
 
   return (
     <div
+      draggable
+      onDragStart={() => onDragStart(story, crewKey, dayNumber)}
       onClick={onClick}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
       className={`${styles.storyCard} ${styles[`status-${story.status}`]}`}
       style={{
         transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-        zIndex: isHovered ? 10 : 1
+        zIndex: isHovered ? 10 : 1,
+        cursor: 'grab'
       }}
     >
       {story.story_points && (
