@@ -14,10 +14,11 @@
 import React, { useEffect, useState } from 'react';
 import type { Sprint, Story, StoryWithDetails, CrewMember } from '@/types/sprint';
 import { CREW_MEMBERS } from '@/types/sprint';
+import styles from './HorizontalSprintTimeline.module.css';
 
 export interface HorizontalSprintTimelineProps {
   projectId?: string;
-  sprintId?: string; // Show specific sprint or current active sprint
+  sprintId?: string;
 }
 
 interface SprintWithStories extends Sprint {
@@ -40,25 +41,18 @@ export default function HorizontalSprintTimeline({
   const [error, setError] = useState<string | null>(null);
   const [hoveredStory, setHoveredStory] = useState<string | null>(null);
 
-  // Internal click handlers
   const handleStoryClick = (story: StoryWithDetails) => {
-    // Open story in new tab or show modal
     console.log('Story clicked:', story.id);
-    // TODO: Implement story detail view
+    // TODO: Implement story detail modal
   };
 
   const handleCrewClick = (crew: CrewMember) => {
-    // Filter or show crew details
     console.log('Crew clicked:', crew);
     // TODO: Implement crew filtering
   };
 
-  // Fetch sprint data
-  useEffect(() => {
-    fetchSprint();
-  }, [projectId, sprintId]);
-
   const fetchSprint = async () => {
+    console.log('[HorizontalSprintTimeline] Fetching sprint...', { projectId, sprintId });
     setLoading(true);
     setError(null);
 
@@ -69,26 +63,31 @@ export default function HorizontalSprintTimeline({
       params.append('status', 'active');
       params.append('include_stories', 'true');
 
-      const response = await fetch(`/api/sprints?${params}`);
+      const url = `/api/sprints?${params}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch sprint');
 
       const data = await response.json();
       const sprints = data.sprints || [];
 
       if (sprints.length > 0) {
-        setSprint(sprints[0]); // Use first active sprint
+        console.log('[HorizontalSprintTimeline] Sprint loaded:', sprints[0].id);
+        setSprint(sprints[0]);
       } else {
         setSprint(null);
       }
     } catch (err: any) {
+      console.error('[HorizontalSprintTimeline] Error:', err);
       setError(err.message);
-      console.error('Error fetching sprint:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculate timeline days
+  useEffect(() => {
+    fetchSprint();
+  }, [projectId, sprintId]);
+
   const getTimelineDays = (): TimelineDay[] => {
     if (!sprint) return [];
 
@@ -102,7 +101,7 @@ export default function HorizontalSprintTimeline({
     let dayNumber = 1;
 
     while (currentDate <= endDate) {
-      const isToday = currentDate.getTime() === today.getTime();
+      const isToday = currentDate.toDateString() === today.toDateString();
       const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
 
       days.push({
@@ -119,9 +118,7 @@ export default function HorizontalSprintTimeline({
     return days;
   };
 
-  // Get estimated completion day for a story
   const getStoryCompletionDay = (story: StoryWithDetails, sprintDays: number): number => {
-    // If story has estimated_completion, calculate day from sprint start
     if (story.estimated_completion) {
       const completionDate = new Date(story.estimated_completion);
       const startDate = new Date(sprint!.start_date);
@@ -129,37 +126,30 @@ export default function HorizontalSprintTimeline({
       return Math.max(1, Math.min(daysDiff, sprintDays));
     }
 
-    // Otherwise, estimate based on status and story points
-    const pointsPerDay = (sprint!.velocity_target || 20) / sprintDays;
-    const daysNeeded = (story.story_points || 3) / pointsPerDay;
-
     switch (story.status) {
       case 'completed':
-        return Math.floor(sprintDays * 0.3); // Early in sprint
+        return Math.floor(sprintDays * 0.3);
       case 'in_review':
-        return Math.floor(sprintDays * 0.7); // Late in sprint
+        return Math.floor(sprintDays * 0.7);
       case 'in_progress':
-        return Math.floor(sprintDays * 0.5); // Mid sprint
+        return Math.floor(sprintDays * 0.5);
       case 'planned':
         return Math.floor(sprintDays * 0.6);
       default:
-        return Math.floor(sprintDays * 0.8); // Later in sprint
+        return Math.floor(sprintDays * 0.8);
     }
   };
 
-  // Group stories by crew and position on timeline
   const getStoriesByCrewAndDay = (): Record<string, Record<number, StoryWithDetails[]>> => {
     if (!sprint) return {};
 
     const grouped: Record<string, Record<number, StoryWithDetails[]>> = {};
     const days = getTimelineDays();
 
-    // Initialize all crew members
     [...Object.keys(CREW_MEMBERS), 'unassigned'].forEach(crew => {
       grouped[crew] = {};
     });
 
-    // Group stories by crew and day
     sprint.stories?.forEach(story => {
       const crew = story.assigned_crew_member || 'unassigned';
       const day = getStoryCompletionDay(story, days.length);
@@ -173,7 +163,6 @@ export default function HorizontalSprintTimeline({
     return grouped;
   };
 
-  // Get visible crew members (those with assigned stories)
   const getVisibleCrew = (): string[] => {
     if (!sprint) return [];
 
@@ -187,41 +176,41 @@ export default function HorizontalSprintTimeline({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-12 bg-white rounded-lg border border-gray-200">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
-        <span className="ml-3 text-gray-600">Loading sprint timeline...</span>
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <span style={{ color: 'var(--muted)' }}>Loading sprint timeline...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-        <p className="text-red-800 font-semibold mb-2">Error loading sprint</p>
-        <p className="text-red-600 text-sm mb-4">{error}</p>
-        <button
-          onClick={fetchSprint}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-        >
-          Retry
-        </button>
+      <div className={styles.error}>
+        <div className={styles.errorContent}>
+          <div className={styles.errorIcon}>⚠️</div>
+          <div className={styles.errorTitle}>Error loading sprint</div>
+          <div className={styles.errorMessage}>{error}</div>
+          <button className={styles.errorButton} onClick={fetchSprint}>
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
   if (!sprint) {
     return (
-      <div className="text-center p-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-        <div className="text-6xl mb-4">📅</div>
-        <p className="text-gray-700 font-semibold text-lg mb-2">No active sprints found</p>
-        <p className="text-gray-500 text-sm mb-6">
-          Create a sprint to get started with your project timeline
-        </p>
-        {projectId && (
-          <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Create Sprint
-          </button>
-        )}
+      <div className={styles.empty}>
+        <div className={styles.emptyContent}>
+          <div className={styles.emptyIcon}>📅</div>
+          <div className={styles.emptyTitle}>No active sprints found</div>
+          <div className={styles.emptyMessage}>
+            Create a sprint to get started with your project timeline
+          </div>
+          {projectId && (
+            <button className={styles.emptyButton}>Create Sprint</button>
+          )}
+        </div>
       </div>
     );
   }
@@ -230,48 +219,47 @@ export default function HorizontalSprintTimeline({
   const storiesByCrewAndDay = getStoriesByCrewAndDay();
   const visibleCrew = getVisibleCrew();
 
-  // Calculate sprint metrics
   const totalStories = sprint.stories?.length || 0;
   const completedStories = sprint.stories?.filter(s => s.status === 'completed').length || 0;
   const completionPercentage = totalStories > 0 ? Math.round((completedStories / totalStories) * 100) : 0;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-      {/* Sprint Header with Metrics */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-6">
-        <div className="flex items-start justify-between mb-4">
+    <div className={styles.container}>
+      {/* Sprint Header */}
+      <div className={styles.header}>
+        <div className={styles.headerTop}>
           <div>
-            <h2 className="text-2xl font-bold mb-1">{sprint.name}</h2>
-            <p className="text-blue-100 text-sm">
+            <div className={styles.headerTitle}>{sprint.name}</div>
+            <div className={styles.headerSubtitle}>
               {new Date(sprint.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(sprint.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              <span className="mx-2">•</span>
+              <span style={{ margin: '0 8px' }}>•</span>
               {timelineDays.length} days
-            </p>
+            </div>
           </div>
 
-          <div className="flex gap-6">
-            <div className="text-right">
-              <div className="text-3xl font-bold">{sprint.velocity_actual || 0}/{sprint.velocity_target || 0}</div>
-              <div className="text-xs text-blue-100">Story Points</div>
+          <div className={styles.metrics}>
+            <div className={styles.metric}>
+              <div className={styles.metricValue}>{sprint.velocity_actual || 0}/{sprint.velocity_target || 0}</div>
+              <div className={styles.metricLabel}>Story Points</div>
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold">{completedStories}/{totalStories}</div>
-              <div className="text-xs text-blue-100">Stories Complete</div>
+            <div className={styles.metric}>
+              <div className={styles.metricValue}>{completedStories}/{totalStories}</div>
+              <div className={styles.metricLabel}>Stories Complete</div>
             </div>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-xs mb-2">
-            <span className="font-semibold">{completionPercentage}% Complete</span>
-            <span className="text-blue-100">
-              {timelineDays.filter(d => d.isToday).length > 0 ? 'Sprint in progress' : 'Not started'}
+        <div className={styles.progressBar}>
+          <div className={styles.progressBarHeader}>
+            <span style={{ fontWeight: 'bold' }}>{completionPercentage}% Complete</span>
+            <span style={{ opacity: 0.8 }}>
+              {timelineDays.some(d => d.isToday) ? 'Sprint in progress' : 'Not started'}
             </span>
           </div>
-          <div className="w-full bg-blue-500 rounded-full h-3">
+          <div className={styles.progressBarTrack}>
             <div
-              className="bg-white rounded-full h-3 transition-all duration-500 shadow-sm"
+              className={styles.progressBarFill}
               style={{ width: `${completionPercentage}%` }}
             />
           </div>
@@ -279,12 +267,12 @@ export default function HorizontalSprintTimeline({
 
         {/* Sprint Goals */}
         {sprint.goals && sprint.goals.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-blue-400">
-            <div className="text-xs font-semibold text-blue-100 mb-2">SPRINT GOALS</div>
-            <ul className="space-y-1">
+          <div className={styles.goals}>
+            <div className={styles.goalsHeader}>Sprint Goals</div>
+            <ul className={styles.goalsList}>
               {sprint.goals.map((goal, idx) => (
-                <li key={idx} className="text-sm flex items-start">
-                  <span className="mr-2">🎯</span>
+                <li key={idx} className={styles.goalItem}>
+                  <span style={{ marginRight: '8px' }}>🎯</span>
                   {goal}
                 </li>
               ))}
@@ -294,135 +282,113 @@ export default function HorizontalSprintTimeline({
       </div>
 
       {/* Horizontal Timeline */}
-      <div className="p-6 bg-gray-50">
-        <div className="overflow-x-auto">
-          {/* Timeline Container */}
-          <div className="inline-block min-w-full">
-            {/* Timeline Header (Days) */}
-            <div className="flex mb-4 sticky top-0 bg-gray-50 z-10 pb-2 border-b-2 border-gray-300">
-              <div className="w-40 flex-shrink-0 font-semibold text-sm text-gray-700 flex items-center">
-                Crew Member
-              </div>
-              {timelineDays.map((day) => (
-                <div
-                  key={day.dayNumber}
-                  className={`
-                    flex-shrink-0 w-32 text-center border-l border-gray-200
-                    ${day.isToday ? 'bg-blue-100 border-blue-400 border-2' : ''}
-                    ${day.isWeekend ? 'bg-gray-100' : 'bg-white'}
-                  `}
-                >
-                  <div className={`text-xs font-semibold ${day.isToday ? 'text-blue-700' : 'text-gray-600'}`}>
-                    Day {day.dayNumber}
-                  </div>
-                  <div className={`text-xs ${day.isToday ? 'text-blue-600 font-bold' : 'text-gray-500'}`}>
-                    {day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </div>
-                  {day.isToday && (
-                    <div className="text-xs text-blue-600 font-bold mt-1">TODAY</div>
-                  )}
+      <div className={styles.timelineArea}>
+        <div className={styles.timeline}>
+          {/* Timeline Header (Days) */}
+          <div className={styles.timelineHeader}>
+            <div className={styles.crewLabel}>Crew Member</div>
+            {timelineDays.map((day) => (
+              <div
+                key={day.dayNumber}
+                className={`${styles.dayColumn} ${day.isToday ? styles.today : ''} ${day.isWeekend ? styles.weekend : ''}`}
+              >
+                <div className={styles.dayNumber}>Day {day.dayNumber}</div>
+                <div className={styles.dayDate}>
+                  {day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </div>
-              ))}
-            </div>
+                {day.isToday && <div className={styles.todayLabel}>TODAY</div>}
+              </div>
+            ))}
+          </div>
 
-            {/* Crew Swimlanes */}
-            <div className="space-y-2">
-              {visibleCrew.map((crewKey) => {
-                const crewInfo = crewKey === 'unassigned'
-                  ? { id: 'unassigned' as CrewMember, name: 'Unassigned', role: 'Backlog', specialty: 'No crew assigned' }
-                  : CREW_MEMBERS[crewKey as CrewMember];
+          {/* Crew Swimlanes */}
+          <div className={styles.swimlanes}>
+            {visibleCrew.map((crewKey) => {
+              const crewInfo = crewKey === 'unassigned'
+                ? { id: 'unassigned' as CrewMember, name: 'Unassigned', role: 'Backlog', specialty: 'No crew assigned' }
+                : CREW_MEMBERS[crewKey as CrewMember];
 
-                const crewStories = storiesByCrewAndDay[crewKey] || {};
-                const totalCrewPoints = Object.values(crewStories)
-                  .flat()
-                  .reduce((sum, s) => sum + (s.story_points || 0), 0);
+              const crewStories = storiesByCrewAndDay[crewKey] || {};
+              const totalCrewPoints = Object.values(crewStories)
+                .flat()
+                .reduce((sum, s) => sum + (s.story_points || 0), 0);
 
-                return (
-                  <div key={crewKey} className="flex border border-gray-200 rounded-lg overflow-hidden bg-white hover:shadow-md transition-shadow">
-                    {/* Crew Info Column */}
-                    <div
-                      className="w-40 flex-shrink-0 p-3 bg-gradient-to-r from-gray-50 to-white border-r border-gray-200 cursor-pointer hover:from-blue-50 hover:to-blue-50"
-                      onClick={() => crewKey !== 'unassigned' && handleCrewClick(crewKey as CrewMember)}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-sm">
-                          {crewInfo.name.charAt(0)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-sm truncate">{crewInfo.name}</div>
-                          <div className="text-xs text-gray-600 truncate">{crewInfo.specialty}</div>
-                        </div>
+              return (
+                <div key={crewKey} className={styles.swimlane}>
+                  {/* Crew Info Column */}
+                  <div
+                    className={styles.crewInfo}
+                    onClick={() => crewKey !== 'unassigned' && handleCrewClick(crewKey as CrewMember)}
+                  >
+                    <div className={styles.crewHeader}>
+                      <div className={styles.crewAvatar}>
+                        {crewInfo.name.charAt(0)}
                       </div>
-                      <div className="text-xs text-gray-600 mt-2">
-                        <div className="font-semibold text-blue-600">{totalCrewPoints} pts</div>
-                        <div className="text-gray-500">
-                          {Object.values(crewStories).flat().length} stories
-                        </div>
+                      <div className={styles.crewDetails}>
+                        <div className={styles.crewName}>{crewInfo.name}</div>
+                        <div className={styles.crewSpecialty}>{crewInfo.specialty}</div>
                       </div>
                     </div>
-
-                    {/* Timeline Days with Story Cards */}
-                    {timelineDays.map((day) => {
-                      const dayStories = crewStories[day.dayNumber] || [];
-
-                      return (
-                        <div
-                          key={day.dayNumber}
-                          className={`
-                            flex-shrink-0 w-32 p-2 border-l border-gray-200 min-h-[120px]
-                            ${day.isToday ? 'bg-blue-50 border-blue-300' : ''}
-                            ${day.isWeekend ? 'bg-gray-50' : ''}
-                          `}
-                        >
-                          {/* Story Cards */}
-                          <div className="space-y-2">
-                            {dayStories.map((story) => (
-                              <StoryTimelineCard
-                                key={story.id}
-                                story={story}
-                                isHovered={hoveredStory === story.id}
-                                onHover={() => setHoveredStory(story.id)}
-                                onLeave={() => setHoveredStory(null)}
-                                onClick={() => handleStoryClick(story)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    <div className={styles.crewStats}>
+                      <div className={styles.crewPoints}>{totalCrewPoints} pts</div>
+                      <div>{Object.values(crewStories).flat().length} stories</div>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
 
-            {/* Legend */}
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <div className="flex flex-wrap gap-4 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-green-200 border border-green-400 rounded"></div>
-                  <span className="text-gray-600">Completed</span>
+                  {/* Timeline Days with Story Cards */}
+                  {timelineDays.map((day) => {
+                    const dayStories = crewStories[day.dayNumber] || [];
+
+                    return (
+                      <div
+                        key={day.dayNumber}
+                        className={`${styles.dayCell} ${day.isToday ? styles.today : ''} ${day.isWeekend ? styles.weekend : ''}`}
+                      >
+                        <div className={styles.storyCards}>
+                          {dayStories.map((story) => (
+                            <StoryTimelineCard
+                              key={story.id}
+                              story={story}
+                              isHovered={hoveredStory === story.id}
+                              onHover={() => setHoveredStory(story.id)}
+                              onLeave={() => setHoveredStory(null)}
+                              onClick={() => handleStoryClick(story)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-yellow-200 border border-yellow-400 rounded"></div>
-                  <span className="text-gray-600">In Progress</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-200 border border-purple-400 rounded"></div>
-                  <span className="text-gray-600">In Review</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-200 border border-blue-400 rounded"></div>
-                  <span className="text-gray-600">Planned</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-red-200 border border-red-400 rounded"></div>
-                  <span className="text-gray-600">Blocked</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-100 border-2 border-blue-400 rounded"></div>
-                  <span className="text-gray-600 font-semibold">Today</span>
-                </div>
-              </div>
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className={styles.legend}>
+            <div className={styles.legendItem}>
+              <div className={styles.legendColor} style={{ borderColor: 'var(--ok)', background: 'rgba(40, 217, 154, 0.15)' }}></div>
+              <span>Completed</span>
+            </div>
+            <div className={styles.legendItem}>
+              <div className={styles.legendColor} style={{ borderColor: 'var(--warn)', background: 'rgba(255, 209, 102, 0.15)' }}></div>
+              <span>In Progress</span>
+            </div>
+            <div className={styles.legendItem}>
+              <div className={styles.legendColor} style={{ borderColor: 'var(--accent1)', background: 'rgba(124, 92, 255, 0.15)' }}></div>
+              <span>In Review</span>
+            </div>
+            <div className={styles.legendItem}>
+              <div className={styles.legendColor} style={{ borderColor: 'var(--good)', background: 'rgba(90, 230, 255, 0.15)' }}></div>
+              <span>Planned</span>
+            </div>
+            <div className={styles.legendItem}>
+              <div className={styles.legendColor} style={{ borderColor: 'var(--risk)', background: 'rgba(255, 92, 147, 0.15)' }}></div>
+              <span>Blocked</span>
+            </div>
+            <div className={styles.legendItem}>
+              <div className={styles.legendColor} style={{ borderColor: 'var(--accent1)', background: 'rgba(124, 92, 255, 0.1)', borderWidth: '2px' }}></div>
+              <span style={{ fontWeight: 'bold' }}>Today</span>
             </div>
           </div>
         </div>
@@ -441,17 +407,6 @@ interface StoryTimelineCardProps {
 }
 
 function StoryTimelineCard({ story, isHovered, onHover, onLeave, onClick }: StoryTimelineCardProps) {
-  const statusColors: Record<string, string> = {
-    backlog: 'bg-gray-200 border-gray-400 text-gray-700',
-    planned: 'bg-blue-200 border-blue-400 text-blue-800',
-    in_progress: 'bg-yellow-200 border-yellow-400 text-yellow-900',
-    in_review: 'bg-purple-200 border-purple-400 text-purple-800',
-    completed: 'bg-green-200 border-green-400 text-green-800',
-    blocked: 'bg-red-200 border-red-400 text-red-800'
-  };
-
-  const statusColor = statusColors[story.status] || statusColors.backlog;
-
   const completedCriteria = story.acceptance_criteria?.filter(ac => ac.is_completed).length || 0;
   const totalCriteria = story.acceptance_criteria?.length || 0;
   const criteriaProgress = totalCriteria > 0 ? Math.round((completedCriteria / totalCriteria) * 100) : 0;
@@ -461,50 +416,35 @@ function StoryTimelineCard({ story, isHovered, onHover, onLeave, onClick }: Stor
       onClick={onClick}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      className={`
-        ${statusColor} border-2 rounded-lg p-2 cursor-pointer transition-all duration-200
-        ${isHovered ? 'shadow-lg scale-105 z-10' : 'shadow-sm'}
-        relative
-      `}
+      className={`${styles.storyCard} ${styles[`status-${story.status}`]}`}
+      style={{
+        transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+        zIndex: isHovered ? 10 : 1
+      }}
     >
-      {/* Story Points Badge */}
       {story.story_points && (
-        <div className="absolute -top-2 -right-2 w-6 h-6 bg-white border-2 border-current rounded-full flex items-center justify-center text-xs font-bold shadow-sm">
-          {story.story_points}
-        </div>
+        <div className={styles.storyPoints}>{story.story_points}</div>
       )}
 
-      {/* Priority Indicator */}
       {story.priority && story.priority <= 2 && (
-        <div className="absolute -top-1 -left-1 text-red-500">
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <div className={styles.priorityStar}>
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" />
           </svg>
         </div>
       )}
 
-      {/* Story Title */}
-      <div className="text-xs font-semibold line-clamp-2 mb-1">
-        {story.title}
-      </div>
+      <div className={styles.storyTitle}>{story.title}</div>
+      <div className={styles.storyType}>{story.story_type.replace('_', ' ')}</div>
 
-      {/* Story Type */}
-      <div className="text-xs opacity-75 truncate">
-        {story.story_type.replace('_', ' ')}
-      </div>
-
-      {/* Acceptance Criteria Progress Bar */}
       {totalCriteria > 0 && (
-        <div className="mt-2">
-          <div className="flex items-center justify-between text-xs mb-1 opacity-75">
+        <div className={styles.criteriaProgress}>
+          <div className={styles.criteriaHeader}>
             <span>{completedCriteria}/{totalCriteria}</span>
             <span>{criteriaProgress}%</span>
           </div>
-          <div className="w-full bg-white bg-opacity-50 rounded-full h-1">
-            <div
-              className="bg-current rounded-full h-1 transition-all"
-              style={{ width: `${criteriaProgress}%` }}
-            />
+          <div className={styles.criteriaBar}>
+            <div className={styles.criteriaFill} style={{ width: `${criteriaProgress}%` }} />
           </div>
         </div>
       )}
