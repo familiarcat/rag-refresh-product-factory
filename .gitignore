@@ -74,3 +74,4 @@ milestones/*.md
 
 # --- Misc ---
 coverage/
+supabase/.temp/
