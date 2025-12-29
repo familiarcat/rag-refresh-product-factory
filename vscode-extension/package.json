@@ -101,6 +101,16 @@
         "title": "Alex AI: Sprint Status"
       },
       {
+        "command": "alexAi.showSprints",
+        "title": "Alex AI: Show Sprint Timeline",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "alexAi.showProjectSprints",
+        "title": "Alex AI: Show Project Sprints",
+        "icon": "$(project)"
+      },
+      {
         "command": "alexAi.observationLounge",
         "title": "Alex AI: Convene Observation Lounge"
       },
@@ -248,6 +258,11 @@
         "command": "alexAi.openPanel",
         "key": "ctrl+alt+p",
         "mac": "cmd+option+p"
+      },
+      {
+        "command": "alexAi.showSprints",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+option+s"
       }
     ],
     "configuration": {

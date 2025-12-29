@@ -10,6 +10,7 @@ import { registerAlexPanel } from "./alexPanel";
 import { registerExecutionCommands } from "./executionCommands";
 import { AlexFileSystemService } from "./alexFileSystem";
 import { ArchitecturePanel } from "./architecturePanel";
+import { SprintPanel } from "./sprintPanel";
 import { join } from "path";
 import { exec } from "child_process";
 
@@ -133,6 +134,19 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("alexAi.showArchitecture", () => {
       ArchitecturePanel.createOrShow(context.extensionUri);
+    })
+  );
+
+  // Register sprint timeline panel
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.showSprints", () => {
+      SprintPanel.createOrShow(context.extensionUri);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("alexAi.showProjectSprints", (projectId: string) => {
+      SprintPanel.createOrShow(context.extensionUri, projectId);
     })
   );
 

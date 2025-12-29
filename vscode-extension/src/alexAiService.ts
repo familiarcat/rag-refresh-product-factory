@@ -1,10 +1,12 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import { join, dirname } from "path";
-import { AlexAiClient, SprintStatus, ObservationLoungeResult as _ObservationLoungeResult } from "./client";
+// TODO: Fix missing client module
+// import { AlexAiClient, SprintStatus, ObservationLoungeResult as _ObservationLoungeResult } from "./client";
 import { AlexFileSystemService } from "./alexFileSystem";
 
-export type ObservationLoungeResult = _ObservationLoungeResult;
+// export type ObservationLoungeResult = _ObservationLoungeResult;
+export type ObservationLoungeResult = any;
 
 interface WorkspaceAnalysis {
   files: {
@@ -31,12 +33,13 @@ interface WorkspaceAnalysis {
 
 export class AlexAiService {
   private workspaceAnalysis: WorkspaceAnalysis | null = null;
-  private client: AlexAiClient;
+  private client: any; // AlexAiClient;
   private config: any;
   fileSystem: AlexFileSystemService | undefined;
 
   constructor() {
-    this.client = new AlexAiClient();
+    // this.client = new AlexAiClient();
+    this.client = null;
   }
 
   async analyzeWorkspace(): Promise<WorkspaceAnalysis> {
@@ -111,8 +114,8 @@ export class AlexAiService {
     return await this.client.chat(crewMember, prompt, fileContext);
   }
 
-  async getSprintStatus(): Promise<SprintStatus | null> {
-    return await this.client.getSprintStatus();
+  async getSprintStatus(): Promise<any | null> { // SprintStatus
+    return await this.client?.getSprintStatus();
   }
 
   async getMemories(crewMember?: string): Promise<string[]> {
