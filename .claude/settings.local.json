@@ -56,7 +56,17 @@
       "Bash(curl:*)",
       "Bash(npm run build:*)",
       "Bash(head:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(node scripts/store-sprint-findings.mjs:*)",
+      "Bash(node scripts/apply-sprint-migration.mjs:*)",
+      "Bash(./scripts/alex-ai/migrate-sprint-system.sh:*)",
+      "Bash(export SUPABASE_URL=\"https://rpkkkbufdwxmjaerbhbn.supabase.co\")",
+      "Bash(export SUPABASE_SERVICE_ROLE_KEY:*)",
+      "Bash(node scripts/alex-ai/auto-migrate.mjs:*)",
+      "Bash(source ~/.zshrc)",
+      "Bash(./scripts/test-sprint-migration.sh:*)",
+      "Bash(pbcopy)",
+      "Bash(' supabase/migrations/20251228_create_sprint_system.sql\\)')"
     ]
   }
 }
