@@ -3,7 +3,7 @@
 .durationBar {
   position: absolute;
   top: 8px;
-  height: 60px;
+  height: 76px;
   border: 2px solid;
   border-radius: 8px;
   padding: 8px 24px;
@@ -183,7 +183,33 @@
 }
 
 .hours {
-  opacity: 0.6;
+  opacity: 0.8;
+}
+
+.velocity {
+  font-weight: bold;
+  opacity: 0.9;
+}
+
+.metrics {
+  display: flex;
+  gap: 10px;
+  font-size: 10px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.cost {
+  color: var(--warn);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.efficiency {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 /* Criteria Progress */

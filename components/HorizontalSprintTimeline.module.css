@@ -260,12 +260,43 @@
 .crewStats {
   font-size: 11px;
   color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .crewPoints {
   font-weight: bold;
   color: var(--good);
   font-size: 12px;
+}
+
+.overlapIndicator {
+  font-size: 10px;
+  color: var(--warn);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.overloadIndicator {
+  font-size: 10px;
+  color: var(--risk);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .timelineTrack {

@@ -7,7 +7,7 @@
 
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import SprintTimelineWebview from './SprintTimelineWebview';
+import SprintTimelineApp from './SprintTimelineApp';
 import './vscode-theme.css';
 
 // VSCode API is injected by the webview
@@ -52,7 +52,7 @@ function render() {
   const root = createRoot(container);
   root.render(
     <StrictMode>
-      <SprintTimelineWebview
+      <SprintTimelineApp
         vscode={vscode}
         projectId={initialState.projectId}
         apiBaseUrl={initialState.apiBaseUrl}

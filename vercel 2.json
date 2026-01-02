@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/crew/drill/cron",
-      "schedule": "0 2 * * 1"
-    }
-  ]
-}

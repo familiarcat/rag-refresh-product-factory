@@ -1,30 +1,29 @@
-'use client';
-
 /**
- * StoryDurationBar - Multi-day story duration visualization
+ * StoryDurationBar - Adapted for VSCode Webview
  *
- * Renders stories as horizontal bars spanning multiple days with:
+ * Multi-day story duration visualization with:
  * - Drag to move entire duration
  * - Resize handles to stretch/contract duration
  * - Visual feedback for status and priority
+ * - Effort/cost metrics display
  */
 
 import React, { useState } from 'react';
-import type { StoryWithDetails } from '@/types/sprint';
-import { estimateCost, CREW_HOURLY_RATES } from '@/utils/story-estimation';
-import { CREW_MEMBERS } from '@/types/sprint';
-import styles from './StoryDurationBar.module.css';
+import type { StoryWithDetails } from '../../../types/sprint';
+import { estimateCost, CREW_HOURLY_RATES } from '../../../utils/story-estimation';
+import { CREW_MEMBERS } from '../../../types/sprint';
+import '../../../components/StoryDurationBar.module.css';
 
 export interface StoryDurationBarProps {
   story: StoryWithDetails;
   sprintStartDate: string;
-  dayWidth: number; // Width of each day column in pixels
-  yOffset: number; // Vertical offset for stacking
+  dayWidth: number;
+  yOffset: number;
   onDurationChange: (storyId: string, newStartDate: string, newEndDate: string) => void;
   onClick: () => void;
 }
 
-export default function StoryDurationBar({
+export default function StoryDurationBarAdapted({
   story,
   sprintStartDate,
   dayWidth,
@@ -44,12 +43,10 @@ export default function StoryDurationBar({
     const storyEnd = story.estimated_completion ? new Date(story.estimated_completion) : null;
 
     if (!storyStart && !storyEnd) {
-      // No dates set - default to 1 day at day 1
       return { startDay: 1, durationDays: 1, leftOffset: 0, width: dayWidth };
     }
 
     if (!storyStart && storyEnd) {
-      // Only end date set - calculate start from estimated_hours or default to 1 day
       const durationDays = story.estimated_hours ? Math.max(1, Math.ceil(story.estimated_hours / 8)) : 1;
       const calculatedStart = new Date(storyEnd);
       calculatedStart.setDate(calculatedStart.getDate() - durationDays + 1);
@@ -62,7 +59,6 @@ export default function StoryDurationBar({
     }
 
     if (storyStart && !storyEnd) {
-      // Only start date set - default to estimated_hours or 1 day
       const durationDays = story.estimated_hours ? Math.max(1, Math.ceil(story.estimated_hours / 8)) : 1;
       const startDay = Math.floor((storyStart.getTime() - sprintStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const leftOffset = (startDay - 1) * dayWidth;
@@ -71,7 +67,6 @@ export default function StoryDurationBar({
       return { startDay: Math.max(1, startDay), durationDays, leftOffset, width };
     }
 
-    // Both dates set - calculate actual duration
     const startDay = Math.floor((storyStart!.getTime() - sprintStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     const endDay = Math.floor((storyEnd!.getTime() - sprintStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     const durationDays = Math.max(1, endDay - startDay + 1);
@@ -91,8 +86,6 @@ export default function StoryDurationBar({
     setIsResizing(side);
     setResizeStartX(e.clientX);
 
-    // Store initial dates
-    const sprintStart = new Date(sprintStartDate);
     const storyStart = story.start_date ? story.start_date : sprintStartDate;
     const storyEnd = story.estimated_completion ? story.estimated_completion : sprintStartDate;
 
@@ -109,34 +102,23 @@ export default function StoryDurationBar({
 
       if (daysDelta === 0) return;
 
-      const sprintStart = new Date(sprintStartDate);
       const currentStart = new Date(resizeStartDates.start);
       const currentEnd = new Date(resizeStartDates.end);
 
       if (isResizing === 'left') {
-        // Adjust start date
         const newStart = new Date(currentStart);
         newStart.setDate(newStart.getDate() + daysDelta);
 
-        // Don't let start go past end
         if (newStart < currentEnd) {
           const newStartStr = newStart.toISOString().split('T')[0];
-          const tempEndStr = currentEnd.toISOString().split('T')[0];
-
-          // Update temporarily (visual feedback)
           story.start_date = newStartStr;
         }
       } else if (isResizing === 'right') {
-        // Adjust end date
         const newEnd = new Date(currentEnd);
         newEnd.setDate(newEnd.getDate() + daysDelta);
 
-        // Don't let end go before start
         if (newEnd > currentStart) {
-          const tempStartStr = currentStart.toISOString().split('T')[0];
           const newEndStr = newEnd.toISOString().split('T')[0];
-
-          // Update temporarily (visual feedback)
           story.estimated_completion = newEndStr;
         }
       }
@@ -168,7 +150,6 @@ export default function StoryDurationBar({
             }
           }
 
-          // Call the update callback
           onDurationChange(story.id, newStart, newEnd);
         }
       }
@@ -219,9 +200,11 @@ export default function StoryDurationBar({
   const velocity = durationDays > 0 ? (story.story_points || 0) / durationDays : 0;
 
   // Calculate efficiency score (0-100)
-  // Lower hours per story point = higher efficiency
   const hoursPerPoint = (story.story_points || 0) > 0 ? estimatedHours / (story.story_points || 1) : 0;
-  const efficiencyScore = Math.max(0, Math.min(100, 100 - (hoursPerPoint * 5))); // Baseline: 4h/point = 80%
+  const efficiencyScore = Math.max(0, Math.min(100, 100 - (hoursPerPoint * 5)));
+
+  // Status colors
+  const statusClass = `status-${story.status}`;
 
   return (
     <div
@@ -233,7 +216,7 @@ export default function StoryDurationBar({
           onClick();
         }
       }}
-      className={`${styles.durationBar} ${styles[`status-${story.status}`]} ${isDragging ? styles.dragging : ''} ${isResizing ? styles.resizing : ''}`}
+      className={`duration-bar ${statusClass} ${isDragging ? 'dragging' : ''} ${isResizing ? 'resizing' : ''}`}
       style={{
         left: `${leftOffset}px`,
         top: `${yOffset}px`,
@@ -244,23 +227,23 @@ export default function StoryDurationBar({
     >
       {/* Left Resize Handle */}
       <div
-        className={`${styles.resizeHandle} ${styles.left}`}
+        className="resize-handle left"
         onMouseDown={(e) => handleResizeStart(e, 'left')}
         title="Drag to adjust start date"
       >
-        <div className={styles.resizeGrip}></div>
+        <div className="resize-grip"></div>
       </div>
 
       {/* Bar Content */}
-      <div className={styles.barContent}>
+      <div className="bar-content">
         {/* Story Points Badge */}
         {story.story_points && (
-          <div className={styles.storyPoints}>{story.story_points}</div>
+          <div className="story-points">{story.story_points}</div>
         )}
 
         {/* Priority Star */}
         {story.priority && story.priority <= 2 && (
-          <div className={styles.priorityStar}>
+          <div className="priority-star">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" />
             </svg>
@@ -268,28 +251,28 @@ export default function StoryDurationBar({
         )}
 
         {/* Story Info */}
-        <div className={styles.storyInfo}>
-          <div className={styles.storyTitle}>{story.title}</div>
-          <div className={styles.storyMeta}>
-            <span className={styles.storyType}>{story.story_type.replace('_', ' ')}</span>
-            <span className={styles.duration}>{durationDays}d</span>
+        <div className="story-info">
+          <div className="story-title">{story.title}</div>
+          <div className="story-meta">
+            <span className="story-type">{story.story_type.replace('_', ' ')}</span>
+            <span className="duration">{durationDays}d</span>
             {estimatedHours > 0 && (
-              <span className={styles.hours} title="Estimated Hours">⏱️ {estimatedHours}h</span>
+              <span className="hours" title="Estimated Hours">⏱️ {estimatedHours}h</span>
             )}
             {velocity > 0 && (
-              <span className={styles.velocity} title="Velocity (pts/day)">⚡ {velocity.toFixed(1)} pt/d</span>
+              <span className="velocity" title="Velocity (pts/day)">⚡ {velocity.toFixed(1)} pt/d</span>
             )}
           </div>
-          <div className={styles.metrics}>
+          <div className="metrics">
             {cost > 0 && (
-              <span className={styles.cost} title={`Cost: ${crewRate} GPL/h × ${estimatedHours}h`}>
+              <span className="cost" title={`Cost: ${crewRate} GPL/h × ${estimatedHours}h`}>
                 💰 {cost.toLocaleString()} GPL
               </span>
             )}
             {efficiencyScore > 0 && (
               <span
-                className={styles.efficiency}
-                style={{ color: efficiencyScore >= 80 ? 'var(--ok)' : efficiencyScore >= 60 ? 'var(--warn)' : 'var(--risk)' }}
+                className="efficiency"
+                style={{ color: efficiencyScore >= 80 ? '#28d99a' : efficiencyScore >= 60 ? '#ffd166' : '#ff5c93' }}
                 title={`Efficiency: ${hoursPerPoint.toFixed(1)}h per story point`}
               >
                 📊 {efficiencyScore.toFixed(0)}%
@@ -300,26 +283,26 @@ export default function StoryDurationBar({
 
         {/* Criteria Progress */}
         {totalCriteria > 0 && (
-          <div className={styles.criteriaProgress}>
-            <div className={styles.criteriaBar}>
-              <div className={styles.criteriaFill} style={{ width: `${criteriaProgress}%` }} />
+          <div className="criteria-progress">
+            <div className="criteria-bar">
+              <div className="criteria-fill" style={{ width: `${criteriaProgress}%` }} />
             </div>
-            <div className={styles.criteriaText}>{completedCriteria}/{totalCriteria}</div>
+            <div className="criteria-text">{completedCriteria}/{totalCriteria}</div>
           </div>
         )}
       </div>
 
       {/* Right Resize Handle */}
       <div
-        className={`${styles.resizeHandle} ${styles.right}`}
+        className="resize-handle right"
         onMouseDown={(e) => handleResizeStart(e, 'right')}
         title="Drag to adjust end date"
       >
-        <div className={styles.resizeGrip}></div>
+        <div className="resize-grip"></div>
       </div>
 
       {/* Hover Tooltip */}
-      <div className={styles.tooltip}>
+      <div className="tooltip">
         <div><strong>{story.title}</strong></div>
         <div style={{ fontSize: '11px', opacity: 0.8, marginTop: '4px' }}>
           {story.story_points || 0} pts • {durationDays} days • {velocity.toFixed(1)} pt/day
@@ -329,7 +312,7 @@ export default function StoryDurationBar({
             📅 {new Date(story.start_date).toLocaleDateString()} → {new Date(story.estimated_completion).toLocaleDateString()}
           </div>
         )}
-        <div style={{ borderTop: '1px solid var(--line)', marginTop: '6px', paddingTop: '6px', fontSize: '11px' }}>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '6px', paddingTop: '6px', fontSize: '11px' }}>
           <div>⏱️ Effort: {estimatedHours}h ({hoursPerPoint.toFixed(1)}h per point)</div>
           {cost > 0 && (
             <div>💰 Cost: {cost.toLocaleString()} GPL ({crewRate} GPL/h)</div>
@@ -342,6 +325,275 @@ export default function StoryDurationBar({
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        .duration-bar {
+          position: absolute;
+          top: 8px;
+          height: 76px;
+          border: 2px solid;
+          border-radius: 8px;
+          padding: 8px 24px;
+          cursor: grab;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          overflow: visible;
+          z-index: 1;
+        }
+
+        .duration-bar:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+          z-index: 10;
+        }
+
+        .duration-bar.dragging {
+          opacity: 0.6;
+          cursor: grabbing;
+          z-index: 100;
+        }
+
+        .duration-bar.resizing {
+          cursor: ew-resize;
+          z-index: 100;
+          box-shadow: 0 8px 20px rgba(124, 92, 255, 0.4);
+        }
+
+        /* Status Colors */
+        .duration-bar.status-planned {
+          background: linear-gradient(135deg, rgba(90, 230, 255, 0.15), rgba(90, 230, 255, 0.25));
+          border-color: #5ae6ff;
+          color: #5ae6ff;
+        }
+
+        .duration-bar.status-in_progress {
+          background: linear-gradient(135deg, rgba(255, 209, 102, 0.15), rgba(255, 209, 102, 0.25));
+          border-color: #ffd166;
+          color: #ffd166;
+        }
+
+        .duration-bar.status-in_review {
+          background: linear-gradient(135deg, rgba(124, 92, 255, 0.15), rgba(124, 92, 255, 0.25));
+          border-color: #7c5cff;
+          color: #7c5cff;
+        }
+
+        .duration-bar.status-completed {
+          background: linear-gradient(135deg, rgba(40, 217, 154, 0.15), rgba(40, 217, 154, 0.25));
+          border-color: #28d99a;
+          color: #28d99a;
+        }
+
+        .duration-bar.status-blocked {
+          background: linear-gradient(135deg, rgba(255, 92, 147, 0.15), rgba(255, 92, 147, 0.25));
+          border-color: #ff5c93;
+          color: #ff5c93;
+        }
+
+        .duration-bar.status-backlog {
+          background: linear-gradient(135deg, rgba(128, 128, 128, 0.1), rgba(128, 128, 128, 0.2));
+          border-color: #808080;
+          color: #808080;
+        }
+
+        /* Resize Handles */
+        .resize-handle {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: ew-resize;
+          z-index: 2;
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+
+        .duration-bar:hover .resize-handle {
+          opacity: 1;
+        }
+
+        .resize-handle.left {
+          left: 0;
+          border-right: 2px solid currentColor;
+          background: linear-gradient(90deg, currentColor, transparent);
+        }
+
+        .resize-handle.right {
+          right: 0;
+          border-left: 2px solid currentColor;
+          background: linear-gradient(-90deg, currentColor, transparent);
+        }
+
+        .resize-grip {
+          width: 4px;
+          height: 40px;
+          background: currentColor;
+          border-radius: 2px;
+          opacity: 0.7;
+        }
+
+        .resize-handle:hover .resize-grip {
+          opacity: 1;
+          height: 50px;
+        }
+
+        /* Bar Content */
+        .bar-content {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+          min-width: 0;
+          position: relative;
+        }
+
+        .story-points {
+          position: absolute;
+          top: -12px;
+          right: -8px;
+          width: 28px;
+          height: 28px;
+          background: var(--vscode-editor-background);
+          border: 2px solid currentColor;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: bold;
+          z-index: 3;
+        }
+
+        .priority-star {
+          position: absolute;
+          top: -8px;
+          left: -8px;
+          color: #ff5c93;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+          z-index: 3;
+        }
+
+        .story-info {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .story-title {
+          font-size: 13px;
+          font-weight: bold;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: var(--vscode-foreground);
+        }
+
+        .story-meta {
+          display: flex;
+          gap: 8px;
+          font-size: 11px;
+          opacity: 0.8;
+        }
+
+        .story-type {
+          text-transform: capitalize;
+        }
+
+        .duration {
+          font-weight: bold;
+        }
+
+        .hours {
+          opacity: 0.8;
+        }
+
+        .velocity {
+          font-weight: bold;
+          opacity: 0.9;
+        }
+
+        .metrics {
+          display: flex;
+          gap: 10px;
+          font-size: 10px;
+          margin-top: 4px;
+          font-weight: 600;
+        }
+
+        .cost {
+          color: #ffd166;
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+
+        .efficiency {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+
+        .criteria-progress {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 60px;
+        }
+
+        .criteria-bar {
+          height: 4px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+
+        .criteria-fill {
+          height: 100%;
+          background: currentColor;
+          border-radius: 2px;
+          transition: width 0.3s;
+        }
+
+        .criteria-text {
+          font-size: 10px;
+          text-align: center;
+          opacity: 0.8;
+        }
+
+        /* Tooltip */
+        .tooltip {
+          position: absolute;
+          bottom: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%);
+          background: var(--vscode-editor-background);
+          border: 1px solid var(--vscode-panel-border);
+          border-radius: 6px;
+          padding: 8px 12px;
+          font-size: 12px;
+          color: var(--vscode-foreground);
+          white-space: nowrap;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.2s;
+          z-index: 1000;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .duration-bar:hover .tooltip {
+          opacity: 1;
+        }
+
+        .tooltip div {
+          margin: 2px 0;
+        }
+      `}</style>
     </div>
   );
 }

@@ -69,7 +69,8 @@
       "Bash(' supabase/migrations/20251228_create_sprint_system.sql\\)')",
       "Bash(npm run dev:*)",
       "Bash(kill:*)",
-      "Bash(/tmp/test-sprint-zero.sh)"
+      "Bash(/tmp/test-sprint-zero.sh)",
+      "Bash(killall git:*)"
     ]
   }
 }

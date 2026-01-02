@@ -273,6 +273,56 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
     return grouped;
   };
 
+  // Calculate vertical positions for stories to avoid overlaps
+  const calculateStoryPositions = (stories: StoryWithDetails[]): Map<string, { yOffset: number; rowIndex: number }> => {
+    const positions = new Map<string, { yOffset: number; rowIndex: number }>();
+    const rows: Array<{ endDay: number }> = [];
+
+    // Sort stories by start date for consistent stacking
+    const sortedStories = [...stories].sort((a, b) => {
+      const aStart = a.start_date || a.estimated_completion || sprint.start_date;
+      const bStart = b.start_date || b.estimated_completion || sprint.start_date;
+      return new Date(aStart).getTime() - new Date(bStart).getTime();
+    });
+
+    sortedStories.forEach(story => {
+      // Calculate story's time range
+      const sprintStart = new Date(sprint.start_date);
+      const storyStart = story.start_date ? new Date(story.start_date) : (story.estimated_completion ? new Date(story.estimated_completion) : sprintStart);
+      const storyEnd = story.estimated_completion ? new Date(story.estimated_completion) : storyStart;
+
+      const startDay = Math.floor((storyStart.getTime() - sprintStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const endDay = Math.floor((storyEnd.getTime() - sprintStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+      // Find first available row where this story doesn't overlap
+      let rowIndex = 0;
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].endDay < startDay) {
+          // This row is available - story starts after previous one ends
+          rowIndex = i;
+          rows[i].endDay = endDay;
+          break;
+        }
+      }
+
+      // If no available row found, create new row
+      if (rowIndex === 0 && rows.length > 0 && rows[0].endDay >= startDay) {
+        rowIndex = rows.length;
+        rows.push({ endDay });
+      } else if (rows.length === 0) {
+        rows.push({ endDay });
+      }
+
+      const storyHeight = 92; // Height of each story bar (76px) + margin (16px)
+      positions.set(story.id, {
+        yOffset: rowIndex * storyHeight,
+        rowIndex
+      });
+    });
+
+    return positions;
+  };
+
   const getVisibleCrew = (): string[] => {
     const crewWithStories = new Set<string>();
     sprint.stories?.forEach(story => {
@@ -486,6 +536,18 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
               const crewStories = storiesByCrew[crewKey] || [];
               const totalCrewPoints = crewStories.reduce((sum, s) => sum + (s.story_points || 0), 0);
 
+              // Calculate positions for this crew's stories
+              const storyPositions = calculateStoryPositions(crewStories);
+              const maxRows = Math.max(1, ...Array.from(storyPositions.values()).map(p => p.rowIndex + 1));
+              const trackHeight = Math.max(120, maxRows * 92); // 92px per row, minimum 120px
+
+              // Check for workload overlaps (multiple stories at same time)
+              const hasOverlaps = maxRows > 1;
+              const totalHours = crewStories.reduce((sum, s) => sum + (s.estimated_hours || 0), 0);
+              const sprintDays = timelineDays.length;
+              const avgHoursPerDay = sprintDays > 0 ? totalHours / sprintDays : 0;
+              const isOverloaded = avgHoursPerDay > 8; // More than 8 hours per day average
+
               return (
                 <div key={crewKey} className={styles.swimlane}>
                   {/* Crew Info Column */}
@@ -512,6 +574,16 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                     <div className={styles.crewStats}>
                       <div className={styles.crewPoints}>{totalCrewPoints} pts</div>
                       <div>{crewStories.length} stories</div>
+                      {hasOverlaps && (
+                        <div className={styles.overlapIndicator} title={`${maxRows} concurrent stories - workload overlap detected`}>
+                          ⚠️ {maxRows} rows
+                        </div>
+                      )}
+                      {isOverloaded && (
+                        <div className={styles.overloadIndicator} title={`Avg ${avgHoursPerDay.toFixed(1)}h/day - exceeds capacity`}>
+                          🔴 Overloaded
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -521,28 +593,33 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                     onDragOver={(e) => handleDragOver(e, crewKey)}
                     onDrop={(e) => handleDrop(e, crewKey)}
                     onDragLeave={handleDragLeave}
+                    style={{ minHeight: `${trackHeight}px` }}
                   >
                     {/* Day Grid Background */}
                     {timelineDays.map((day) => (
                       <div
                         key={day.dayNumber}
                         className={`${styles.dayCell} ${day.isToday ? styles.today : ''} ${day.isWeekend ? styles.weekend : ''}`}
-                        style={{ width: `${dayWidth}px` }}
+                        style={{ width: `${dayWidth}px`, minHeight: `${trackHeight}px` }}
                       />
                     ))}
 
                     {/* Story Duration Bars (Absolutely Positioned) */}
                     <div className={styles.storiesLayer}>
-                      {crewStories.map((story) => (
-                        <StoryDurationBar
-                          key={story.id}
-                          story={story}
-                          sprintStartDate={sprint.start_date}
-                          dayWidth={dayWidth}
-                          onDurationChange={handleDurationChange}
-                          onClick={() => handleStoryCardClick(story)}
-                        />
-                      ))}
+                      {crewStories.map((story) => {
+                        const position = storyPositions.get(story.id) || { yOffset: 0, rowIndex: 0 };
+                        return (
+                          <StoryDurationBar
+                            key={story.id}
+                            story={story}
+                            sprintStartDate={sprint.start_date}
+                            dayWidth={dayWidth}
+                            yOffset={position.yOffset}
+                            onDurationChange={handleDurationChange}
+                            onClick={() => handleStoryCardClick(story)}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

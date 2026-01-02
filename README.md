@@ -2,7 +2,7 @@
 
 > A Retrieval Augmented Generation (RAG) system for product information management with crew-based coordination
 
-## 🎯 Overview
+- [ ] ## 🎯 Overview
 
 This project implements a comprehensive RAG system designed around the Alex AI crew model, featuring:
 
