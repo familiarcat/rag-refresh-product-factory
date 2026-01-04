@@ -1,5 +1,10 @@
+import dotenv from "dotenv";
+import path from "node:path";
 import fs from "fs";
 import path from "path";
+
+dotenv.config({ path: path.resolve(process.cwd(), ".secrets/.env.local") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") }); // optional fallback
 
 const metaPath = process.argv[2];
 if (!metaPath) throw new Error("Pass /tmp/milestone_meta.json");
