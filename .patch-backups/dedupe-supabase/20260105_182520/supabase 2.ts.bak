@@ -1,0 +1,309 @@
+/**
+ * Supabase Client for Alex AI
+ *
+ * Provides authenticated access to Supabase database with RBAC support.
+ * Uses service role key for backend operations with Row Level Security.
+ */
+
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+// Type definitions matching Supabase schema
+export interface AuthProfile {
+  id: string;
+  email: string;
+  display_name: string | null;
+  system_role: 'administrator' | 'owner' | 'developer' | 'viewer';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupabaseProject {
+  id: string;
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  owner_id: string;
+  category_slug: string | null;
+  status: 'active' | 'archived' | 'deleted';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  hierarchy_level: number;
+  description: string | null;
+  capabilities: string[];
+  created_at: string;
+}
+
+export interface ProjectMember {
+  id: string;
+  project_id: string;
+  user_id: string;
+  role_id: string;
+  invited_by: string | null;
+  joined_at: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  user_id: string | null;
+  action: string;
+  resource_type: string | null;
+  resource_id: string | null;
+  permission_checked: string | null;
+  allowed: boolean;
+  metadata: Record<string, any> | null;
+  timestamp: string;
+}
+
+export interface ApiKey {
+  id: string;
+  user_id: string;
+  key_hash: string;
+  key_prefix: string;
+  name: string;
+  scopes: string[];
+  last_used_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  revoked_at: string | null;
+}
+
+// Database schema types
+export interface Database {
+  public: {
+    Tables: {
+      auth_profiles: {
+        Row: AuthProfile;
+        Insert: Omit<AuthProfile, 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<AuthProfile, 'id' | 'created_at'>>;
+      };
+      projects: {
+        Row: SupabaseProject;
+        Insert: Omit<SupabaseProject, 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<SupabaseProject, 'id' | 'created_at'>>;
+      };
+      roles: {
+        Row: Role;
+      };
+      project_members: {
+        Row: ProjectMember;
+        Insert: Omit<ProjectMember, 'id' | 'joined_at'>;
+        Update: Partial<Omit<ProjectMember, 'id' | 'joined_at'>>;
+      };
+      audit_log: {
+        Row: AuditLogEntry;
+      };
+      api_keys: {
+        Row: ApiKey;
+        Insert: Omit<ApiKey, 'id' | 'created_at'>;
+        Update: Partial<Omit<ApiKey, 'id' | 'user_id' | 'created_at'>>;
+      };
+    };
+    Functions: {
+      check_permission: {
+        Args: {
+          p_user_id: string;
+          p_permission: string;
+          p_project_id?: string;
+        };
+        Returns: boolean;
+      };
+      log_audit: {
+        Args: {
+          p_user_id: string;
+          p_action: string;
+          p_resource_type: string;
+          p_resource_id: string;
+          p_permission_checked: string;
+          p_allowed: boolean;
+          p_metadata?: Record<string, any>;
+        };
+        Returns: string; // UUID
+      };
+    };
+  };
+}
+
+/**
+ * Create Supabase client with typed schema
+ */
+function createSupabaseClient(): SupabaseClient<Database> {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      'Missing Supabase credentials. Run: npm run script:secrets:sync'
+    );
+  }
+
+  return createClient<Database>(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
+/**
+ * Singleton Supabase client instance
+ * Uses service role key for backend operations
+ */
+export const supabase = createSupabaseClient();
+
+/**
+ * Check if user has permission for action
+ *
+ * @param userId - User UUID
+ * @param permission - Permission string (e.g., "project:create")
+ * @param projectId - Optional project ID for project-scoped permissions
+ * @returns true if user has permission, false otherwise
+ */
+export async function checkPermission(
+  userId: string,
+  permission: string,
+  projectId?: string
+): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.rpc('check_permission', {
+      p_user_id: userId,
+      p_permission: permission,
+      p_project_id: projectId || null,
+    });
+
+    if (error) {
+      console.error('[Supabase] Permission check failed:', error);
+      return false;
+    }
+
+    return data === true;
+  } catch (error) {
+    console.error('[Supabase] Permission check error:', error);
+    return false;
+  }
+}
+
+/**
+ * Log action to audit log
+ *
+ * @param userId - User UUID
+ * @param action - Action performed
+ * @param resourceType - Type of resource (e.g., "project", "file")
+ * @param resourceId - Resource identifier
+ * @param permissionChecked - Permission that was checked
+ * @param allowed - Whether action was allowed
+ * @param metadata - Additional metadata
+ * @returns Audit log entry ID or null on error
+ */
+export async function logAudit(
+  userId: string,
+  action: string,
+  resourceType: string,
+  resourceId: string,
+  permissionChecked: string,
+  allowed: boolean,
+  metadata: Record<string, any> = {}
+): Promise<string | null> {
+  try {
+    const { data, error } = await supabase.rpc('log_audit', {
+      p_user_id: userId,
+      p_action: action,
+      p_resource_type: resourceType,
+      p_resource_id: resourceId,
+      p_permission_checked: permissionChecked,
+      p_allowed: allowed,
+      p_metadata: metadata,
+    });
+
+    if (error) {
+      console.error('[Supabase] Audit log failed:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('[Supabase] Audit log error:', error);
+    return null;
+  }
+}
+
+/**
+ * Get user profile by ID
+ */
+export async function getUserProfile(
+  userId: string
+): Promise<AuthProfile | null> {
+  const { data, error } = await supabase
+    .from('auth_profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error('[Supabase] Get user profile failed:', error);
+    return null;
+  }
+
+  return data;
+}
+
+/**
+ * Get user profile by email
+ */
+export async function getUserByEmail(
+  email: string
+): Promise<AuthProfile | null> {
+  const { data, error } = await supabase
+    .from('auth_profiles')
+    .select('*')
+    .eq('email', email)
+    .single();
+
+  if (error) {
+    console.error('[Supabase] Get user by email failed:', error);
+    return null;
+  }
+
+  return data;
+}
+
+/**
+ * Check if Supabase is configured and accessible
+ */
+export async function checkSupabaseConnection(): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('auth_profiles').select('id').limit(1);
+    return !error;
+  } catch (error) {
+    console.error('[Supabase] Connection check failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Development/debugging utility: Get current database stats
+ */
+export async function getDatabaseStats() {
+  try {
+    const [profiles, projects, roles, members] = await Promise.all([
+      supabase.from('auth_profiles').select('id', { count: 'exact', head: true }),
+      supabase.from('projects').select('id', { count: 'exact', head: true }),
+      supabase.from('roles').select('id', { count: 'exact', head: true }),
+      supabase.from('project_members').select('id', { count: 'exact', head: true }),
+    ]);
+
+    return {
+      users: profiles.count || 0,
+      projects: projects.count || 0,
+      roles: roles.count || 0,
+      memberships: members.count || 0,
+    };
+  } catch (error) {
+    console.error('[Supabase] Stats query failed:', error);
+    return null;
+  }
+}

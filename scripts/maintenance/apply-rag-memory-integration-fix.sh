@@ -1,3 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT_DIR"
+
+TS="$(date +%Y%m%d_%H%M%S)"
+TARGET="lib/orchestration/rag-memory-integration.ts"
+BACKUP_DIR=".patch-backups/rag-memory/$TS"
+mkdir -p "$BACKUP_DIR"
+
+if [[ -f "$TARGET" ]]; then
+  cp "$TARGET" "$BACKUP_DIR/rag-memory-integration.ts.bak"
+  echo "✅ Backed up $TARGET -> $BACKUP_DIR/rag-memory-integration.ts.bak"
+else
+  echo "⚠️  $TARGET not found; will create it."
+fi
+
+mkdir -p "$(dirname "$TARGET")"
+
+cat > "$TARGET" <<'EOF'
 /**
  * RAG Memory Integration for Crew Collaboration
  *
@@ -322,3 +343,9 @@ export async function getRecommendedCrewForNewProject(
     };
   }
 }
+EOF
+
+echo "✅ Wrote updated $TARGET"
+echo "Run:"
+echo "  rm -rf .next || true"
+echo "  npm run build"

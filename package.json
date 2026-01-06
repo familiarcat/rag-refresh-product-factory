@@ -9,24 +9,34 @@
   "lint": "next lint",
 
   "check:env": "node scripts/check-env.mjs",
-  "dev:check": "npm run check:env && next dev",
-
-  "secrets:sync": "bash scripts/secrets/sync_from_zshrc.sh && cp .secrets/.env.local .env.local",
-  "secrets:gh": "bash scripts/secrets/gh_sync_secrets.sh",
-  "script:secrets:ensure": "npx -y tsx scripts/ts/secrets/ensure-env.ts",
-  "scripts:check": "node scripts/maintenance/check-package-scripts.mjs",
-
-  "milestone": "bash scripts/milestone/run_milestone.sh",
-  "milestone:prune": "node scripts/milestone/prune_local.mjs",
+  "dev:check": "npm run -s check:env && next dev",
 
   "doctor": "bash scripts/bootstrap/doctor.sh",
   "bootstrap:init": "bash scripts/bootstrap/init_repo.sh",
   "bootstrap:setup": "bash scripts/bootstrap/unify_setup.sh",
 
   "infra:init": "cd infra && terraform init",
+  "infra:plan": "cd infra && terraform plan",
   "infra:apply": "cd infra && terraform apply",
-  "infra:plan": "cd infra && terraform plan"
 
+  "secrets:sync": "bash scripts/secrets/sync_from_zshrc.sh && cp .secrets/.env.local .env.local",
+  "script:secrets:sync": "npm run -s secrets:sync",
+  "secrets:gh": "bash scripts/secrets/gh_sync_secrets.sh",
+  "script:secrets:ensure": "npx -y tsx scripts/ts/secrets/ensure-env.ts",
+
+  "milestone": "bash scripts/milestone/run_milestone.sh",
+  "milestone:prune": "node scripts/milestone/prune_local.mjs",
+  "alexai:git:sanitize": "bash scripts/maintenance/git-sanitize.sh",
+
+
+  "scripts:check": "node scripts/maintenance/check-package-scripts.mjs",
+
+  "alexai:upgrade": "bash scripts/maintenance/upgrade-and-verify.sh ./rag-refresh-product-factory_enhancements_patch.zip",
+  "alexai:utf8:fix": "bash scripts/maintenance/fix-utf8-base64-and-verify.sh --apply",
+  "alexai:import": "node scripts/alex-ai/import_project_from_zip.mjs",
+  "alexai:memory": "node scripts/alex-ai/create_and_ingest_memory.mjs",
+  "alexai:upgrade+ingest": "bash scripts/alex-ai/upgrade_and_ingest.sh --enhancements ./rag-refresh-product-factory_enhancements_patch.zip --orchestrator ./rag-refresh-product-factory_orchestrator_patch.zip --pm-root ./projects",
+  "alexai:ts:heal": "bash scripts/maintenance/fix-ts-known-issues.sh && bash scripts/maintenance/fix-ts-rag-memory-never.sh && bash scripts/maintenance/fix-ts-sprint-planning-memories.sh && bash scripts/maintenance/fix-ts-rag-memory-integration-insert.sh && bash scripts/maintenance/ts-heal-supabase-inserts.sh && rm -rf .next || true && npm run build"
 },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.952.0",

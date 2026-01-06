@@ -553,7 +553,8 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
                   {/* Crew Info Column */}
                   <div
                     className={styles.crewInfo}
-                    onClick={() => crewKey !== 'unassigned' && handleCrewClick(crewKey as CrewMember)}
+                    onClick={() => crewKey !== 'unassigned' && onCrewClick?.(crewKey as CrewMember)}
+
                   >
                     <div className={styles.crewHeader}>
                       <div className={styles.crewAvatar}>
