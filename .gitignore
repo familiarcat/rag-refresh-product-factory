@@ -2,6 +2,12 @@
 .DS_Store
 .idea/
 
+.press-logs/
+.trash/
+.next/
+node_modules/
+
+
 # Python
 __pycache__/
 *.py[cod]
