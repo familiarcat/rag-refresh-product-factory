@@ -12,7 +12,7 @@ import {
   revokeApiKey,
   deleteApiKey,
 } from '@/lib/auth/api-keys';
-import { logAudit } from '@/lib/supabase';
+import { logAudit } from '@/lib/supabase-server';
 
 /**
  * GET /api/auth/api-keys - List user's API keys

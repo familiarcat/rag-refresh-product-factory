@@ -1,41 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-cd "$ROOT_DIR"
+say(){ printf "%b\n" "$*"; }
+ok(){ say "✅ $*"; }
+warn(){ say "⚠️  $*"; }
 
-TS="$(date +%Y%m%d_%H%M%S)"
-BACKUP_DIR=".patch-backups/dedupe-supabase/$TS"
-mkdir -p "$BACKUP_DIR"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT"
 
-say() { printf "%b\n" "$*"; }
+targets=(
+  "lib/supabase.ts"
+  "lib/supabase 2.ts"
+  "lib/supabase2.ts"
+)
 
-CANON="lib/supabase.ts"
-if [[ ! -f "$CANON" ]]; then
-  say "❌ Expected canonical file missing: $CANON"
-  exit 1
-fi
+for f in "${targets[@]}"; do
+  if [[ -f "$f" ]]; then
+    rm -f "$f"
+    ok "Removed duplicate: $f"
+  fi
+done
 
-say "🔎 Scanning for duplicate supabase files in ./lib …"
-
-FOUND_ANY=0
-
-# Find any lib/supabase*.ts that is NOT lib/supabase.ts
-# This catches: "supabase 2.ts", "supabase copy.ts", "supabase (1).ts", etc.
-while IFS= read -r f; do
-  [[ -z "$f" ]] && continue
-  FOUND_ANY=1
-  bn="$(basename "$f")"
-
-  mkdir -p "$BACKUP_DIR"
-  cp "$f" "$BACKUP_DIR/$bn.bak"
-  rm -f "$f"
-
-  say "✅ Removed duplicate: $f (backup: $BACKUP_DIR/$bn.bak)"
-done < <(find lib -maxdepth 1 -type f -name "supabase*.ts" ! -name "supabase.ts" -print)
-
-if [[ "$FOUND_ANY" -eq 0 ]]; then
-  say "✅ No duplicate lib/supabase* files found."
+# Clean obvious trash duplicates (non-destructive if absent)
+if [[ -d ".trash" ]]; then
+  find ".trash" -type f \( -name "supabase.ts" -o -name "supabase 2.ts" -o -name "supabase2.ts" -o -name "supabase-server.ts" -o -name "supabase-browser.ts" \) -print 2>/dev/null || true
+  # Do NOT remove server/browser from trash automatically; only remove classic duplicates
+  find ".trash" -type f \( -name "supabase.ts" -o -name "supabase 2.ts" -o -name "supabase2.ts" \) -exec rm -f {} \; 2>/dev/null || true
+  ok "Cleaned duplicate supabase files under .trash (if any)"
 else
-  say "✅ Supabase lib dedupe complete."
+  warn "No .trash directory (skipping)"
 fi
+
+# Safety check: ensure canonical files exist or will exist after patch overlay
+if [[ -f "lib/supabase-server.ts" ]]; then ok "Found lib/supabase-server.ts"; else warn "lib/supabase-server.ts not present yet (ok if patch not applied)"; fi
+if [[ -f "lib/supabase-browser.ts" ]]; then ok "Found lib/supabase-browser.ts"; else warn "lib/supabase-browser.ts not present yet (ok if patch not applied)"; fi

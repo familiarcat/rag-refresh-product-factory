@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createDevApiKey } from '@/lib/auth/api-keys';
-import { checkSupabaseConnection, getDatabaseStats, supabase } from '@/lib/supabase';
+import { checkSupabaseConnection, getDatabaseStats, supabase } from '@/lib/supabase-server';
 
 /**
  * GET /api/dev/test-auth - Get development utilities and stats

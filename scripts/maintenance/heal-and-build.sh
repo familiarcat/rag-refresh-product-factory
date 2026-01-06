@@ -1,4 +1,3 @@
-\
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -10,97 +9,141 @@ ok(){ say "✅ $*"; }
 warn(){ say "⚠️  $*"; }
 err(){ say "❌ $*"; exit 1; }
 
-ts() { date +"%Y%m%d_%H%M%S"; }
+usage(){
+  cat <<'EOF'
+Usage:
+  bash scripts/maintenance/heal-and-build.sh --build
+  bash scripts/maintenance/heal-and-build.sh --clean-only
 
-MODE_BUILD="false"
-for a in "$@"; do
-  [[ "$a" == "--build" ]] && MODE_BUILD="true"
-done
+What it does:
+- Cleans .next safely even if rm -rf hangs (moves it aside first)
+- Kills stuck Next/Turbopack processes for this repo
+- Runs next build with a heartbeat so "hangs" are visible
+- Retries build once if it appears stuck (no output)
+EOF
+}
 
-command -v rg >/dev/null || err "ripgrep (rg) is required"
-command -v perl >/dev/null || err "perl is required"
+MODE="${1:-}"
+[[ "$MODE" == "--build" || "$MODE" == "--clean-only" ]] || { usage; exit 2; }
 
-say "🧹 Cleaning Next build artifacts..."
-pkill -f "next" >/dev/null 2>&1 || true
-pkill -f "node.*next" >/dev/null 2>&1 || true
+# --- helpers ---
+kill_next_procs() {
+  # Only best-effort; don't fail if none found.
+  warn "Killing potentially stuck Next/Turbopack processes (best-effort)..."
+  # kill processes that often lock .next; keep it broad but safe
+  pkill -f "next dev" >/dev/null 2>&1 || true
+  pkill -f "next build" >/dev/null 2>&1 || true
+  pkill -f "turbopack" >/dev/null 2>&1 || true
+  pkill -f "node .*next" >/dev/null 2>&1 || true
+  pkill -f "node .*turbopack" >/dev/null 2>&1 || true
+  ok "Process cleanup done."
+}
 
-if [[ -d ".next" ]]; then
-  rm -rf .next >/dev/null 2>&1 || true
+safe_clear_next() {
+  local ts trash=".trash"
+  ts="$(date +%Y%m%d_%H%M%S)"
+  mkdir -p "$trash"
+
   if [[ -d ".next" ]]; then
-    find .next -mindepth 1 -maxdepth 6 -exec rm -rf {} + >/dev/null 2>&1 || true
-    rm -rf .next >/dev/null 2>&1 || true
+    warn "Safely clearing .next (move-then-delete)..."
+    local moved="$trash/.next_$ts"
+    # Move is usually instant even if rm -rf would hang.
+    mv ".next" "$moved" 2>/dev/null || true
+
+    # Now delete moved dir in background; don't block.
+    ( rm -rf "$moved" >/dev/null 2>&1 || true ) & disown || true
+    ok ".next moved to $moved and scheduled for deletion."
+  else
+    ok "No .next directory found."
   fi
-fi
-[[ ! -d ".next" ]] && ok "Removed .next" || warn "Could not fully remove .next (may still be in use)"
+}
 
-say "🧩 Reconciling duplicate ' 2' files under app/api..."
-ARCHIVE_DIR=".patch-backups/duplicates/$(ts)"
-mkdir -p "$ARCHIVE_DIR"
+heartbeat_build() {
+  # Run build but ensure we see progress; if no output for N seconds, treat as stuck.
+  local timeout_no_output=120   # seconds without output => stuck
+  local max_total=1800          # hard ceiling 30min (won't block forever)
+  local log=".press-logs/next_build_$(date +%Y%m%d_%H%M%S).log"
+  mkdir -p ".press-logs"
 
-shopt -s nullglob
-dupes=( app/api/**/**" 2.ts" app/api/**/**" 2.tsx" )
-if [[ ${#dupes[@]} -eq 0 ]]; then
-  ok "No ' 2' duplicates found in app/api"
-else
-  for f in "${dupes[@]}"; do
-    base="${f/ 2./.}"
-    if [[ -f "$base" ]]; then
-      if cmp -s "$f" "$base"; then
-        rm -f "$f"
-        ok "Removed identical duplicate: $f"
-      else
-        mv "$f" "$ARCHIVE_DIR/"
-        warn "Archived conflicting duplicate: $f -> $ARCHIVE_DIR/"
-      fi
+  warn "Running Next build with heartbeat..."
+  say "📝 Logging to: $log"
+
+  # Start build in background, capture output to log + console
+  # Use stdbuf to reduce buffering where available; macOS may not have GNU stdbuf.
+  ( npm run -s build 2>&1 | tee "$log" ) &
+  local pid=$!
+
+  local start now last_out last_size size
+  start="$(date +%s)"
+  last_out="$start"
+  last_size=0
+
+  while kill -0 "$pid" >/dev/null 2>&1; do
+    sleep 2
+    now="$(date +%s)"
+
+    # file size as proxy for output progress
+    if [[ -f "$log" ]]; then
+      size="$(wc -c < "$log" | tr -d ' ')"
     else
-      mv "$f" "$base"
-      ok "Renamed: $f -> $base"
+      size=0
+    fi
+
+    if [[ "$size" -gt "$last_size" ]]; then
+      last_size="$size"
+      last_out="$now"
+    fi
+
+    # heartbeat line every ~10s
+    if (( (now - start) % 10 == 0 )); then
+      say "⏳ build running... elapsed=$((now-start))s  last_output=$((now-last_out))s_ago"
+    fi
+
+    # stuck detector
+    if (( now - last_out > timeout_no_output )); then
+      warn "No build output for >${timeout_no_output}s — treating as stuck. Killing build PID=$pid"
+      kill -TERM "$pid" >/dev/null 2>&1 || true
+      sleep 3
+      kill -KILL "$pid" >/dev/null 2>&1 || true
+      return 124
+    fi
+
+    # hard ceiling
+    if (( now - start > max_total )); then
+      warn "Build exceeded hard ceiling (${max_total}s). Killing build PID=$pid"
+      kill -TERM "$pid" >/dev/null 2>&1 || true
+      sleep 3
+      kill -KILL "$pid" >/dev/null 2>&1 || true
+      return 124
     fi
   done
-fi
-shopt -u nullglob
 
-say "🧷 Ensuring StoryStatus includes \"review\"..."
-candidates="$(rg -n --hidden --glob '!**/node_modules/**' --glob '!**/.next/**' '(^|\\s)(export\\s+)?(type|enum)\\s+StoryStatus\\b' . || true)"
-if [[ -z "$candidates" ]]; then
-  warn "No StoryStatus definition found (skipping)"
-else
-  files="$(echo "$candidates" | cut -d: -f1 | sort -u)"
-  changed_any="false"
-  while IFS= read -r file; do
-    [[ -z "$file" ]] && continue
-    if rg -q --fixed-strings '"review"' "$file"; then
-      ok "StoryStatus already includes review: $file"
-      continue
-    fi
+  wait "$pid"
+}
 
-    if rg -q 'type\\s+StoryStatus\\s*=' "$file"; then
-      cp "$file" "$ARCHIVE_DIR/$(echo "$file" | tr '/' '__').bak"
-      perl -0777 -i -pe 's/(type\\s+StoryStatus\\s*=\\s*(?:.|\\n)*?)(;\\s*)/$1\\n  | "review"$2/sm' "$file" || true
-      changed_any="true"
-      ok "Patched StoryStatus union to include review: $file"
-      continue
-    fi
+# --- main ---
+kill_next_procs
+safe_clear_next
 
-    if rg -q 'enum\\s+StoryStatus' "$file"; then
-      cp "$file" "$ARCHIVE_DIR/$(echo "$file" | tr '/' '__').bak"
-      perl -0777 -i -pe 's/(enum\\s+StoryStatus\\s*\\{)/$1\\n  review = "review",/sm' "$file" || true
-      changed_any="true"
-      ok "Patched StoryStatus enum to include review: $file"
-      continue
-    fi
-
-    warn "Found StoryStatus definition but could not patch automatically: $file"
-  done <<< "$files"
-
-  [[ "$changed_any" == "true" ]] && ok "StoryStatus patching complete (backups in $ARCHIVE_DIR)" || ok "No StoryStatus patches needed"
+if [[ "$MODE" == "--clean-only" ]]; then
+  ok "Clean-only complete."
+  exit 0
 fi
 
-if [[ "$MODE_BUILD" == "true" ]]; then
-  say "🏗️  Running clean build..."
-  rm -rf .next >/dev/null 2>&1 || true
-  npm run build
-  ok "Build complete."
-else
-  say "ℹ️  Heal complete. To build: bash scripts/maintenance/heal-and-build.sh --build"
+# First attempt
+if heartbeat_build; then
+  ok "Build succeeded."
+  exit 0
 fi
+
+rc=$?
+warn "Build attempt 1 ended with code $rc. Retrying once after another cleanup..."
+kill_next_procs
+safe_clear_next
+
+if heartbeat_build; then
+  ok "Build succeeded on retry."
+  exit 0
+fi
+
+err "Build failed after retry. Check the latest log in .press-logs/next_build_*.log"
