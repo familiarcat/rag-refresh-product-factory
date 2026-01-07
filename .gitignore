@@ -109,3 +109,9 @@ dist/
 *.tgz
 *.tar.gz
 .DS_Store
+
+# AlexAI generated artifacts
+.press-logs/
+.trash/
+.next/
+*.zip
