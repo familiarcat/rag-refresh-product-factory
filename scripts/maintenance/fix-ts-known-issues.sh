@@ -8,146 +8,136 @@ say(){ printf "%b\n" "$*"; }
 ok(){ say "✅ $*"; }
 warn(){ say "⚠️  $*"; }
 err(){ say "❌ $*"; exit 1; }
-ts(){ date +"%Y%m%d_%H%M%S"; }
 
-command -v rg >/dev/null || err "ripgrep (rg) is required"
-command -v perl >/dev/null || err "perl is required"
+# --- timeout helper (macOS: coreutils provides gtimeout) ---
+TIMEOUT_BIN=""
+if command -v gtimeout >/dev/null 2>&1; then
+  TIMEOUT_BIN="gtimeout"
+elif command -v timeout >/dev/null 2>&1; then
+  TIMEOUT_BIN="timeout"
+fi
 
-BACKUP_DIR=".patch-backups/ts-fixes/$(ts)"
-mkdir -p "$BACKUP_DIR"
-
-# ------------------------------------------------------------
-# Fix A) Normalize duplicate middleware filename (space + 2)
-# ------------------------------------------------------------
-SRC_MW="lib/auth/middleware 2.ts"
-DST_MW="lib/auth/middleware.ts"
-
-say "🔧 Fixing auth middleware typing + file duplicates..."
-
-if [[ -f "$SRC_MW" ]]; then
-  mkdir -p "$BACKUP_DIR/lib_auth"
-  cp "$SRC_MW" "$BACKUP_DIR/lib_auth/middleware_2.ts.bak"
-  ok "Backed up: $SRC_MW -> $BACKUP_DIR/lib_auth/middleware_2.ts.bak"
-
-  if [[ -f "$DST_MW" ]]; then
-    # If both exist, keep middleware.ts and archive middleware 2.ts to backups.
-    warn "Both $SRC_MW and $DST_MW exist. Archiving $SRC_MW and keeping $DST_MW."
-    mv "$SRC_MW" "$BACKUP_DIR/lib_auth/middleware_2.ts.archived"
-    ok "Archived: $SRC_MW -> $BACKUP_DIR/lib_auth/middleware_2.ts.archived"
+with_timeout() {
+  local seconds="$1"; shift
+  if [[ -n "$TIMEOUT_BIN" ]]; then
+    "$TIMEOUT_BIN" "${seconds}" "$@"
   else
-    mv "$SRC_MW" "$DST_MW"
-    ok "Renamed: $SRC_MW -> $DST_MW"
+    "$@"
   fi
-fi
+}
 
-# Determine which middleware file we will patch
-MW_FILE=""
-if [[ -f "$DST_MW" ]]; then
-  MW_FILE="$DST_MW"
-elif [[ -f "$SRC_MW" ]]; then
-  MW_FILE="$SRC_MW"
-fi
+# --- Safe ripgrep wrapper ---
+rg_safe() {
+  rg --no-mmap --hidden --follow \
+    --glob '!.git/**' \
+    --glob '!node_modules/**' \
+    --glob '!**/node_modules/**' \
+    --glob '!.next/**' \
+    --glob '!.trash/**' \
+    --glob '!.press-logs/**' \
+    --glob '!.press-pids/**' \
+    --glob '!.alexai-secrets/**' \
+    --glob '!.secrets/**' \
+    --glob '!vscode-extension/node_modules/**' \
+    --glob '!**/*.map' \
+    "$@"
+}
 
-# ------------------------------------------------------------
-# Fix B) Make revoked_at check null-safe (apiKeyData?.revoked_at)
-# ------------------------------------------------------------
-if [[ -n "$MW_FILE" ]]; then
-  cp "$MW_FILE" "$BACKUP_DIR/lib_auth/$(basename "$MW_FILE").bak"
-  ok "Backed up: $MW_FILE -> $BACKUP_DIR/lib_auth/$(basename "$MW_FILE").bak"
+# --- Find Supabase types file ---
+TYPES_CANDIDATES=(
+  "types/supabase.ts"
+  "types/supabase.generated.ts"
+  "src/types/supabase.ts"
+  "app/types/supabase.ts"
+)
 
-  # Replace: if (apiKeyData.revoked_at) {
-  # With:    if (apiKeyData?.revoked_at) {
-  perl -i -pe 's/\bif\s*\(\s*apiKeyData\.revoked_at\s*\)\s*\{/if (apiKeyData?.revoked_at) {/g' "$MW_FILE"
-
-  if rg -q "apiKeyData\\?\\.revoked_at" "$MW_FILE"; then
-    ok "Patched revoked_at check to be null-safe in: $MW_FILE"
-  else
-    warn "Did not find exact pattern 'if (apiKeyData.revoked_at) {' in $MW_FILE (skipping this patch)."
+TYPES_FILE=""
+for c in "${TYPES_CANDIDATES[@]}"; do
+  if [[ -f "$c" ]]; then
+    TYPES_FILE="$c"
+    break
   fi
-else
-  warn "No middleware file found at lib/auth/middleware(.ts| 2.ts). Skipping middleware fixes."
-fi
+done
 
-# ------------------------------------------------------------
-# Fix C) Ensure Database types include api_keys table to avoid `never`
-# ------------------------------------------------------------
-TYPES_FILE="types/supabase.ts"
-if [[ ! -f "$TYPES_FILE" ]]; then
-  warn "Missing $TYPES_FILE; cannot add api_keys typing automatically."
-  warn "Create/restore types/supabase.ts first, then rerun."
+if [[ -z "$TYPES_FILE" ]]; then
+  warn "No Supabase types file found. Skipping api_keys typing injection."
   exit 0
 fi
 
-cp "$TYPES_FILE" "$BACKUP_DIR/$(echo "$TYPES_FILE" | tr '/' '__').bak"
-ok "Backed up: $TYPES_FILE -> $BACKUP_DIR/$(echo "$TYPES_FILE" | tr '/' '__').bak"
+ok "Using types file: $TYPES_FILE"
 
-# If api_keys already exists, we’re done.
-if rg -q '^\s*api_keys\s*:\s*\{' "$TYPES_FILE"; then
-  ok "types/supabase.ts already contains api_keys table."
-else
-  say "➕ Injecting minimal api_keys table into types/supabase.ts..."
+# --- backup ---
+BACKUP_DIR=".press-logs/ts-fix-backups/$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+cp -f "$TYPES_FILE" "$BACKUP_DIR/$(basename "$TYPES_FILE").bak"
+ok "Backup saved: $BACKUP_DIR/$(basename "$TYPES_FILE").bak"
 
-  # Minimal supabase-compatible table block
-  API_KEYS_BLOCK=$'api_keys: {\n'\
-$'        Row: {\n'\
-$'          id: string\n'\
-$'          created_at: string | null\n'\
-$'          revoked_at: string | null\n'\
-$'          key_hash: string\n'\
-$'          name: string | null\n'\
-$'          user_id: string | null\n'\
-$'          scopes: string[] | null\n'\
-$'          is_active: boolean | null\n'\
-$'        }\n'\
-$'        Insert: {\n'\
-$'          id?: string\n'\
-$'          created_at?: string | null\n'\
-$'          revoked_at?: string | null\n'\
-$'          key_hash: string\n'\
-$'          name?: string | null\n'\
-$'          user_id?: string | null\n'\
-$'          scopes?: string[] | null\n'\
-$'          is_active?: boolean | null\n'\
-$'        }\n'\
-$'        Update: {\n'\
-$'          id?: string\n'\
-$'          created_at?: string | null\n'\
-$'          revoked_at?: string | null\n'\
-$'          key_hash?: string\n'\
-$'          name?: string | null\n'\
-$'          user_id?: string | null\n'\
-$'          scopes?: string[] | null\n'\
-$'          is_active?: boolean | null\n'\
-$'        }\n'\
-$'        Relationships: []\n'\
-$'      },\n'
-
-  # Insert right after `Tables: {` opening.
-  # This is a safe heuristic for your stub style file.
-  perl -0777 -i -pe '
-    my $ins = $ENV{API_KEYS_BLOCK};
-    s/(Tables:\s*\{\s*\n)/$1      $ins/s
-  ' "$TYPES_FILE" 2>/dev/null || true
-
-  # Export env for perl injection
-  export API_KEYS_BLOCK="$API_KEYS_BLOCK"
-  perl -0777 -i -pe '
-    my $ins = $ENV{API_KEYS_BLOCK};
-    s/(Tables:\s*\{\s*\n)/$1      $ins/s
-  ' "$TYPES_FILE"
-
-  if rg -q '^\s*api_keys\s*:\s*\{' "$TYPES_FILE"; then
-    ok "Injected api_keys table typing into $TYPES_FILE"
-  else
-    warn "Failed to inject api_keys block (structure may differ)."
-    warn "Open $TYPES_FILE and add api_keys under Database.public.Tables manually."
-  fi
+# --- If already present, stop ---
+if rg_safe -q "api_keys:\s*\{" "$TYPES_FILE"; then
+  ok "api_keys typing already present (skipping)."
+  exit 0
 fi
 
-say ""
+# --- Write block to temp file (NO env var passing) ---
+TMP_BLOCK="$(mktemp)"
+trap 'rm -f "$TMP_BLOCK"' EXIT
+
+cat > "$TMP_BLOCK" <<'BLOCK'
+/**
+ * --- AlexAI patch: api_keys table typing ---
+ * Add/adjust fields to match your Supabase schema.
+ */
+api_keys: {
+  Row: {
+    id: string
+    user_id: string
+    api_key_hash: string
+    label: string | null
+    created_at: string
+    revoked_at: string | null
+  }
+  Insert: {
+    id?: string
+    user_id: string
+    api_key_hash: string
+    label?: string | null
+    created_at?: string
+    revoked_at?: string | null
+  }
+  Update: {
+    id?: string
+    user_id?: string
+    api_key_hash?: string
+    label?: string | null
+    created_at?: string
+    revoked_at?: string | null
+  }
+  Relationships: []
+}
+BLOCK
+
+say "🔧 Injecting api_keys typing into Database.public.Tables..."
+
+# Insert right after `Tables: {` inside the Database type definition
+BLOCK_FILE="$TMP_BLOCK" with_timeout 20 perl -0777 -i -pe '
+  my $block_file = $ENV{BLOCK_FILE};
+  open(my $fh, "<", $block_file) or die "Cannot open block file\n";
+  local $/ = undef;
+  my $ins = <$fh>;
+  close($fh);
+
+  # Insert inside the first occurrence of Tables: {
+  s/(Tables:\s*\{\s*\n)/$1$ins\n/;
+' "$TYPES_FILE" || err "Injection timed out or failed."
+
+# Verify injection
+if rg_safe -q "api_keys:\s*\{" "$TYPES_FILE"; then
+  ok "Injected api_keys typing into $TYPES_FILE"
+else
+  warn "Injection did not verify. Open $TYPES_FILE and add api_keys under Database.public.Tables manually."
+fi
+
 ok "Automation complete."
-say "Backups saved in: $BACKUP_DIR"
-say ""
 say "Next step:"
 say "  rm -rf .next || true"
 say "  npm run build"

@@ -1,23 +1,25 @@
-# Supabase Canonical Client Patch
+# Patch: Repo Hygiene + Proxy Zip + VSCode Extension Branch Sync (v2)
 
-This patch adds canonical Supabase client modules and maintenance scripts:
+## Install (zip overlay)
+1) Copy into repo root:
+   cp ~/Downloads/rag-refresh-product-factory_patch_repo_hygiene_v2.zip .
 
-- lib/supabase-server.ts
-- lib/supabase-browser.ts
-- scripts/maintenance/dedupe-lib-supabase.sh
-- scripts/maintenance/fix-imports-supabase.sh
-- scripts/maintenance/validate-supabase-imports.sh
+2) Apply with overlay:
+   npm run alexai:upgrade -- ./rag-refresh-product-factory_patch_repo_hygiene_v2.zip
 
-## Apply
+3) Append ignores and commit:
+   cat .gitignore.append.txt >> .gitignore
+   git add .gitignore && git commit -m "chore: repo hygiene ignores"
 
-1) Copy the zip into repo root (or use your Downloads-to-repo overlay flow)
-2) Apply patch overlay using your existing upgrade script:
-   bash scripts/maintenance/upgrade-and-verify.sh ./rag-refresh-product-factory_patch_supabase_heal.zip
+## Run prune → verify → build
+bash scripts/maintenance/prune-verify-build.sh
 
-## Run (in order)
+## Create a clean proxy zip (shareable, excludes node_modules/.next/.git/secrets)
+bash scripts/maintenance/make-clean-patch-zip.sh
+# Output: .press-logs/rag-refresh-product-factory_proxy_<timestamp>.zip
 
-npm run secrets:sync
-bash scripts/maintenance/dedupe-lib-supabase.sh
-bash scripts/maintenance/fix-imports-supabase.sh
-bash scripts/maintenance/validate-supabase-imports.sh
-npm run build
+## VSCode extension branch flow (keeps extension in its own branch, stays in sync)
+bash scripts/maintenance/vscode-extension-branch-sync.sh split
+bash scripts/maintenance/vscode-extension-branch-sync.sh push
+# later, merge back:
+bash scripts/maintenance/vscode-extension-branch-sync.sh pull

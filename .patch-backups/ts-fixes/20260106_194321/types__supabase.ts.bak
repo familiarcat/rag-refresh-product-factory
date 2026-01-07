@@ -1,0 +1,26 @@
+/**
+ * Minimal Supabase generated types placeholder.
+ *
+ * Replace with real generated types when your CLI is configured.
+ * This file exists to prevent Supabase generics collapsing to `never`.
+ */
+
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
+export interface Database {
+  public: {
+    Tables: {
+
+      [table: string]: {
+        Row: Record<string, any>;
+        Insert: Record<string, any>;
+        Update: Record<string, any>;
+        Relationships: any[];
+      };
+    };
+    Views: Record<string, any>;
+    Functions: Record<string, any>;
+    Enums: Record<string, any>;
+    CompositeTypes: Record<string, any>;
+  };
+}

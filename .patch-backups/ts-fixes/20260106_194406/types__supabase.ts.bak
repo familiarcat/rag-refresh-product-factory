@@ -12,38 +12,6 @@ export interface Database {
     Tables: {
 
 
-/**
- * --- AlexAI patch: api_keys table typing ---
- * Add/adjust fields to match your Supabase schema.
- */
-api_keys: {
-  Row: {
-    id: string
-    user_id: string
-    api_key_hash: string
-    label: string | null
-    created_at: string
-    revoked_at: string | null
-  }
-  Insert: {
-    id?: string
-    user_id: string
-    api_key_hash: string
-    label?: string | null
-    created_at?: string
-    revoked_at?: string | null
-  }
-  Update: {
-    id?: string
-    user_id?: string
-    api_key_hash?: string
-    label?: string | null
-    created_at?: string
-    revoked_at?: string | null
-  }
-  Relationships: []
-}
-
       sprint_planning_memories: {
         Row: {
           id: string
