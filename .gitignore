@@ -115,3 +115,12 @@ dist/
 .trash/
 .next/
 *.zip
+
+.press-logs/
+.press-zips/
+.press-pids/
+.trash/
+.alexai-secrets/
+.next/
+node_modules/
+**/node_modules/
