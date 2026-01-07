@@ -92,3 +92,20 @@ supabase/.temp/
 !.vscode/settings.json
 !.vscode/launch.json
 
+# --- AlexAI / RAG Refresh Product Factory hygiene ---
+.env
+.env.*
+!.env.example
+.secrets/
+.alexai-secrets/
+.next/
+.turbo/
+out/
+dist/
+.press-logs/
+.press-pids/
+.trash/
+*.zip
+*.tgz
+*.tar.gz
+.DS_Store
