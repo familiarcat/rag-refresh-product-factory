@@ -1,0 +1,1 @@
+Apply:\n\ncp ~/Downloads/rag-refresh-product-factory_patch_api_keys_route_missing_fields.zip .\nnpm run alexai:upgrade -- ./rag-refresh-product-factory_patch_api_keys_route_missing_fields.zip\n\nchmod +x scripts/maintenance/patch-api-keys-route-missing-fields.sh\nbash scripts/maintenance/patch-api-keys-route-missing-fields.sh\n\nnpm run build\n

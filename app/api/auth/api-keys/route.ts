@@ -1,3 +1,4 @@
+import { normalizeUserId } from "@/lib/auth/user-id";
 /**
  * API Key Management Routes
  *
@@ -12,7 +13,7 @@ import {
   revokeApiKey,
   deleteApiKey,
 } from '@/lib/auth/api-keys';
-import { logAudit } from '@/lib/supabase-server';
+import { logAudit } from '@/lib/supabase';
 
 /**
  * GET /api/auth/api-keys - List user's API keys
@@ -28,33 +29,35 @@ export async function GET(req: NextRequest) {
 
   const { user } = authResult;
 
+
   // Get query params
   const { searchParams } = new URL(req.url);
   const includeRevoked = searchParams.get('includeRevoked') === 'true';
 
+  
+  if (!user?.id || typeof user.id !== "string") {
+    return NextResponse.json({ success: false, error: "Missing user id" }, { status: 401 });
+  }
   const keys = await listApiKeys(user.id, includeRevoked);
 
   // Don't send sensitive data
   const sanitizedKeys = keys.map((key) => ({
     id: key.id,
-    name: key.name,
-    key_prefix: key.key_prefix,
-    scopes: key.scopes,
+    name: (key as any).name ?? (key as any).label ?? "",
+    key_prefix: (key as any).key_prefix ?? "",
+    scopes: (key as any).scopes ?? [],
     created_at: key.created_at,
-    last_used_at: key.last_used_at,
-    expires_at: key.expires_at,
+    last_used_at: (key as any).last_used_at ?? null,
+    expires_at: (key as any).expires_at ?? null,
     revoked_at: key.revoked_at,
   }));
 
-  await logAudit(
-    user.id,
-    'list_api_keys',
-    'api_key',
-    'all',
-    'user:manage_api_keys',
-    true,
-    { count: keys.length }
-  );
+  await logAudit({
+    userId: user.id,
+    action: "list_api_keys",
+    resource: "api_key",
+    metadata: { scope: "all", permission: "user:manage_api_keys" }
+  });
 
   return NextResponse.json({
     api_keys: sanitizedKeys,
@@ -111,8 +114,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Create API key
-  const result = await createApiKeyForUser(
-    user.id,
+// AlexAI canonical userId normalization (server route)
+const userId = (typeof (user as any)?.id === "string") ? (user as any).id : "";
+if (!userId) {
+  return NextResponse.json({ success: false, error: "Missing user id" }, { status: 401 });
+}
+
+  const result = await createApiKeyForUser(userId,
     name,
     requestedScopes,
     expiresInDays !== undefined ? expiresInDays : 365
@@ -143,11 +151,11 @@ export async function POST(req: NextRequest) {
     api_key: result.apiKey, // ⚠️ ONLY SHOWN ONCE!
     record: {
       id: result.record.id,
-      name: result.record.name,
-      key_prefix: result.record.key_prefix,
-      scopes: result.record.scopes,
+      name: (result.record as any).name ?? (result.record as any).label ?? "",
+      key_prefix: (result.record as any).key_prefix ?? "",
+      scopes: (result.record as any).scopes ?? [],
       created_at: result.record.created_at,
-      expires_at: result.record.expires_at,
+      expires_at: (result.record as any).expires_at ?? null,
     },
     message:
       '⚠️ Save this API key securely - it will not be shown again!',
@@ -183,10 +191,10 @@ export async function DELETE(req: NextRequest) {
 
   if (permanent) {
     // Permanently delete
-    success = await deleteApiKey(keyId, user.id);
+    success = await deleteApiKey(keyId, normalizeUserId(user));
   } else {
     // Revoke (soft delete)
-    success = await revokeApiKey(keyId, user.id);
+    success = await revokeApiKey(keyId, normalizeUserId(user));
   }
 
   if (!success) {

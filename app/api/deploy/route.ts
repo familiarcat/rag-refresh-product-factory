@@ -225,7 +225,3 @@ async function executeSSMCommand(
   }
 }
 
-
-
-
-

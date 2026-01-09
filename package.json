@@ -4,7 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean:build": "node -e \"require('fs').existsSync('.next') && require('fs').renameSync('.next', '.trash/.next_'+Date.now())\" || true",
+    "build": "npm run -s clean:build:webpack",
+    "build:ci": "NEXT_TELEMETRY_DISABLED=1 NEXT_DISABLE_TURBOPACK=1 npm run clean:build && npm run typecheck && next build",
+    "clean:build:webpack": "bash scripts/maintenance/clean-build-safe.sh webpack",
+    "clean:build:turbopack": "bash scripts/maintenance/clean-build-safe.sh turbopack",
     "start": "next start",
     "lint": "next lint",
     "check:env": "node scripts/check-env.mjs",

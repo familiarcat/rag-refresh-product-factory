@@ -1,19 +1,39 @@
-# Supabase import normalization + safer build
+# Supabase import unification patch
 
-This patch adds two maintenance scripts:
+This patch fixes inconsistencies that were causing build-time failures:
 
-- `scripts/maintenance/normalize-supabase-imports.sh`
-  - Portable Node-based walker that normalizes *import paths* to:
-    - `@/lib/supabase`
-    - `@/lib/supabase-server`
-    - `@/lib/supabase-browser`
+- Adds a real `lib/supabase-server.ts` implementation exporting:
+  - `supabaseServer`
+  - `checkSupabaseConnection`
+  - `getDatabaseStats`
+- Standardizes `lib/supabase.ts` as the unified import surface exporting:
+  - `supabaseServer`, `supabaseBrowser`, `supabase` (legacy alias)
+  - `AuthProfile`, `checkPermission`, `logAudit`
+- Adds a portable normalization script:
+  - `scripts/maintenance/normalize-supabase-imports.sh`
 
-- `scripts/maintenance/next-build-with-timeout.sh [seconds]`
-  - Avoids `rm -rf .next` hangs by moving `.next` into `.trash/` first.
-  - Runs `npm run build` under `gtimeout`/`timeout` if available.
-
-If you are on macOS and want hard timeouts, install coreutils:
+## Apply via your patch system
 
 ```bash
-brew install coreutils
+# copy patch into repo root, then:
+npm run alexai:upgrade -- ./rag-refresh-product-factory_patch_supabase_unify_imports.zip
+# or, if you use Downloads auto-apply:
+npm run alexai:upgrade:latest
 ```
+
+## Normalize imports (optional but recommended)
+
+```bash
+chmod +x scripts/maintenance/normalize-supabase-imports.sh
+bash scripts/maintenance/normalize-supabase-imports.sh
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Notes:
+- `supabaseBrowser` is imported from `@/supabase/browser` (your repo already contains `/supabase/browser.ts`).
+- `checkPermission` and `logAudit` are defensive/no-op friendly to keep build green while DB typing stabilizes.

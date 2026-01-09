@@ -8,7 +8,7 @@
  * 4. Build institutional knowledge across projects
  */
 
-import { supabase } from '@/lib/supabase-server';
+import { supabase } from '@/lib/supabase';
 import { CrewMember } from '@/types/sprint';
 
 /**
