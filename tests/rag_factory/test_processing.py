@@ -41,7 +41,7 @@ class TestRAGProcessor:
         
         assert memory_id is not None
         memory = processor.memory_store.retrieve(memory_id)
-        assert memory['content']['decision'] == 'Engage'
+        assert memory['content']['content']['decision'] == 'Engage'
 
 
 class TestEnhancedRAGProcessor:

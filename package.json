@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "bash scripts/worf/worf.sh dev && next dev",
-    "build": "npm run test && next build",
+    "build": "echo 'Build step 1: Syncing secrets...' && npm run script:secrets:sync && echo 'Build step 2: Running tests...' && npm run test && echo 'Build step 3: Running Next.js build...' && next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "pytest",
+    "test": "which poetry && poetry env info && poetry run pytest",
     "deploy": "bash scripts/deploy.sh",
     "milestone": "bash scripts/milestone/run_milestone.sh",
     "secrets:sync": "bash scripts/secrets/sync_from_zshrc.sh && cp .secrets/.env.local .env.local",
-    "script:secrets:sync": "npm run -s secrets:sync"
+    "script:secrets:sync": "npm run secrets:sync"
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.952.0",

@@ -13,9 +13,6 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!supabaseUrl || !supabaseKey) throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
 
-console.log(`Using Supabase URL: ${supabaseUrl}`);
-console.log(`Using Supabase Key (masked): ${supabaseKey.substring(0, 3)}...${supabaseKey.substring(supabaseKey.length - 4)}`);
-
 
 const absMd = path.join(process.cwd(), meta.path);
 const mdText = fs.readFileSync(absMd, "utf8");

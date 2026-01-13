@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase/server';
 import type {
   Story,
   Persona,
@@ -23,10 +23,7 @@ import type {
 } from '@/types/sprint';
 import { CREW_MEMBERS } from '@/types/sprint';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+
 
 interface RouteContext {
   params: Promise<{ id: string }>;
