@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/server';
+<<<<<<< HEAD
+=======
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+>>>>>>> d1624f7 (build working 011525)
+
 
 interface RouteContext {
   params: Promise<{ id: string }>;

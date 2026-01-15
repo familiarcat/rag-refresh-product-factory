@@ -9,18 +9,29 @@
     "skipLibCheck": true,
     "strict": false,
     "noEmit": true,
-    "incremental": true,
+    "incremental": false,
     "module": "esnext",
     "esModuleInterop": true,
+<<<<<<< HEAD
     "ignoreDeprecations": "6.0",
+=======
+    "ignoreDeprecations": "5.0",
+>>>>>>> d1624f7 (build working 011525)
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "target": "ES2017",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
     "plugins": [
       {
         "name": "next"
       }
+<<<<<<< HEAD
     ],
     "target": "ES2017",
     "baseUrl": ".",
@@ -29,13 +40,16 @@
         "./*"
       ]
     }
+=======
+    ]
+>>>>>>> d1624f7 (build working 011525)
   },
   "include": [
     "next-env.d.ts",
-    ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
