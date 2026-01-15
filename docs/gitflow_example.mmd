@@ -1,0 +1,190 @@
+---
+config:
+  theme: default
+id: 9ccad9f2-cb02-4afe-96af-b13fe9f095d8
+---
+graph TD
+    subgraph MergeFlow["MERGE WORKFLOW - Preserves History with Pull Requests"]
+        direction TB
+        
+        Title1["<b>MERGE WORKFLOW</b><br/>Preserves Complete History with Pull Requests"]
+        
+        Title1 --> Start1([Start: Main Branch])
+        
+        Dev1A[/Developer 1: Create feature-login branch/]
+        Dev2A[/Developer 2: Create feature-payment branch/]
+        Dev3A[/Developer 3: Create feature-dashboard branch/]
+        
+        Start1 --> Dev1A
+        Start1 --> Dev2A
+        Start1 --> Dev3A
+        
+        Commit1A[Commit changes to feature-login]
+        Commit2A[Commit changes to feature-payment]
+        Commit3A[Commit changes to feature-dashboard]
+        
+        Dev1A --> Commit1A
+        Dev2A --> Commit2A
+        Dev3A --> Commit3A
+        
+        Push1A[Push feature-login to remote]
+        Push2A[Push feature-payment to remote]
+        Push3A[Push feature-dashboard to remote]
+        
+        Commit1A --> Push1A
+        Commit2A --> Push2A
+        Commit3A --> Push3A
+        
+        PR1A{Create Pull Request<br/>feature-login → main}
+        PR2A{Create Pull Request<br/>feature-payment → main}
+        PR3A{Create Pull Request<br/>feature-dashboard → main}
+        
+        Push1A --> PR1A
+        Push2A --> PR2A
+        Push3A --> PR3A
+        
+        Review1A[[Code Review & Approval<br/>for feature-login]]
+        Review2A[[Code Review & Approval<br/>for feature-payment]]
+        Review3A[[Code Review & Approval<br/>for feature-dashboard]]
+        
+        PR1A --> Review1A
+        PR2A --> Review2A
+        PR3A --> Review3A
+        
+        Merge1A[Git merge feature-login into main<br/>Creates merge commit]
+        Merge2A[Git merge feature-payment into main<br/>Creates merge commit]
+        Merge3A[Git merge feature-dashboard into main<br/>Creates merge commit]
+        
+        Review1A --> Merge1A
+        Review2A --> Merge2A
+        Review3A --> Merge3A
+        
+        MainA([Main Branch: Complete history<br/>with all merge commits visible])
+        
+        Merge1A --> MainA
+        Merge2A --> MainA
+        Merge3A --> MainA
+        
+        style Start1 fill:#e8e8f0,stroke:#666,stroke-width:3px,color:#000
+        style Title1 fill:#2c3e50,stroke:#2c3e50,stroke-width:3px,color:#ffffff
+        style Dev1A fill:#b8e6b8,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Dev2A fill:#b8e6b8,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Dev3A fill:#b8e6b8,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Commit1A fill:#90c890,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Commit2A fill:#90c890,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Commit3A fill:#90c890,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Push1A fill:#d4d4e8,stroke:#666,stroke-width:2px,color:#000
+        style Push2A fill:#d4d4e8,stroke:#666,stroke-width:2px,color:#000
+        style Push3A fill:#d4d4e8,stroke:#666,stroke-width:2px,color:#000
+        style PR1A fill:#fff9b3,stroke:#b38600,stroke-width:3px,color:#000
+        style PR2A fill:#fff9b3,stroke:#b38600,stroke-width:3px,color:#000
+        style PR3A fill:#fff9b3,stroke:#b38600,stroke-width:3px,color:#000
+        style Review1A fill:#ffd9b3,stroke:#b35900,stroke-width:2px,color:#000
+        style Review2A fill:#ffd9b3,stroke:#b35900,stroke-width:2px,color:#000
+        style Review3A fill:#ffd9b3,stroke:#b35900,stroke-width:2px,color:#000
+        style Merge1A fill:#ff8533,stroke:#b35900,stroke-width:3px,color:#000
+        style Merge2A fill:#ff8533,stroke:#b35900,stroke-width:3px,color:#000
+        style Merge3A fill:#ff8533,stroke:#b35900,stroke-width:3px,color:#000
+        style MainA fill:#d4d4e8,stroke:#666,stroke-width:4px,color:#000
+    end
+    
+    MergeFlow ~~~ Spacer1[ ]
+    
+    subgraph RebaseFlow["REBASE WORKFLOW - Linear History with Pull Requests"]
+        direction TB
+        
+        Title2["<b>REBASE WORKFLOW</b><br/>Creates Clean Linear History with Pull Requests"]
+        
+        Title2 --> Start2([Start: Main Branch])
+        
+        Dev1B[/Developer 1: Create feature-login branch/]
+        Dev2B[/Developer 2: Create feature-payment branch/]
+        Dev3B[/Developer 3: Create feature-dashboard branch/]
+        
+        Start2 --> Dev1B
+        Start2 --> Dev2B
+        Start2 --> Dev3B
+        
+        Commit1B[Commit changes to feature-login]
+        Commit2B[Commit changes to feature-payment]
+        Commit3B[Commit changes to feature-dashboard]
+        
+        Dev1B --> Commit1B
+        Dev2B --> Commit2B
+        Dev3B --> Commit3B
+        
+        Rebase1B[Git rebase main onto feature-login<br/>before pushing]
+        Rebase2B[Git rebase main onto feature-payment<br/>before pushing]
+        Rebase3B[Git rebase main onto feature-dashboard<br/>before pushing]
+        
+        Commit1B --> Rebase1B
+        Commit2B --> Rebase2B
+        Commit3B --> Rebase3B
+        
+        Push1B[Push rebased feature-login to remote]
+        Push2B[Push rebased feature-payment to remote]
+        Push3B[Push rebased feature-dashboard to remote]
+        
+        Rebase1B --> Push1B
+        Rebase2B --> Push2B
+        Rebase3B --> Push3B
+        
+        PR1B{Create Pull Request<br/>feature-login → main}
+        PR2B{Create Pull Request<br/>feature-payment → main}
+        PR3B{Create Pull Request<br/>feature-dashboard → main}
+        
+        Push1B --> PR1B
+        Push2B --> PR2B
+        Push3B --> PR3B
+        
+        Review1B[[Code Review & Approval<br/>for feature-login]]
+        Review2B[[Code Review & Approval<br/>for feature-payment]]
+        Review3B[[Code Review & Approval<br/>for feature-dashboard]]
+        
+        PR1B --> Review1B
+        PR2B --> Review2B
+        PR3B --> Review3B
+        
+        Merge1B[Git merge --ff-only feature-login<br/>Fast-forward merge]
+        Merge2B[Git merge --ff-only feature-payment<br/>Fast-forward merge]
+        Merge3B[Git merge --ff-only feature-dashboard<br/>Fast-forward merge]
+        
+        Review1B --> Merge1B
+        Review2B --> Merge2B
+        Review3B --> Merge3B
+        
+        MainB([Main Branch: Clean linear history<br/>no merge commits])
+        
+        Merge1B --> MainB
+        Merge2B --> MainB
+        Merge3B --> MainB
+        
+        style Start2 fill:#e8e8f0,stroke:#666,stroke-width:3px,color:#000
+        style Title2 fill:#2c3e50,stroke:#2c3e50,stroke-width:3px,color:#ffffff
+        style Dev1B fill:#b8e6b8,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Dev2B fill:#b8e6b8,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Dev3B fill:#b8e6b8,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Commit1B fill:#90c890,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Commit2B fill:#90c890,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Commit3B fill:#90c890,stroke:#2d6b2d,stroke-width:2px,color:#000
+        style Rebase1B fill:#6699ff,stroke:#003d99,stroke-width:3px,color:#000
+        style Rebase2B fill:#6699ff,stroke:#003d99,stroke-width:3px,color:#000
+        style Rebase3B fill:#6699ff,stroke:#003d99,stroke-width:3px,color:#000
+        style Push1B fill:#9bb3ff,stroke:#003d99,stroke-width:2px,color:#000
+        style Push2B fill:#9bb3ff,stroke:#003d99,stroke-width:2px,color:#000
+        style Push3B fill:#9bb3ff,stroke:#003d99,stroke-width:2px,color:#000
+        style PR1B fill:#fff9b3,stroke:#b38600,stroke-width:3px,color:#000
+        style PR2B fill:#fff9b3,stroke:#b38600,stroke-width:3px,color:#000
+        style PR3B fill:#fff9b3,stroke:#b38600,stroke-width:3px,color:#000
+        style Review1B fill:#ffd9b3,stroke:#b35900,stroke-width:2px,color:#000
+        style Review2B fill:#ffd9b3,stroke:#b35900,stroke-width:2px,color:#000
+        style Review3B fill:#ffd9b3,stroke:#b35900,stroke-width:2px,color:#000
+        style Merge1B fill:#3377ff,stroke:#003d99,stroke-width:3px,color:#fff
+        style Merge2B fill:#3377ff,stroke:#003d99,stroke-width:3px,color:#fff
+        style Merge3B fill:#3377ff,stroke:#003d99,stroke-width:3px,color:#fff
+        style MainB fill:#d4d4e8,stroke:#666,stroke-width:4px,color:#000
+    end
+    
+    style Spacer1 fill:none,stroke:none
+    style MergeFlow fill:#fffef8,stroke:#333,stroke-width:3px
+    style RebaseFlow fill:#f0f6ff,stroke:#333,stroke-width:3px
