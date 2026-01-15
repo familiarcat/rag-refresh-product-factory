@@ -1,0 +1,154 @@
+// lib/supabase.ts
+/**
+ * Unified Supabase surface for the app.
+ *
+ * Preferred:
+ *  - Server (App Routes / server utilities): import { supabaseServer } from "@/lib/supabase"
+ *  - Browser (client components):           import { supabaseBrowser } from "@/lib/supabase"
+ *
+ * Legacy compatibility (avoid in new code):
+ *  - import { supabase } from "@/lib/supabase"  (aliases server client)
+ */
+
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/supabase";
+
+import { supabaseServer } from "@/supabase/server";
+import { supabaseBrowser } from "@/supabase/browser";
+
+// ---- Canonical exports ----
+
+// Legacy alias: many older files used `supabase`
+export const supabase: SupabaseClient<Database> = supabaseServer;
+
+// Minimal AuthProfile shape used by middleware/routes.
+// Extend as needed without breaking callers.
+export type AuthProfile = {
+  user_id: string;
+  email?: string | null;
+  role?: string | null;
+  is_active?: boolean | null;
+  [key: string]: unknown;
+};
+
+// ---- Auth helper exports expected by older code ----
+// Defensive/no-op friendly to keep build green while DB typing stabilizes.
+
+export async function checkPermission(args: {
+  userId: string;
+  permission?: string;
+  projectId?: string | null;
+}): Promise<boolean> {
+  try {
+    const { data, error } = await (supabaseServer as any).rpc("check_permission", {
+      p_user_id: args.userId,
+      p_permission: args.permission,
+      p_project_id: args.projectId ?? null,
+    });
+    if (error) return false;
+    if (typeof data === "boolean") return data;
+    if (data && typeof (data as any).allowed === "boolean") return (data as any).allowed;
+    return !!data;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check if Supabase is configured and accessible
+ */
+export async function checkSupabaseConnection(): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('auth_profiles').select('id').limit(1);
+    return !error;
+  } catch (error) {
+    console.error('[Supabase] Connection check failed:', error);
+    return false;
+  }
+}
+/**
+ * logAudit supports BOTH:
+ *  1) New form: logAudit({ userId, action, resource?, metadata? })
+ *  2) Legacy positional form: logAudit(userId, action, resource?, scope?, permission?, ...extra)
+ *
+ * Prefer the object form in new code.
+ */
+export type LogAuditEvent = {
+  userId: string;
+  action: string;
+  resource?: string | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+/**
+ * logAudit supports BOTH:
+ *  1) New form: logAudit({ userId, action, resource?, metadata? })
+ *  2) Legacy positional form: logAudit(userId, action, resource?, scope?, permission?, ...extra)
+ *
+ * Prefer the object form in new code.
+ */
+export async function logAudit(event: LogAuditEvent): Promise<void>;
+export async function logAudit(
+  userId: unknown,
+  action: unknown,
+  resource?: unknown,
+  scopeOrMeta?: unknown,
+  permissionMaybe?: unknown,
+  ...extra: unknown[]
+): Promise<void>;
+export async function logAudit(
+  a: unknown,
+  b?: unknown,
+  c?: unknown,
+  d?: unknown,
+  e?: unknown,
+  ...extra: unknown[]
+): Promise<void> {
+  // Normalize to object form
+  let event: LogAuditEvent;
+
+  if (typeof a === "object" && a !== null && b === undefined) {
+    const obj = a as any;
+    event = {
+      userId: String(obj.userId ?? obj.user_id ?? ""),
+      action: String(obj.action ?? ""),
+      resource: obj.resource ?? null,
+      metadata: obj.metadata ?? null,
+    };
+  } else {
+    const meta =
+      d && typeof d === "object"
+        ? (d as any)
+        : {
+            scope: d === undefined ? null : String(d),
+            permission: e === undefined ? null : String(e),
+            extra,
+          };
+
+    event = {
+      userId: String(a ?? ""),
+      action: String(b ?? ""),
+      resource: c === undefined ? null : String(c),
+      metadata: meta,
+    };
+  }
+
+  try {
+    await (supabaseServer as any)
+      .from("audit_logs")
+      .insert({
+        user_id: event.userId,
+        action: event.action,
+        resource: event.resource ?? null,
+        metadata: event.metadata ?? null,
+      });
+  } catch {
+    // no-op in build/dev if table doesn't exist yet
+  }
+}
+
+// AlexAI: typed re-exports
+export type ApiKey = import("@/types/supabase").Database["public"]["Tables"]["api_keys"]["Row"];
+export type ApiKeyInsert = import("@/types/supabase").Database["public"]["Tables"]["api_keys"]["Insert"];
+export type ApiKeyUpdate = import("@/types/supabase").Database["public"]["Tables"]["api_keys"]["Update"];
+

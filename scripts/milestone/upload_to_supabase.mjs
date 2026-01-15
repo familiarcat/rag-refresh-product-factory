@@ -1,5 +1,9 @@
+import dotenv from "dotenv";
+import path from "node:path";
 import fs from "fs";
-import path from "path";
+
+dotenv.config({ path: path.resolve(process.cwd(), ".secrets/.env.local") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") }); // optional fallback
 
 const metaPath = process.argv[2];
 if (!metaPath) throw new Error("Pass /tmp/milestone_meta.json");
@@ -8,6 +12,7 @@ const meta = JSON.parse(fs.readFileSync(metaPath, "utf8"));
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!supabaseUrl || !supabaseKey) throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+
 
 const absMd = path.join(process.cwd(), meta.path);
 const mdText = fs.readFileSync(absMd, "utf8");

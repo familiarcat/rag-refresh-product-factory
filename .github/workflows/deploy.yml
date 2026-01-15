@@ -41,6 +41,10 @@ env:
   AWS_REGION: us-east-2
   ECR_REPO: rag-refresh-product-factory
   EC2_INSTANCE_ID: i-006cd2a8477f36489
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+  SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
 
 jobs:
   build-and-deploy:

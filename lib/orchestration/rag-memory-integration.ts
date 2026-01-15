@@ -42,22 +42,43 @@ export interface SprintPlanningMemory {
 }
 
 /**
+ * Minimal row shapes to avoid `never` typing issues until supabase types are fully generated.
+ * These are intentionally lightweight and compile-safe.
+ */
+type CrewActionRow = {
+  crew_member?: string | null;
+  action_type?: string | null;
+  description?: string | null;
+  outcome?: string | null;
+  context?: Record<string, any> | null;
+  created_at?: string | null;
+  success_score?: number | null;
+};
+
+type SprintPlanningMemoryInsert = {
+  sprint_id: string;
+  project_id: string;
+  project_name: string;
+  goals: string[];
+  crew_assignments: Record<string, string[]>;
+  velocity_target: number;
+  picard_analysis: string;
+  riker_organization: string;
+  quark_optimization: string;
+};
+
+/**
  * Query RAG for crew member expertise relevant to project goals
  */
 export async function queryCrewExpertise(
   goals: string[],
   limit: number = 10
 ): Promise<CrewMemory[]> {
-  // Using global supabase client
-
   try {
-    // Combine goals into search query
     const searchQuery = goals.join(' ');
 
-    // Query crew_actions table for relevant memories
-    // This requires the RAG system to have logged crew actions
     const { data, error } = await supabase
-      .from('crew_actions')
+      .from(('crew_actions' as any))
       .select('*')
       .textSearch('description', searchQuery)
       .order('created_at', { ascending: false })
@@ -68,20 +89,20 @@ export async function queryCrewExpertise(
       return [];
     }
 
-    // Transform to CrewMemory format
-    const memories: CrewMemory[] = (data || []).map((action: any) => ({
-      crewMember: action.crew_member as CrewMember,
+    const rows = (data || []) as CrewActionRow[];
+
+    const memories: CrewMemory[] = rows.map((action) => ({
+      crewMember: (action.crew_member || 'unknown') as CrewMember,
       actionType: action.action_type || 'unknown',
       description: action.description || '',
       outcome: action.outcome || '',
       context: action.context || {},
-      timestamp: action.created_at,
-      successScore: action.success_score || 50
+      timestamp: action.created_at || new Date().toISOString(),
+      successScore: action.success_score ?? 50,
     }));
 
     console.log(`📚 Retrieved ${memories.length} crew memories from RAG`);
     return memories;
-
   } catch (error) {
     console.error('Error querying crew expertise:', error);
     return [];
@@ -95,15 +116,14 @@ export async function querySimilarSprints(
   projectGoals: string[],
   limit: number = 5
 ): Promise<SprintPlanningMemory[]> {
-  // Using global supabase client
-
   try {
     const searchQuery = projectGoals.join(' ');
 
-    // Query sprint_planning_memories table
     const { data, error } = await supabase
-      .from('sprint_planning_memories')
+      .from(('sprint_planning_memories' as any))
       .select('*')
+      // NOTE: textSearch on arrays may not behave as intended depending on schema;
+      // leaving as-is for now.
       .textSearch('goals', searchQuery)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -115,7 +135,6 @@ export async function querySimilarSprints(
 
     console.log(`📊 Retrieved ${data?.length || 0} similar sprint planning examples`);
     return (data || []) as SprintPlanningMemory[];
-
   } catch (error) {
     console.error('Error querying similar sprints:', error);
     return [];
@@ -129,30 +148,26 @@ export async function getCrewSuccessRate(
   crewMember: CrewMember,
   expertiseArea: string
 ): Promise<number> {
-  // Using global supabase client
-
   try {
-    // Query crew actions filtered by crew member and expertise
     const { data, error } = await supabase
-      .from('crew_actions')
+      .from(('crew_actions' as any))
       .select('success_score')
       .eq('crew_member', crewMember)
       .textSearch('description', expertiseArea)
       .order('created_at', { ascending: false })
-      .limit(20); // Last 20 actions
+      .limit(20);
 
-    if (error || !data || data.length === 0) {
-      return 50; // Default score
-    }
+    if (error || !data || (data as any[]).length === 0) return 50;
 
-    // Calculate average success score
-    const avgScore = data.reduce((sum, action) => sum + (action.success_score || 50), 0) / data.length;
+    const rows = data as Array<{ success_score?: number | null }>;
+
+    const avgScore =
+      rows.reduce((sum, a) => sum + (a.success_score ?? 50), 0) / rows.length;
 
     return avgScore;
-
   } catch (error) {
     console.error('Error getting crew success rate:', error);
-    return 50; // Default score
+    return 50;
   }
 }
 
@@ -170,10 +185,9 @@ export async function storeSprint0Memory(
   rikerOrganization: string,
   quarkOptimization: string
 ): Promise<boolean> {
-  // Using global supabase client
-
   try {
-    const memory: Omit<SprintPlanningMemory, 'timestamp'> = {
+    // Kept for caller logic / future use (even though DB uses snake_case)
+    const _memory: Omit<SprintPlanningMemory, 'timestamp'> = {
       sprintId,
       projectId,
       projectName,
@@ -182,23 +196,24 @@ export async function storeSprint0Memory(
       velocityTarget,
       picardAnalysis,
       rikerOrganization,
-      quarkOptimization
+      quarkOptimization,
     };
 
-    // Store in sprint_planning_memories table
+    const insertPayload: SprintPlanningMemoryInsert = {
+      sprint_id: sprintId,
+      project_id: projectId,
+      project_name: projectName,
+      goals,
+      crew_assignments: crewAssignments,
+      velocity_target: velocityTarget,
+      picard_analysis: picardAnalysis,
+      riker_organization: rikerOrganization,
+      quark_optimization: quarkOptimization,
+    };
+
     const { error } = await supabase
-      .from('sprint_planning_memories')
-      .insert({
-        sprint_id: sprintId,
-        project_id: projectId,
-        project_name: projectName,
-        goals: goals,
-        crew_assignments: crewAssignments,
-        velocity_target: velocityTarget,
-        picard_analysis: picardAnalysis,
-        riker_organization: rikerOrganization,
-        quark_optimization: quarkOptimization
-      });
+      .from(('sprint_planning_memories' as any))
+      .insert((insertPayload as any));
 
     if (error) {
       console.error('Error storing sprint planning memory:', error);
@@ -207,7 +222,6 @@ export async function storeSprint0Memory(
 
     console.log(`💾 Stored Sprint 0 planning memory for ${projectName}`);
     return true;
-
   } catch (error) {
     console.error('Error storing sprint planning memory:', error);
     return false;
@@ -227,44 +241,38 @@ export async function enhanceCrewAssignments(
   const insights: string[] = [];
 
   try {
-    // Query crew expertise for each goal area
     const crewMemories = await queryCrewExpertise(goals, 20);
 
-    // Group memories by crew member
     const crewPerformance: Record<string, { count: number; avgScore: number }> = {};
 
-    crewMemories.forEach(memory => {
-      if (!crewPerformance[memory.crewMember]) {
-        crewPerformance[memory.crewMember] = { count: 0, avgScore: 0 };
-      }
-      crewPerformance[memory.crewMember].count++;
-      crewPerformance[memory.crewMember].avgScore += memory.successScore;
+    crewMemories.forEach((memory) => {
+      const key = memory.crewMember;
+      if (!crewPerformance[key]) crewPerformance[key] = { count: 0, avgScore: 0 };
+      crewPerformance[key].count++;
+      crewPerformance[key].avgScore += memory.successScore;
     });
 
-    // Calculate average scores
-    Object.keys(crewPerformance).forEach(crew => {
+    Object.keys(crewPerformance).forEach((crew) => {
       const perf = crewPerformance[crew];
       perf.avgScore = perf.avgScore / perf.count;
 
       if (perf.avgScore > 80) {
-        insights.push(`${crew} has exceptional performance (${perf.avgScore.toFixed(1)}%) in similar tasks`);
+        insights.push(
+          `${crew} has exceptional performance (${perf.avgScore.toFixed(1)}%) in similar tasks`
+        );
       } else if (perf.avgScore < 40) {
-        insights.push(`${crew} may need support for this type of work (${perf.avgScore.toFixed(1)}% success rate)`);
+        insights.push(
+          `${crew} may need support for this type of work (${perf.avgScore.toFixed(1)}% success rate)`
+        );
       }
     });
 
-    // For now, return initial assignments
-    // Future enhancement: Adjust assignments based on performance data
-    return {
-      enhancedAssignments: initialAssignments,
-      insights
-    };
-
+    return { enhancedAssignments: initialAssignments, insights };
   } catch (error) {
     console.error('Error enhancing crew assignments:', error);
     return {
       enhancedAssignments: initialAssignments,
-      insights: ['Unable to retrieve crew performance data']
+      insights: ['Unable to retrieve crew performance data'],
     };
   }
 }
@@ -279,44 +287,38 @@ export async function getRecommendedCrewForNewProject(
   reasoning: string;
 }> {
   try {
-    // Query similar sprint planning memories
     const similarSprints = await querySimilarSprints(projectGoals, 5);
 
     if (similarSprints.length === 0) {
       return {
         recommendedCrew: [],
-        reasoning: 'No similar projects found in memory. Using default crew analysis.'
+        reasoning: 'No similar projects found in memory. Using default crew analysis.',
       };
     }
 
-    // Count crew member appearances across similar sprints
     const crewCounts: Record<string, number> = {};
 
-    similarSprints.forEach(sprint => {
-      Object.keys(sprint.crewAssignments).forEach(crew => {
+    similarSprints.forEach((sprint) => {
+      Object.keys(sprint.crewAssignments || {}).forEach((crew) => {
         crewCounts[crew] = (crewCounts[crew] || 0) + 1;
       });
     });
 
-    // Sort by frequency
     const recommendedCrew = Object.entries(crewCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
-      .map(([crew, _]) => crew as CrewMember);
+      .map(([crew]) => crew as CrewMember);
 
-    const reasoning = `Based on ${similarSprints.length} similar projects, ` +
+    const reasoning =
+      `Based on ${similarSprints.length} similar projects, ` +
       `the following crew members were most frequently assigned: ${recommendedCrew.join(', ')}`;
 
-    return {
-      recommendedCrew,
-      reasoning
-    };
-
+    return { recommendedCrew, reasoning };
   } catch (error) {
     console.error('Error getting recommended crew:', error);
     return {
       recommendedCrew: [],
-      reasoning: 'Error retrieving crew recommendations from memory.'
+      reasoning: 'Error retrieving crew recommendations from memory.',
     };
   }
 }

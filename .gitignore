@@ -2,6 +2,12 @@
 .DS_Store
 .idea/
 
+.press-logs/
+.trash/
+.next/
+node_modules/
+
+
 # Python
 __pycache__/
 *.py[cod]
@@ -75,3 +81,46 @@ milestones/*.md
 # --- Misc ---
 coverage/
 supabase/.temp/
+# --- AlexAI build trash / caches ---
+.trash/
+.tmp/
+*.pid
+
+# VSCode: ignore workspace noise but keep sharable config
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# --- AlexAI / RAG Refresh Product Factory hygiene ---
+.env
+.env.*
+!.env.example
+.secrets/
+.alexai-secrets/
+.next/
+.turbo/
+out/
+dist/
+.press-logs/
+.press-pids/
+.trash/
+*.zip
+*.tgz
+*.tar.gz
+.DS_Store
+
+# AlexAI generated artifacts
+.press-logs/
+.trash/
+.next/
+*.zip
+
+.press-logs/
+.press-zips/
+.press-pids/
+.trash/
+.alexai-secrets/
+.next/
+node_modules/
+**/node_modules/

@@ -37,7 +37,6 @@ export async function POST(req: Request) {
   // const answer = await call_generative_model(prompt);
   const answer = "This is a placeholder answer from the new Gemini-powered RAG pipeline.";
 
-
   const trace = {
     retrieval: searchResults.map((r: any) => ({ id: r.id, source: r.source, score: r.score })),
     docs_loaded: searchResults.length,

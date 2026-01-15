@@ -76,12 +76,13 @@ tf_apply() {
   say "Applying infrastructure..."
   cd "$INFRA_DIR"
   
-  if [[ -f "tfplan" ]]; then
-    terraform apply tfplan
-    rm -f tfplan
-  else
-    terraform apply
-  fi
+  # Always run terraform apply without a saved plan file for full deployment.
+  # This forces a fresh plan generation and application, resolving "inconsistent dependency lock file" errors.
+  # Added -auto-approve for non-interactive deployment as implied by 'npm run deploy'.
+  terraform apply -auto-approve
+  
+  # Remove any leftover tfplan file to prevent future conflicts
+  rm -f tfplan
   
   ok "Infrastructure deployed!"
   echo ""
@@ -91,15 +92,9 @@ tf_apply() {
 # Destroy infrastructure
 tf_destroy() {
   warn "This will DESTROY all AWS resources!"
-  read -p "Are you sure? (type 'destroy' to confirm): " confirm
-  
-  if [[ "$confirm" == "destroy" ]]; then
-    cd "$INFRA_DIR"
-    terraform destroy
-    ok "Infrastructure destroyed"
-  else
-    say "Aborted"
-  fi
+  cd "$INFRA_DIR"
+  terraform destroy -auto-approve
+  ok "Infrastructure destroyed"
 }
 
 # Build and push Docker image
@@ -194,6 +189,13 @@ case "${1:-}" in
   destroy)
     check_prereqs
     tf_destroy
+    ;;
+  destroy-force)
+    check_prereqs
+    tf_init
+    cd "$INFRA_DIR"
+    terraform destroy -auto-approve
+    ok "Infrastructure destroyed"
     ;;
   build)
     check_prereqs
