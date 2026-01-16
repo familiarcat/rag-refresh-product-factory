@@ -10,7 +10,7 @@ import {
   getStoryStatusColor,
   getPriorityColor,
   getStoryTypeIcon,
-} from "../lib/sprints";
+} from "../types/sprint";
 
 interface SprintBoardProps {
   projectId: string;
