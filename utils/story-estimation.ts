@@ -6,23 +6,23 @@
  * - Quark: Cost analysis and ROI optimization
  */
 
-import type { CrewMember, StoryType } from '@/types/sprint';
+import type { CrewMember, StoryType } from "@/types/sprint";
 
 /**
  * Crew member hourly rates in Gold-Pressed Latinum (GPL)
  * Based on crew member expertise and specialty
  */
 export const CREW_HOURLY_RATES: Record<CrewMember, number> = {
-  picard: 150,    // Strategic leadership
-  riker: 125,     // Execution coordination
-  data: 175,      // AI/ML expertise (highest rate)
-  la_forge: 140,  // Infrastructure/DevOps
-  troi: 110,      // UX/UI design
-  worf: 120,      // Security/Testing
-  crusher: 130,   // Performance optimization
-  uhura: 115,     // API/Integration
-  quark: 100,     // Business analysis (lowest overhead)
-  obrien: 105     // Implementation/Maintenance
+  picard: 150, // Strategic leadership
+  riker: 125, // Execution coordination
+  data: 175, // AI/ML expertise (highest rate)
+  la_forge: 140, // Infrastructure/DevOps
+  troi: 110, // UX/UI design
+  worf: 120, // Security/Testing
+  crusher: 130, // Performance optimization
+  uhura: 115, // API/Integration
+  quark: 100, // Business analysis (lowest overhead)
+  obrien: 105, // Implementation/Maintenance
 };
 
 /**
@@ -36,7 +36,7 @@ export const CREW_HOURLY_RATES: Record<CrewMember, number> = {
 export function estimateHoursFromPoints(
   storyPoints: number,
   storyType: StoryType,
-  assignedCrew?: CrewMember
+  assignedCrew?: CrewMember,
 ): number {
   if (!storyPoints || storyPoints === 0) return 0;
 
@@ -45,10 +45,15 @@ export function estimateHoursFromPoints(
 
   // Type-based complexity multipliers (Data's analysis)
   const typeMultipliers: Record<StoryType, number> = {
-    'user_story': 1.0,        // Standard complexity
-    'developer_story': 1.2,   // More technical, +20%
-    'technical_task': 0.8,    // More straightforward, -20%
-    'bug_fix': 0.6            // Usually faster, -40%
+    user_story: 1.0, // Standard complexity
+    developer_story: 1.2, // More technical, +20%
+    technical_task: 0.8, // More straightforward, -20%
+    bug_fix: 0.6, // Usually faster, -40%
+    feature: 1.0, // Standard feature
+    bug: 0.6, // Alias for bug_fix
+    tech_debt: 1.1, // Refactoring can be complex
+    spike: 1.0, // Research/Investigation
+    documentation: 0.5, // Writing docs
   };
 
   baseHours *= typeMultipliers[storyType];
@@ -56,13 +61,13 @@ export function estimateHoursFromPoints(
   // Crew efficiency factors (some crew work faster in their specialty)
   if (assignedCrew) {
     const crewEfficiency: Partial<Record<CrewMember, number>> = {
-      data: 0.85,      // AI-enhanced efficiency (-15%)
-      la_forge: 0.9,   // Engineering optimization (-10%)
-      obrien: 1.0,     // Baseline
-      quark: 1.1       // Business analysis takes slightly longer (+10%)
+      data: 0.85, // AI-enhanced efficiency (-15%)
+      la_forge: 0.9, // Engineering optimization (-10%)
+      obrien: 1.0, // Baseline
+      quark: 1.1, // Business analysis takes slightly longer (+10%)
     };
 
-    baseHours *= (crewEfficiency[assignedCrew] || 1.0);
+    baseHours *= crewEfficiency[assignedCrew] || 1.0;
   }
 
   // Round to nearest 0.5 hour
@@ -75,7 +80,7 @@ export function estimateHoursFromPoints(
  */
 export function estimateCost(
   estimatedHours: number,
-  assignedCrew?: CrewMember
+  assignedCrew?: CrewMember,
 ): number {
   if (!estimatedHours || estimatedHours === 0) return 0;
   if (!assignedCrew) return estimatedHours * 100; // Average rate if no crew assigned
@@ -89,9 +94,9 @@ export function estimateCost(
  * Quark's formula: Higher priority + lower cost = better ROI
  */
 export function calculateROI(
-  priority: number,      // 1-5 (1 = highest priority)
+  priority: number, // 1-5 (1 = highest priority)
   storyPoints: number,
-  cost: number
+  cost: number,
 ): number {
   if (cost === 0 || storyPoints === 0) return 0;
 
@@ -113,7 +118,7 @@ export function getEstimationRecommendation(
   storyPoints: number,
   storyType: StoryType,
   priority: number,
-  assignedCrew?: CrewMember
+  assignedCrew?: CrewMember,
 ): {
   estimatedHours: number;
   estimatedCost: number;
@@ -121,24 +126,32 @@ export function getEstimationRecommendation(
   recommendation: string;
   estimatedBy: string;
 } {
-  const estimatedHours = estimateHoursFromPoints(storyPoints, storyType, assignedCrew);
+  const estimatedHours = estimateHoursFromPoints(
+    storyPoints,
+    storyType,
+    assignedCrew,
+  );
   const estimatedCost = estimateCost(estimatedHours, assignedCrew);
   const roiScore = calculateROI(priority, storyPoints, estimatedCost);
 
   // Generate recommendation based on ROI
-  let recommendation = '';
-  let estimatedBy = 'Commander Data & Quark';
+  let recommendation = "";
+  let estimatedBy = "Commander Data & Quark";
 
   if (roiScore >= 80) {
-    recommendation = 'Excellent ROI - High priority, efficient implementation. Recommend immediate scheduling.';
+    recommendation =
+      "Excellent ROI - High priority, efficient implementation. Recommend immediate scheduling.";
   } else if (roiScore >= 60) {
-    recommendation = 'Good ROI - Balanced value delivery. Proceed as planned.';
+    recommendation = "Good ROI - Balanced value delivery. Proceed as planned.";
   } else if (roiScore >= 40) {
-    recommendation = 'Moderate ROI - Consider optimization opportunities or priority adjustment.';
+    recommendation =
+      "Moderate ROI - Consider optimization opportunities or priority adjustment.";
   } else if (roiScore >= 20) {
-    recommendation = 'Low ROI - High cost or low priority. Review scope or defer if possible.';
+    recommendation =
+      "Low ROI - High cost or low priority. Review scope or defer if possible.";
   } else {
-    recommendation = 'Poor ROI - Recommend scope reduction, priority increase, or alternative approach.';
+    recommendation =
+      "Poor ROI - Recommend scope reduction, priority increase, or alternative approach.";
   }
 
   return {
@@ -146,7 +159,7 @@ export function getEstimationRecommendation(
     estimatedCost,
     roiScore,
     recommendation,
-    estimatedBy
+    estimatedBy,
   };
 }
 

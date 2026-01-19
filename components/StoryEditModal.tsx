@@ -12,8 +12,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import type { Story, StoryWithDetails, CrewMember, StoryType, StoryStatus } from '@/types/sprint';
-import { CREW_MEMBERS } from '@/types/sprint';
+import type { Story, StoryWithDetails, CrewMember, StoryType, StoryStatus, EstimationResult } from '@/types/sprint';
+import { CREW_MEMBERS, getPriorityValue, calculateStoryROI } from '@/types/sprint';
 import { getEstimationRecommendation, calculateDurationDays } from '@/utils/story-estimation';
 import styles from './StoryEditModal.module.css';
 
@@ -40,7 +40,7 @@ export default function StoryEditModal({
     story_type: story.story_type,
     status: story.status,
     story_points: story.story_points || 0,
-    priority: story.priority,
+    priority: getPriorityValue(story.priority),
     assigned_crew_member: story.assigned_crew_member || '',
     start_date: story.start_date || '',
     estimated_completion: story.estimated_completion || '',
@@ -59,7 +59,7 @@ export default function StoryEditModal({
         story_type: story.story_type,
         status: story.status,
         story_points: story.story_points || 0,
-        priority: story.priority,
+        priority: getPriorityValue(story.priority),
         assigned_crew_member: story.assigned_crew_member || '',
         start_date: story.start_date || '',
         estimated_completion: story.estimated_completion || '',
@@ -108,7 +108,7 @@ export default function StoryEditModal({
           field === 'story_type' ? value : updated.story_type,
           updated.priority,
           field === 'assigned_crew_member' ? (value || undefined) : (updated.assigned_crew_member || undefined) as CrewMember
-        );
+        ) as EstimationResult;
 
         updated.estimated_hours = estimation.estimatedHours;
         updated.cost_estimate = estimation.estimatedCost;
@@ -251,7 +251,7 @@ export default function StoryEditModal({
                     <select
                       className={styles.select}
                       value={formData.priority}
-                      onChange={(e) => handleChange('priority', parseInt(e.target.value))}
+                      onChange={(e) => handleChange('priority', getPriorityValue(e.target.value))}
                     >
                       <option value="1">1 - Critical</option>
                       <option value="2">2 - High</option>

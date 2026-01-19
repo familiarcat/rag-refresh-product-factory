@@ -291,7 +291,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -382,7 +383,8 @@
   color: var(--accent1);
 }
 
-.storyCard.status-completed {
+.storyCard.status-completed,
+.storyCard.status-done {
   background: rgba(40, 217, 154, 0.15);
   border-color: var(--ok);
   color: var(--ok);
@@ -484,7 +486,9 @@
   border-radius: 4px;
 }
 
-.loading, .error, .empty {
+.loading,
+.error,
+.empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -505,19 +509,24 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.errorContent, .emptyContent {
+.errorContent,
+.emptyContent {
   text-align: center;
 }
 
-.errorIcon, .emptyIcon {
+.errorIcon,
+.emptyIcon {
   font-size: 48px;
   margin-bottom: 16px;
 }
 
-.errorTitle, .emptyTitle {
+.errorTitle,
+.emptyTitle {
   font-size: 18px;
   font-weight: bold;
   color: var(--text);

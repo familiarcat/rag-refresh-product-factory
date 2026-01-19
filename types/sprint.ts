@@ -9,16 +9,11 @@
 // Enums
 // ============================================================================
 
-//   getStoryStatusColor,
-//   getPriorityColor,
-//   getStoryTypeIcon,
-
-export type SprintMetrics =
-  | "idealBurndown"
-  | "averageVelocity"
-  | "idealBurndown"
-  | "actualBurndown"
-  | "averageVelocity";
+export interface SprintMetrics {
+  idealBurndown: number[];
+  actualBurndown: number[];
+  averageVelocity: number;
+}
 
 export type SprintStatus =
   | "planning" // Sprint being planned
@@ -32,13 +27,21 @@ export type StoryStatus =
   | "in_progress" // Being worked on
   | "in_review" // In code review
   | "completed" // Completed
-  | "blocked"; // Blocked by dependency
+  | "blocked" // Blocked by dependency
+  | "todo"
+  | "review"
+  | "done";
 
 export type StoryType =
   | "user_story" // As a [persona], I want [goal]
   | "developer_story" // As a [developer persona], I need [technical goal]
   | "technical_task" // Technical task
-  | "bug_fix"; // Bug fix
+  | "bug_fix" // Bug fix
+  | "feature"
+  | "bug"
+  | "tech_debt"
+  | "spike"
+  | "documentation";
 
 export type PersonaType =
   | "user" // End user persona
@@ -47,7 +50,8 @@ export type PersonaType =
 export type TaskStatus =
   | "todo" // Not started
   | "in_progress" // Being worked on
-  | "done"; // Completed
+  | "done" // Completed
+  | "completed"; // Alias for done
 
 // ============================================================================
 // Core Entities
@@ -70,6 +74,14 @@ export interface Sprint {
   velocity_actual: number; // Actual completed story points
   created_at?: string; // ISO timestamp
   updated_at?: string; // ISO timestamp
+  // Frontend compatibility fields
+  committedPoints?: number;
+  completedPoints?: number;
+  budgetedCost?: number;
+  projectedROI?: number;
+  dailyProgress?: number[];
+  stories?: Story[];
+  duration?: number;
 }
 
 /**
@@ -103,13 +115,20 @@ export interface Story {
   persona_id?: string; // Which persona this is for
   assigned_crew_member?: string; // 'picard', 'data', 'troi', etc.
   story_points?: number; // Fibonacci: 1, 2, 3, 5, 8, 13, 21
-  priority: number; // 1 (highest) to 5 (lowest)
+  priority: number | string; // 1 (highest) to 5 (lowest) or "high", "medium"
   start_date?: string; // ISO date: when work begins
   estimated_completion?: string; // ISO date: estimated completion date
   estimated_hours?: number; // Estimated hours for Riker's timeline
   related_goals?: string[]; // Sprint goals this story addresses
   created_at?: string;
   updated_at?: string;
+  // Frontend compatibility fields
+  type?: StoryType;
+  storyPoints?: number;
+  assignedCrew?: any[];
+  estimatedCost?: number;
+  progress?: number;
+  tasks?: Task[];
 }
 
 /**
@@ -410,4 +429,96 @@ export const CREW_MEMBERS: Record<CrewMember, CrewMemberInfo> = {
     role: "Chief Engineer",
     specialty: "Implementation & Maintenance",
   },
+};
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+export const getStoryStatusColor = (status: StoryStatus): string => {
+  switch (status) {
+    case "done":
+    case "completed":
+      return "#10b981"; // green
+    case "in_progress":
+    case "active" as StoryStatus: // Explicitly cast "active" to StoryStatus
+      return "#3b82f6"; // blue
+    case "review":
+    case "in_review":
+      return "#f59e0b"; // yellow/orange
+    case "blocked":
+      return "#ef4444"; // red
+    case "todo":
+    case "planned":
+      return "#6366f1"; // indigo
+    case "backlog":
+    default:
+      return "#6b7280"; // gray
+  }
+};
+
+export const getPriorityColor = (priority: string | number): string => {
+  const p = String(priority).toLowerCase();
+  if (p === "critical" || p === "1") return "#ef4444";
+  if (p === "high" || p === "2") return "#f97316";
+  if (p === "medium" || p === "3") return "#eab308";
+  return "#94a3b8"; // low/gray
+};
+
+export const getStoryTypeIcon = (type: string): string => {
+  switch (type) {
+    case "feature":
+      return "✨";
+    case "bug":
+      return "🐛";
+    case "tech_debt":
+      return "🔧";
+    case "spike":
+      return "🔬";
+    case "documentation":
+      return "📚";
+    default:
+      return "📋";
+  }
+};
+
+export const getPriorityValue = (priority: string | number): number => {
+  if (typeof priority === "number") return priority;
+  const p = String(priority).toLowerCase();
+  if (p === "critical" || p === "1") return 1;
+  if (p === "high" || p === "2") return 2;
+  if (p === "medium" || p === "3") return 3;
+  if (p === "low" || p === "4") return 4;
+  return 5; // lowest/default
+};
+
+/**
+ * Result from story estimation utilities
+ */
+export interface EstimationResult {
+  estimatedHours: number;
+  estimatedCost: number;
+  recommendation: string;
+  roiScore: number;
+}
+
+/**
+ * Calculate ROI score for a story safely handling string/number priorities
+ * Formula: (Inverse Priority / Points) * 100
+ */
+export const calculateStoryROI = (
+  priority: string | number,
+  points: number = 1,
+): number => {
+  const priorityVal = getPriorityValue(priority);
+  const safePoints = points || 1; // Avoid division by zero
+  return ((6 - priorityVal) / safePoints) * 100;
+};
+
+export const isHighPriority = (priority: string | number): boolean => {
+  if (!priority) {
+    return false;
+  }
+  const p = String(priority).toLowerCase();
+  return p === "critical" || p === "1" || p === "high" || p === "2";
 };

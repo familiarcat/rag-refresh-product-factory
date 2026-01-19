@@ -12,7 +12,7 @@
 import React, { useState } from 'react';
 import type { StoryWithDetails } from '@/types/sprint';
 import { estimateCost, CREW_HOURLY_RATES } from '@/utils/story-estimation';
-import { CREW_MEMBERS } from '@/types/sprint';
+import { CREW_MEMBERS, isHighPriority } from '@/types/sprint';
 import styles from './StoryDurationBar.module.css';
 
 export interface StoryDurationBarProps {
@@ -259,7 +259,7 @@ export default function StoryDurationBar({
         )}
 
         {/* Priority Star */}
-        {story.priority && story.priority <= 2 && (
+        {isHighPriority(story.priority) && (
           <div className={styles.priorityStar}>
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" />

@@ -16,6 +16,7 @@ import { analyzePicardTask } from './picard-analyzer';
 import { optimizeQuarkROI } from './quark-optimizer';
 import { TaskComplexity, LLMTier } from './types';
 import { CREW_MEMBERS, CrewMember, Story, Sprint, StoryType } from '@/types/sprint';
+import { calculateStoryROI } from '@/types/sprint';
 
 /**
  * Project analysis from Picard
@@ -249,7 +250,7 @@ export function optimizeQuarkPriorities(
     const priority = story.priority || 5;
 
     // Higher priority + lower points = better ROI (quick wins)
-    const roi = (6 - priority) / points * 100;
+    const roi = calculateStoryROI(priority, points);
 
     return {
       storyId: story.id || `temp_${index}`,

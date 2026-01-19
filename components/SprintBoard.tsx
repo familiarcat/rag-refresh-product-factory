@@ -10,6 +10,7 @@ import {
   getStoryStatusColor,
   getPriorityColor,
   getStoryTypeIcon,
+  getPriorityValue,
 } from "../types/sprint";
 
 interface SprintBoardProps {
@@ -401,7 +402,7 @@ export function SprintBoard({ projectId, theme }: SprintBoardProps) {
                   fontSize: 13,
                 }}
               >
-                {activeSprint.goal || "No sprint goal set"}
+                {activeSprint.goals || "No sprint goal set"}
               </p>
             )}
           </div>
@@ -1635,8 +1636,8 @@ function NewStoryModal({
                   description,
                   storyPoints: storyPoints as Story["storyPoints"],
                   type,
-                  priority,
-                  estimatedHours: storyPoints * 4,
+                  priority: getPriorityValue(priority),
+                  estimated_hours: storyPoints * 4,
                 })
               }
               style={{
@@ -1983,5 +1984,3 @@ function StatBox({
     </div>
   );
 }
-
-

@@ -14,7 +14,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import type { Sprint, Story, StoryWithDetails, CrewMember } from '@/types/sprint';
-import { CREW_MEMBERS } from '@/types/sprint';
+import { CREW_MEMBERS, isHighPriority } from '@/types/sprint';
 import styles from './HorizontalSprintTimeline.module.css';
 import StoryEditModal from './StoryEditModal';
 import StoryDurationBar from './StoryDurationBar';
@@ -246,6 +246,7 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
 
     switch (story.status) {
       case 'completed':
+      case 'done':
         return Math.floor(sprintDays * 0.3);
       case 'in_review':
         return Math.floor(sprintDays * 0.7);
@@ -445,7 +446,7 @@ function SingleSprintView({ sprint, onStoryClick, onCrewClick }: SingleSprintVie
   const dayWidth = 120; // Width of each day column in pixels
 
   const totalStories = sprint.stories?.length || 0;
-  const completedStories = sprint.stories?.filter(s => s.status === 'completed').length || 0;
+  const completedStories = sprint.stories?.filter(s => s.status === 'completed' || s.status === 'done').length || 0;
   const completionPercentage = totalStories > 0 ? Math.round((completedStories / totalStories) * 100) : 0;
 
   return (
@@ -717,7 +718,7 @@ function StoryTimelineCard({
         <div className={styles.storyPoints}>{story.story_points}</div>
       )}
 
-      {story.priority && story.priority <= 2 && (
+      {isHighPriority(story.priority) && (
         <div className={styles.priorityStar}>
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" />
